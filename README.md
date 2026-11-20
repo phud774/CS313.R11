@@ -66,7 +66,7 @@
 | TV3 `[ĐIỀN tên]` | Masking, encoder/decoder, loss L_f |
 | TV4 `[ĐIỀN tên]` | Module discrepancy, chọn cạnh thích ứng, L_d · **Thuyết trình phần 2** |
 | TV5 `[ĐIỀN tên]` | Thực nghiệm phân loại node · **Thuyết trình phần 3** |
-| TV6 `[ĐIỀN tên]` | Thực nghiệm phân cụm + phân loại đồ thị |
+| TV6 `DATKINGKHUNG` | Thực nghiệm phân cụm + phân loại đồ thị |
 | TV7 `[ĐIỀN tên]` | Ablation, độ nhạy, trực quan hóa, template slide |
 
 **Lời thoại:** Lướt nhanh, nói rõ ai trả lời câu hỏi phần nào ở cuối.
