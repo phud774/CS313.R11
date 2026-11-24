@@ -19,6 +19,10 @@ def parse_args():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--protocol", choices=("paper", "upstream"), help="Full-run protocol")
     parser.add_argument("--roman-split", choices=("public", "paper-ratio"))
+    parser.add_argument(
+        "--discrepancy-neighborhood", choices=("one-hop", "one-hop-two-hop"),
+        help="Paper protocol only. Defaults to one-hop.",
+    )
     parser.add_argument("--dataset", nargs="+", choices=DATASETS, default=list(DATASETS))
     parser.add_argument("--variant", nargs="+", choices=VARIANTS, default=list(VARIANTS))
     parser.add_argument("--seeds", nargs="+", type=int, choices=range(10), metavar="0–9")
@@ -31,6 +35,8 @@ def parse_args():
         parser.error("choose --roman-split explicitly for full paper runs on Roman")
     if args.protocol == "upstream" and args.roman_split == "paper-ratio":
         parser.error("upstream runs use Roman's public masks")
+    if args.protocol == "upstream" and args.discrepancy_neighborhood is not None:
+        parser.error("--discrepancy-neighborhood requires the paper protocol")
     args.protocol = args.protocol or "paper"
     args.roman_split = args.roman_split or "public"
     args.seeds = list(dict.fromkeys(args.seeds or ([0] if args.smoke else list(range(10)))))
@@ -61,6 +67,7 @@ def configuration(args, dataset, graph, classes):
     load_best_configs(config, args.upstream / "configs.yml")
     if args.protocol == "paper":
         vars(config).update(PAPER_SETTINGS[dataset], alpha_l=3, replace_rate=0)
+        config.discrepancy_neighborhood = args.discrepancy_neighborhood or "one-hop"
     if args.smoke:
         config.max_epoch = 1
         config.max_epoch_f = 2
@@ -110,6 +117,8 @@ def main():
     }
     experiment_commit = git_revision(Path(__file__).resolve().parent)
     output = args.output / args.protocol / ("smoke" if args.smoke else "full")
+    if args.discrepancy_neighborhood == "one-hop-two-hop":
+        output /= args.discrepancy_neighborhood
     print(json.dumps({"experiment_commit": experiment_commit, "upstream_commit": revision, **environment}), flush=True)
 
     for dataset in args.dataset:

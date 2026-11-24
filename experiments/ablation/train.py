@@ -8,13 +8,11 @@ from graphmae.models.loss_func import sce_loss
 from graphmae.utils import create_optimizer
 
 
-def sparse_neighbors(row, col, values, features):
-    nodes = features.shape[0]
-    adjacency = torch.sparse_coo_tensor(torch.stack((row, col)), values, (nodes, nodes)).coalesce()
-    return torch.sparse.mm(adjacency, features)
+def sparse_adjacency(row, col, values, nodes):
+    return torch.sparse_coo_tensor(torch.stack((row, col)), values, (nodes, nodes)).coalesce()
 
 
-def paper_target(features, edges, inv_degree, selected=None):
+def paper_targets(features, edges, inv_degree, selected=None, *, include_two_hop=False):
     # Rows are the GAT receivers. Self-loops belong to the backbone only.
     src, dst = edges
     keep = src != dst
@@ -22,11 +20,17 @@ def paper_target(features, edges, inv_degree, selected=None):
         keep &= selected
     src, dst = src[keep], dst[keep]
     weights = inv_degree[dst] * inv_degree[src]
-    neighbors = sparse_neighbors(dst, src, weights, features)
+    adjacency = sparse_adjacency(dst, src, weights, features.shape[0])
+    neighbors = torch.sparse.mm(adjacency, features)
     if selected is None:
-        return features - neighbors  # Eq. 5
-    degree = weights.new_zeros(features.shape[0]).index_add_(0, dst, weights)
-    return degree[:, None] * features - neighbors  # Eq. 9
+        diagonal = 1  # Eq. 5
+    else:
+        diagonal = weights.new_zeros(features.shape[0]).index_add_(0, dst, weights)[:, None]  # Eq. 9
+    one_hop = diagonal * features - neighbors
+    two_hop = None
+    if include_two_hop:
+        two_hop = diagonal * one_hop - torch.sparse.mm(adjacency, one_hop)
+    return one_hop, two_hop
 
 
 def upstream_target(features, edges, hops):
@@ -34,9 +38,10 @@ def upstream_target(features, edges, hops):
     degree = torch.bincount(row, minlength=features.shape[0]).to(features.dtype)
     inv = degree.clamp_min(1).rsqrt() * (degree > 0)
     weights = inv[row] * inv[col]
+    adjacency = sparse_adjacency(row, col, weights, features.shape[0])
     target = features
     for _ in range(hops):
-        target = target - sparse_neighbors(row, col, weights, target)
+        target = target - torch.sparse.mm(adjacency, target)
     return target
 
 
@@ -74,11 +79,12 @@ def pretrain(config, graph, variant, protocol):
     edges = torch.stack(graph.edges(order="eid"))
     inv_degree = (graph.in_degrees() - 1).clamp_min(1).to(features.dtype).rsqrt()
     paper = protocol == "paper"
+    include_two_hop = paper and config.discrepancy_neighborhood == "one-hop-two-hop"
     if use_discrepancy and not use_selection:
-        fixed_target = (
-            paper_target(features, edges, inv_degree)
+        fixed_targets = (
+            paper_targets(features, edges, inv_degree, include_two_hop=include_two_hop)
             if paper
-            else upstream_target(features, edges, config.hop)
+            else (upstream_target(features, edges, config.hop), None)
         )
 
     model.train()
@@ -102,18 +108,26 @@ def pretrain(config, graph, variant, protocol):
         if use_discrepancy:
             if paper:
                 unmasked, _ = model.encoder(graph, features)
-            target = fixed_target if not use_selection else None
-            if use_selection:
+            if not use_selection:
+                target, two_hop_target = fixed_targets
+            else:
                 weights = attention.detach().mean(dim=1).reshape(-1)
                 if paper:
                     probability = ((1 - weights) * config.pc).clamp(0, config.pt)
-                    target = paper_target(features, edges, inv_degree, torch.bernoulli(probability).bool())
+                    selected = torch.bernoulli(probability).bool()
+                    target, two_hop_target = paper_targets(
+                        features, edges, inv_degree, selected, include_two_hop=include_two_hop,
+                    )
                 else:
                     weights = 1 - weights.sigmoid()
                     probability = (weights / weights.mean() * config.pc).clamp_max(config.pt)
                     target = upstream_target(features, edges[:, torch.bernoulli(probability).bool()], config.hop)
-            discrepancy = model.mlp(unmasked) - reconstruction
-            discrepancy_loss = sce_loss(discrepancy[~mask], target[~mask], config.gamma2)
+                    two_hop_target = None
+            discrepancy = (model.mlp(unmasked) - reconstruction)[~mask]
+            discrepancy_loss = sce_loss(discrepancy, target[~mask], config.gamma2)
+            if two_hop_target is not None:
+                two_hop_loss = sce_loss(discrepancy, two_hop_target[~mask], config.gamma2)
+                discrepancy_loss = (discrepancy_loss + two_hop_loss) / 2
 
         # Keep the original coefficient for each retained term of Eq. 13.
         loss = 0
