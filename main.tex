@@ -12,8 +12,8 @@
 
 % ── Hỗ trợ tiếng Việt đầy đủ với XeLaTeX & fontspec ──
 \usepackage{fontspec}
-\setsansfont{DejaVu Sans}
-\setmonofont{DejaVu Sans Mono}
+\IfFontExistsTF{DejaVu Sans}{\setsansfont{DejaVu Sans}}{\setsansfont{Arial}}
+\IfFontExistsTF{DejaVu Sans Mono}{\setmonofont{DejaVu Sans Mono}}{\setmonofont{Consolas}}
 
 % ── Toán & ký hiệu ──
 \usepackage{amsmath,amssymb}

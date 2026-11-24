@@ -1,46 +1,255 @@
-% ══════════════════════════════════════════════════════
-% PHẦN 2 — Phương pháp chính & Implement
-% Người thuyết trình: B (TV4 — Trịnh Duy Hưng)
-% Thời lượng: ~7.5 phút · Slides 11–17 (theo README)
-% ══════════════════════════════════════════════════════
+% PHẦN 2 — Phương pháp DGMAE
+% Nguồn: Zheng et al., KDD 2025, arXiv:2506.19343v2, §4.
+% Mỗi frame tập trung vào một bước của phương pháp.
 
 \section{Phương pháp DGMAE}
 
-% ── Slide: Ý tưởng chính ─────────────────────────────
-\begin{frame}{Ý tưởng chính của DGMAE}
-  % TODO: Nội dung
-  % - GMAE: "khôi phục sự nhất quán"
-  % - DGMAE: "bảo toàn sự khác biệt"
+% 1. Định nghĩa mục tiêu
+\begin{frame}{Sai khác gốc giữa nút và láng giềng}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \centering
+      \textcolor{Theme_Color}{\textbf{Dạng từng nút}}\\[1.2em]
+      $\displaystyle x_i^D = x_i -
+      \sum_{j\in\mathcal N(i)}\frac{x_j}{\sqrt{d_i d_j}}$\\[1.5em]
+      {\small $x_i$: đặc trưng nút $i$;\\[0.4em]
+      $\mathcal N(i)$: láng giềng của $i$;\\[0.4em]
+      $d_i$: bậc của nút $i$.}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering
+      \textcolor{Theme_Color}{\textbf{Dạng ma trận}}\\[1.2em]
+      $\displaystyle X^D=L_{\mathrm{sym}}X$\\[0.6em]
+      $\displaystyle L_{\mathrm{sym}}=I-D^{-1/2}AD^{-1/2}$\\[1.1em]
+      {\small $X$: ma trận đặc trưng;\quad $A$: ma trận kề;\\[0.4em]
+      $D$: ma trận bậc;\quad $I$: ma trận đơn vị;\\[0.4em]
+      $L_{\mathrm{sym}}$: Laplacian chuẩn hóa.}
+    \end{column}
+  \end{columns}
+  \vfill
+  \centering
+  \textbf{Đây là sai khác gốc; mục tiêu $\mathcal L_d$ sẽ được điều chỉnh sau khi chọn cạnh.}
+  \vspace{0.5em}
+
+  {\tiny Zheng et al., KDD 2025, Eq. (4)–(5)}
 \end{frame}
 
-% ── Slide: Mục tiêu discrepancy gốc ──────────────────
-\begin{frame}{Mục tiêu discrepancy gốc}
-  % TODO: Eq. 4, 5 — Discrepancy qua Laplacian chuẩn hóa
+% 2. Chọn cạnh bằng attention
+\begin{frame}{Attention thấp làm cạnh dễ được chọn}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.52\textwidth}
+      \vspace{0.5em}
+      $w_{ij}$: attention của cạnh $(i,j)$ từ GAT encoder.\\[1.0em]
+      {\Large
+      $\displaystyle p_{ij}=
+      \min\!\bigl((1-w_{ij})p_c,\,p_\tau\bigr)$
+      }\\[0.9em]
+      $m_{ij}\sim\mathrm{Bernoulli}(p_{ij})$\\[1.0em]
+      \small $p_{ij}$: xác suất chọn cạnh;\quad $m_{ij}=1$: cạnh được chọn.\\[0.35em]
+      $p_c$: mức lấy mẫu;\quad $p_\tau$: giới hạn xác suất.\\[0.35em]
+      % Bernoulli: phép lấy mẫu nhị phân.
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \centering
+      \begin{tikzpicture}[scale=1.02,
+        every node/.style={font=\small},
+        point/.style={circle,draw=Theme_Color,fill=Theme_Color!12,minimum size=8mm}]
+        \node[point] (i) at (0,0) {$i$};
+        \node[point] (a) at (2.2,1.2) {$j_1$};
+        \node[point] (b) at (2.2,-1.2) {$j_2$};
+        \draw[very thick,Theme_Color] (i) -- node[above,sloped,font=\scriptsize] {$w$ cao} (a);
+        \draw[very thick,orange!90!black,dashed] (i) -- node[below,sloped,font=\scriptsize] {$w$ thấp} (b);
+      \end{tikzpicture}\\[0.7em]
+      \small\textcolor{orange!90!black}{\textbf{Cạnh nét đứt:}} có $p_{ij}$ cao hơn.
+    \end{column}
+  \end{columns}
+  \vfill
+  \centering
+  {\tiny Zheng et al., KDD 2025, Eq. (6)–(8)}
 \end{frame}
 
-% ── Slide: Chọn discrepancy thích ứng ─────────────────
-\begin{frame}{Chọn discrepancy thích ứng}
-  % TODO: Eq. 6–9 — Adaptive Discrepancy Selection
+% 3. Mục tiêu sau chọn cạnh
+\begin{frame}{Đích sai khác chỉ dùng cạnh được chọn}
+  \centering
+  \vspace{0.8em}
+  {\Large
+  $\displaystyle x_i^D=
+  \sum_{j\in\mathcal N(i)}
+  \frac{m_{ij}}{\sqrt{d_i d_j}}(x_i-x_j)$
+  }
+  \vspace{1.2em}
+
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \centering
+      \textcolor{Theme_Color}{\Large $m_{ij}=0$}\\[0.45em]
+      Cạnh không đóng góp vào đích $x_i^D$.
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering
+      \textcolor{orange!90!black}{\Large $m_{ij}=1$}\\[0.45em]
+      Giữ chênh lệch $x_i-x_j$ của cặp nút.
+    \end{column}
+  \end{columns}
+  \vfill
+  \textbf{$x_i^D$ tổng hợp chênh lệch đặc trưng giữa nút $i$ và các láng giềng được chọn.}
+  \vspace{0.5em}
+
+  {\tiny Zheng et al., KDD 2025, Eq. (9)}
 \end{frame}
 
-% ── Slide: Projector & Contextual Discrepancy ─────────
-\begin{frame}{Projector, Contextual Discrepancy \& $L_d$}
-  % TODO: Eq. 10–12
+% 4. Giới thiệu hai nhánh
+\begin{frame}{Hai nhánh huấn luyện DGMAE}
+  \centering
+  % \vspace{0.3em}
+  % Cùng ma trận kề $A$ và cùng encoder $f_E$;
+  % hai nhánh khác nhau ở đặc trưng đầu vào.
+  \vspace{1.2em}
+
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \centering
+      \textcolor{Theme_Color}{\Large Nhánh đồ thị bị che}\\[0.8em]
+      $\hat X\xrightarrow{f_E}\hat H\xrightarrow{f_D}\hat Z$\\[1.0em]
+      \textbf{$\mathcal L_f$:} khôi phục đặc trưng\\
+      trên các nút bị che $\hat V$.
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \centering
+      \textcolor{orange!90!black}{\Large Nhánh đồ thị không che}\\[0.8em]
+      $X\xrightarrow{f_E}H\xrightarrow{\mathrm{MLP}}Z$\\[1.0em]
+      \textbf{$\mathcal L_d$:} giữ sai khác\\
+      trên các nút không bị che $V\setminus\hat V$.
+    \end{column}
+  \end{columns}
+  \vspace{1.4em}
+
+  {\large $z_i^D=z_i-\hat z_i$}\\[0.5em]
+  \textbf{$\mathcal L_d$ cần cả $Z$ và $\hat Z$; hai nhánh được huấn luyện chung.}
+  \vfill
+  {\tiny Zheng et al., KDD 2025, §4.2–4.4}
 \end{frame}
 
-% ── Slide: Loss tổng & thuật toán ─────────────────────
-\begin{frame}{Loss tổng \& thuật toán huấn luyện}
-  % TODO: L = L_f + λ·L_d, pseudocode
+% 5. Nhánh đồ thị bị che và loss tái tạo
+\begin{frame}{Nhánh đồ thị bị che: tái tạo đặc trưng}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.47\textwidth}
+      \centering
+      \textcolor{Theme_Color}{\bfseries Đồ thị bị che}\\[1.0em]
+      $\displaystyle \hat x_i=0\quad(i\in\hat V)$\\[1.1em]
+      $\hat X\xrightarrow{f_E}\hat H\xrightarrow{f_D}\hat Z$\\[1.1em]
+      {Decoder $f_D$ dùng ngữ cảnh láng giềng
+      để tái tạo đặc trưng của nút bị che.}\\[1.0em]
+      {\small $x_i$ gốc được giữ làm mục tiêu,
+      không đưa vào lượt xử lý này.}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \centering
+      \textcolor{Theme_Color}{\bfseries Loss tái tạo $\mathcal L_f$}\\[1.0em]
+      {\small $\displaystyle
+        % Eq. (3) prints z_i, but Eq. (2), the prose, and author code
+        % compare decoder output \hat z_i with original x_i.
+        \mathcal L_f=
+        \frac{1}{|\hat V|}
+        \sum_{i\in\hat V}
+        \bigl(1-\cos(\hat z_i,x_i)\bigr)^{\gamma_1}
+      $}\\[1.1em]
+      \textbf{So sánh $\hat z_i$ với $x_i$}\\
+      trên \textbf{nút bị che}.\\[1.0em]
+      {\small $\cos$: độ tương đồng cosine;\\[0.4em]
+      $\gamma_1>1$: số mũ điều chỉnh loss.}
+    \end{column}
+  \end{columns}
+  \vfill
+  \centering
+  {\tiny Zheng et al., KDD 2025, Eq. (1)–(3)}
+\end{frame}
+
+% 6. Nhánh đồ thị đầy đủ và loss sai khác
+\begin{frame}{Nhánh đồ thị không che: giữ sai khác}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.47\textwidth}
+      \centering
+      \textcolor{orange!90!black}{\bfseries Đồ thị không che}\\[1.0em]
+      $X\xrightarrow{f_E}H\xrightarrow{\mathrm{MLP}}Z$\\[1.0em]
+      {Projector MLP đưa $H$ về cùng không gian
+      đặc trưng với $\hat Z$.}\\[1.1em]
+      {\large $z_i^D=z_i-\hat z_i$}\\[0.7em]
+      {\small $\hat z_i$ đến từ nhánh có che;
+      $x_i^D$ là mục tiêu tính từ các cạnh được chọn.}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      \centering
+      \textcolor{orange!90!black}{\bfseries Loss sai khác $\mathcal L_d$}\\[1.0em]
+      {\small $\displaystyle
+        \mathcal L_d=
+        % Eq. (12) in the paper prints |\hat V|, but its sum and prose use
+        % unmasked nodes; the authors' code averages over keep_nodes.
+        \frac{1}{|V\setminus\hat V|}
+        \sum_{i\in V\setminus\hat V}
+        \bigl(1-\cos(z_i^D,x_i^D)\bigr)^{\gamma_2}
+      $}\\[1.1em]
+      \textbf{So sánh $z_i^D$ với $x_i^D$}\\
+      trên \textbf{nút không bị che}.\\[1.0em]
+      {\small $\cos$: độ tương đồng cosine;\\[0.4em]
+      $\gamma_2>1$: số mũ điều chỉnh loss.}
+    \end{column}
+  \end{columns}
+  \vfill
+  \centering
+  {\tiny Zheng et al., KDD 2025, Eq. (10)–(12); tập nút theo phần giải thích sau Eq. (12)}
+\end{frame}
+
+% 7. Mục tiêu chung
+\begin{frame}{Huấn luyện DGMAE: loss và một epoch}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.48\textwidth}
+      \centering
+      \textcolor{Theme_Color}{\bfseries Hàm mất mát tổng}\\[1.0em]
+      {\large $\displaystyle
+        \mathcal L=(1-\lambda)\mathcal L_f+\lambda\mathcal L_d
+      $}\\[1.3em]
+
+      \textcolor{Theme_Color}{\Large $\mathcal L_f$}\\[0.3em]
+      Khôi phục đặc trưng $x_i$\\
+      trên \textbf{nút bị che}\\[1.1em]
+
+      \textcolor{orange!90!black}{\Large $\mathcal L_d$}\\[0.3em]
+      Giữ sai khác $x_i^D$\\
+      trên \textbf{nút không bị che}\\[1.2em]
+
+      {\small $\lambda$ điều chỉnh trọng số của hai loss.}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \centering
+      \textcolor{Theme_Color}{\bfseries Một epoch huấn luyện}\\[0.7em]
+      \begin{tikzpicture}[
+        flowbox/.style={draw=Theme_Color, fill=Theme_Color!8,
+          rounded corners=2pt, minimum width=5.5cm, minimum height=0.9cm,
+          align=center, font=\small},
+        flow/.style={->, thick, Theme_Color}
+      ]
+        \node[flowbox] (mask) at (0,0) {1. Che đặc trưng nút\\$X\rightarrow\hat X$};
+        \node[flowbox] (encode) at (0,-1.28) {2. Hai lượt xử lý đồ thị\\$\hat X\rightarrow\hat Z,\quad X\rightarrow Z$};
+        \node[flowbox] (diff) at (0,-2.56) {3. Chọn cạnh và tính sai khác\\$x_i^D,\quad z_i^D$};
+        \node[flowbox] (loss) at (0,-3.84) {4. Tính loss và cập nhật\\$\mathcal L_f,\mathcal L_d\rightarrow\mathcal L$};
+        \draw[flow] (mask) -- (encode);
+        \draw[flow] (encode) -- (diff);
+        \draw[flow] (diff) -- (loss);
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  \vfill
+  \centering
+  {\tiny Zheng et al., KDD 2025, §4.2–4.4, Eq. (13)}
 \end{frame}
 
 \section{Implement của nhóm}
 
-% ── Slide: Cấu trúc code ─────────────────────────────
 \begin{frame}{Implement: cấu trúc code}
   % TODO: Cấu trúc repo, framework, phần cứng
 \end{frame}
 
-% ── Slide: Khó khăn & đối chiếu ──────────────────────
 \begin{frame}{Implement: khó khăn \& đối chiếu}
   % TODO: Khó khăn gặp phải, so sánh với code tác giả
 \end{frame}
