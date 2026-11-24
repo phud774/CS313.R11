@@ -6,9 +6,9 @@
 
 Ở phần trước, chúng ta đã thấy vấn đề của các mô hình GMAE thông thường: khi tái tạo một nút bị che từ láng giềng, mô hình có xu hướng học phần thông tin chung giữa các nút. Trên đồ thị dị tính, một cạnh vẫn có thể nối hai nút rất khác nhau. Nếu chỉ giữ phần chung, biểu diễn của chúng có thể trở nên khó phân biệt. DGMAE bổ sung một mục tiêu khác: học cả **phần khác biệt** giữa nút và vùng lân cận.
 
-[Chỉ công thức bên trái.] Với nút $i$, ta lấy đặc trưng gốc $x_i$, rồi trừ đi tổng đặc trưng của các láng giềng đã được chuẩn hóa theo bậc $d_i$ và $d_j$. Kết quả là $x_i^D$. Trực giác là phép tính này làm nổi bật phần đặc trưng của nút không được tín hiệu từ láng giềng giải thích tốt. Đây là một vector sai khác trên đồ thị, không đơn thuần là khoảng cách giữa hai nút. Hệ số theo bậc điều chỉnh đóng góp của các cạnh khi các nút có số láng giềng khác nhau.
+[Chỉ công thức.] Với nút $i$, ta lấy đặc trưng gốc $x_i$, rồi trừ đi tổng đặc trưng của các láng giềng đã được chuẩn hóa theo bậc $d_i$ và $d_j$. Kết quả là $x_i^D$. Trực giác là phép tính này làm nổi bật phần đặc trưng của nút không được tín hiệu từ láng giềng giải thích tốt. Đây là một vector sai khác trên đồ thị, không đơn thuần là khoảng cách giữa hai nút. Hệ số theo bậc điều chỉnh đóng góp của các cạnh khi các nút có số láng giềng khác nhau.
 
-[Chuyển sang công thức bên phải.] Khi tính đồng thời cho toàn bộ nút, ta viết gọn thành $X^D=L_{\mathrm{sym}}X$. Ở đây $X$ là ma trận đặc trưng, còn $L_{\mathrm{sym}}=I-D^{-1/2}AD^{-1/2}$ là Laplacian chuẩn hóa. Phép toán này thường được xem như làm nổi bật thành phần khác biệt trên đồ thị, tương ứng trực giác của một bộ lọc thông cao. Đây là **sai khác gốc**; bước chọn cạnh ở hai trang sau sẽ điều chỉnh nó thành mục tiêu dùng cho loss sai khác. Encoder nhận $X$ hoặc phiên bản bị che $\hat X$, chứ không nhận trực tiếp $X^D$.
+Đây là **sai khác gốc**, tính với toàn bộ láng giềng. Bước chọn cạnh ở hai trang sau sẽ tạo mục tiêu dùng cho loss sai khác. Encoder nhận $X$ hoặc phiên bản bị che $\hat X$, chứ không nhận trực tiếp $x_i^D$.
 
 **Công thức vừa rồi tính sai khác với mọi láng giềng. Nhưng không phải cạnh nào cũng mang thông tin khác biệt đáng học như nhau, nên DGMAE có thêm bước chọn cạnh.**
 
@@ -38,8 +38,6 @@ Từ đây ta sẽ xem DGMAE huấn luyện bằng **hai nhánh**. Chúng dùng 
 
 [Chỉ nhánh trái.] Đặc trưng bị che $\hat X$ đi qua encoder và decoder, cho ra $\hat Z$. Nhánh này học khôi phục đặc trưng gốc của **nút bị che** bằng loss $\mathcal L_f$. [Chỉ nhánh phải.] Đặc trưng đầy đủ $X$ đi qua cùng encoder rồi qua projector MLP để tạo $Z$. Nhánh thứ hai hướng tới bảo toàn sai khác trên **nút không bị che** bằng loss $\mathcal L_d$.
 
-[Chỉ công thức phía dưới.] Hai nhánh **không hoàn toàn tách rời**: để tính $\mathcal L_d$, ta cần lấy $z_i^D=z_i-\hat z_i$. Nghĩa là nhánh đồ thị đầy đủ cung cấp $Z$, nhưng vẫn cần $\hat Z$ từ nhánh có che. Đây là lý do phải chạy hai lượt trong cùng một epoch.
-
 **Ta đi vào nhánh có che trước: nó tạo $\hat Z$ ra sao và dùng $\mathcal L_f$ như thế nào?**
 
 ## Trang 17 — Nhánh đồ thị bị che: tái tạo đặc trưng
@@ -56,7 +54,7 @@ Loss này buộc mô hình khai thác thông tin từ láng giềng. Tuy nhiên,
 
 [Chỉ cột trái.] Lượt thứ hai dùng đặc trưng gốc đầy đủ $X$ và cùng encoder $f_E$ để tạo $H$. Projector MLP hai lớp đưa $H$ thành $Z$ trong cùng không gian đặc trưng với $\hat Z$. Sau đó ta lấy $z_i^D=z_i-\hat z_i$. Cần nhớ $\hat z_i$ đến từ nhánh **có che** ở slide trước, chứ nhánh này không tự tạo được toàn bộ sai khác. Còn $x_i^D$ là mục tiêu sai khác tính từ đặc trưng gốc và các cạnh đã chọn ở trang 15.
 
-[Chỉ cột phải.] Loss $\mathcal L_d$ so sánh $z_i^D$ và $x_i^D$ bằng cosine similarity, rồi lấy trung bình trên **các nút không bị che** $V\setminus\hat V$. Khi hai vector cùng hướng hơn, cosine tăng và loss giảm. Số mũ $\gamma_2>1$ điều chỉnh mức phạt. Đây là mục tiêu giúp sai khác học được trong biểu diễn đi theo sai khác từ đặc trưng gốc.
+[Chỉ cột phải.] Dòng đầu viết sai số của từng nút là $\ell_i^D$: so sánh $z_i^D$ và $x_i^D$ bằng cosine similarity, rồi nâng lên số mũ $\gamma_2>1$. Dòng sau lấy trung bình các sai số này trên **các nút không bị che** $V\setminus\hat V$ để được $\mathcal L_d$. Khi hai vector cùng hướng hơn, cosine tăng và loss giảm. Đây là mục tiêu giúp sai khác học được trong biểu diễn đi theo sai khác từ đặc trưng gốc.
 
 Điểm chính ở đây không phải dự đoán nhãn hay buộc hai nút nối nhau phải khác nhãn. Mục tiêu là giữ thông tin về **chênh lệch đặc trưng** trong biểu diễn học được. Nhờ vậy, khi ngữ cảnh láng giềng làm các nút có xu hướng giống nhau hơn, mô hình vẫn có một tín hiệu để bảo toàn phần khác biệt.
 

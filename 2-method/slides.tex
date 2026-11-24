@@ -6,32 +6,22 @@
 
 % 1. Định nghĩa mục tiêu
 \begin{frame}{Sai khác gốc giữa nút và láng giềng}
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.48\textwidth}
-      \centering
-      \textcolor{Theme_Color}{\textbf{Dạng từng nút}}\\[1.2em]
-      $\displaystyle x_i^D = x_i -
-      \sum_{j\in\mathcal N(i)}\frac{x_j}{\sqrt{d_i d_j}}$\\[1.5em]
-      {\small $x_i$: đặc trưng nút $i$;\\[0.4em]
-      $\mathcal N(i)$: láng giềng của $i$;\\[0.4em]
-      $d_i$: bậc của nút $i$.}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \centering
-      \textcolor{Theme_Color}{\textbf{Dạng ma trận}}\\[1.2em]
-      $\displaystyle X^D=L_{\mathrm{sym}}X$\\[0.6em]
-      $\displaystyle L_{\mathrm{sym}}=I-D^{-1/2}AD^{-1/2}$\\[1.1em]
-      {\small $X$: ma trận đặc trưng;\quad $A$: ma trận kề;\\[0.4em]
-      $D$: ma trận bậc;\quad $I$: ma trận đơn vị;\\[0.4em]
-      $L_{\mathrm{sym}}$: Laplacian chuẩn hóa.}
-    \end{column}
-  \end{columns}
-  \vfill
   \centering
-  \textbf{Đây là sai khác gốc; mục tiêu $\mathcal L_d$ sẽ được điều chỉnh sau khi chọn cạnh.}
+  \vspace{1.0em}
+  {\Large $\displaystyle x_i^D=x_i-
+    \sum_{j\in\mathcal N(i)}\frac{x_j}{\sqrt{d_i d_j}}$}\\[1.4em]
+  {\small
+    \begin{tabular}{r@{\quad}l}
+      $x_i$ & đặc trưng của nút $i$ \\[0.45em]
+      $\mathcal N(i)$ & tập láng giềng của nút $i$ \\[0.45em]
+      $d_i, d_j$ & bậc của hai nút $i$ và $j$
+    \end{tabular}
+  }
+  \vfill
+  \textbf{Ở bước này, sai khác dùng toàn bộ láng giềng; bước sau sẽ chọn cạnh để tạo đích cho $\mathcal L_d$.}
   \vspace{0.5em}
 
-  {\tiny Zheng et al., KDD 2025, Eq. (4)–(5)}
+  {\tiny Zheng et al., KDD 2025, Eq. (4)}
 \end{frame}
 
 % 2. Chọn cạnh bằng attention
@@ -101,63 +91,68 @@
 % 4. Giới thiệu hai nhánh
 \begin{frame}{Hai nhánh huấn luyện DGMAE}
   \centering
-  % \vspace{0.3em}
-  % Cùng ma trận kề $A$ và cùng encoder $f_E$;
-  % hai nhánh khác nhau ở đặc trưng đầu vào.
-  \vspace{1.2em}
-
-  \begin{columns}[T,onlytextwidth]
-    \begin{column}{0.48\textwidth}
-      \centering
-      \textcolor{Theme_Color}{\Large Nhánh đồ thị bị che}\\[0.8em]
-      $\hat X\xrightarrow{f_E}\hat H\xrightarrow{f_D}\hat Z$\\[1.0em]
-      \textbf{$\mathcal L_f$:} khôi phục đặc trưng\\
-      trên các nút bị che $\hat V$.
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \centering
-      \textcolor{orange!90!black}{\Large Nhánh đồ thị không che}\\[0.8em]
-      $X\xrightarrow{f_E}H\xrightarrow{\mathrm{MLP}}Z$\\[1.0em]
-      \textbf{$\mathcal L_d$:} giữ sai khác\\
-      trên các nút không bị che $V\setminus\hat V$.
-    \end{column}
-  \end{columns}
-  \vspace{1.4em}
-
-  {\large $z_i^D=z_i-\hat z_i$}\\[0.5em]
-  \textbf{$\mathcal L_d$ cần cả $Z$ và $\hat Z$; hai nhánh được huấn luyện chung.}
+  \vspace{1.5em}
+  {\small Hai lượt dùng cùng ma trận kề $A$ và encoder $f_E$.}\\[1.0em]
+  \begin{tikzpicture}[
+    branch/.style={draw, rounded corners=3pt, minimum width=5.6cm,
+      minimum height=3.3cm, align=center, inner sep=5pt, font=\small}
+  ]
+    \node[branch, draw=Theme_Color!70, fill=Theme_Color!5] (masked) at (-3.05,0) {
+      \textcolor{Theme_Color}{\bfseries Nhánh đồ thị bị che}\\[0.55em]
+      $\hat X\xrightarrow{f_E}\hat H\xrightarrow{f_D}\hat Z$\\[0.65em]
+      $\mathcal L_f$: khôi phục đặc trưng\\
+      trên nút bị che $\hat V$
+    };
+    \node[branch, draw=orange!80!black, fill=orange!5] (full) at (3.05,0) {
+      \textcolor{orange!90!black}{\bfseries Nhánh đồ thị không che}\\[0.55em]
+      $X\xrightarrow{f_E}H\xrightarrow{\mathrm{MLP}}Z$\\[0.65em]
+      $\mathcal L_d$: giữ sai khác\\
+      trên nút không bị che $V\setminus\hat V$
+    };
+  \end{tikzpicture}
   \vfill
   {\tiny Zheng et al., KDD 2025, §4.2–4.4}
 \end{frame}
 
 % 5. Nhánh đồ thị bị che và loss tái tạo
 \begin{frame}{Nhánh đồ thị bị che: tái tạo đặc trưng}
+  \vspace{0.3em}
   \begin{columns}[T,onlytextwidth]
     \begin{column}{0.47\textwidth}
-      \centering
-      \textcolor{Theme_Color}{\bfseries Đồ thị bị che}\\[1.0em]
-      $\displaystyle \hat x_i=0\quad(i\in\hat V)$\\[1.1em]
-      $\hat X\xrightarrow{f_E}\hat H\xrightarrow{f_D}\hat Z$\\[1.1em]
-      {Decoder $f_D$ dùng ngữ cảnh láng giềng
-      để tái tạo đặc trưng của nút bị che.}\\[1.0em]
-      {\small $x_i$ gốc được giữ làm mục tiêu,
-      không đưa vào lượt xử lý này.}
+      {\setlength{\fboxsep}{7pt}\setlength{\fboxrule}{0.65pt}%
+      \fcolorbox{Theme_Color!65}{Theme_Color!4}{%
+        \begin{minipage}[c][4.6cm][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+          \centering
+          \textcolor{Theme_Color}{\bfseries Đồ thị bị che}\\[1.0em]
+          $\displaystyle \hat x_i=0\quad(i\in\hat V)$\\[1.1em]
+          $\hat X\xrightarrow{f_E}\hat H\xrightarrow{f_D}\hat Z$\\[1.1em]
+          {Decoder $f_D$ dùng ngữ cảnh láng giềng
+          để tái tạo đặc trưng của nút bị che.}\\[1.0em]
+          {\small $x_i$ gốc được giữ làm mục tiêu,
+          không đưa vào lượt xử lý này.}
+        \end{minipage}%
+      }}
     \end{column}
-    \begin{column}{0.50\textwidth}
-      \centering
-      \textcolor{Theme_Color}{\bfseries Loss tái tạo $\mathcal L_f$}\\[1.0em]
-      {\small $\displaystyle
-        % Eq. (3) prints z_i, but Eq. (2), the prose, and author code
-        % compare decoder output \hat z_i with original x_i.
-        \mathcal L_f=
-        \frac{1}{|\hat V|}
-        \sum_{i\in\hat V}
-        \bigl(1-\cos(\hat z_i,x_i)\bigr)^{\gamma_1}
-      $}\\[1.1em]
-      \textbf{So sánh $\hat z_i$ với $x_i$}\\
-      trên \textbf{nút bị che}.\\[1.0em]
-      {\small $\cos$: độ tương đồng cosine;\\[0.4em]
-      $\gamma_1>1$: số mũ điều chỉnh loss.}
+    \begin{column}{0.47\textwidth}
+      {\setlength{\fboxsep}{7pt}\setlength{\fboxrule}{0.65pt}%
+      \fcolorbox{Theme_Color!65}{Theme_Color!4}{%
+        \begin{minipage}[c][4.6cm][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+          \centering
+          \textcolor{Theme_Color}{\bfseries Loss tái tạo $\mathcal L_f$}\\[1.0em]
+          {\small $\displaystyle
+            % Eq. (3) prints z_i, but Eq. (2), the prose, and author code
+            % compare decoder output \hat z_i with original x_i.
+            \mathcal L_f=
+            \frac{1}{|\hat V|}
+            \sum_{i\in\hat V}
+            \bigl(1-\cos(\hat z_i,x_i)\bigr)^{\gamma_1}
+          $}\\[1.1em]
+          \textbf{So sánh $\hat z_i$ với $x_i$}\\
+          trên \textbf{nút bị che}.\\[1.0em]
+          {\small $\cos$: độ tương đồng cosine;\\[0.4em]
+          $\gamma_1>1$: số mũ điều chỉnh loss.}
+        \end{minipage}%
+      }}
     \end{column}
   \end{columns}
   \vfill
@@ -167,32 +162,45 @@
 
 % 6. Nhánh đồ thị đầy đủ và loss sai khác
 \begin{frame}{Nhánh đồ thị không che: giữ sai khác}
+  \vspace{0.3em}
   \begin{columns}[T,onlytextwidth]
     \begin{column}{0.47\textwidth}
-      \centering
-      \textcolor{orange!90!black}{\bfseries Đồ thị không che}\\[1.0em]
-      $X\xrightarrow{f_E}H\xrightarrow{\mathrm{MLP}}Z$\\[1.0em]
-      {Projector MLP đưa $H$ về cùng không gian
-      đặc trưng với $\hat Z$.}\\[1.1em]
-      {\large $z_i^D=z_i-\hat z_i$}\\[0.7em]
-      {\small $\hat z_i$ đến từ nhánh có che;
-      $x_i^D$ là mục tiêu tính từ các cạnh được chọn.}
+      {\setlength{\fboxsep}{7pt}\setlength{\fboxrule}{0.65pt}%
+      \fcolorbox{orange!75!black}{orange!4}{%
+        \begin{minipage}[c][4.6cm][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+          \centering
+          \textcolor{orange!90!black}{\bfseries Đồ thị không che}\\[0.9em]
+          $X\xrightarrow{f_E}H\xrightarrow{\mathrm{MLP}}Z$\\[0.9em]
+          {\small Projector MLP đưa $H$ về cùng không gian
+          đặc trưng với $\hat Z$.}\\[1.1em]
+          {\large $z_i^D=z_i-\hat z_i$}\\[0.7em]
+          {\small $\hat z_i$: từ nhánh có che;\\[0.25em]
+          $x_i^D$: đích tính từ các cạnh được chọn.}
+        \end{minipage}%
+      }}
     \end{column}
-    \begin{column}{0.50\textwidth}
-      \centering
-      \textcolor{orange!90!black}{\bfseries Loss sai khác $\mathcal L_d$}\\[1.0em]
-      {\small $\displaystyle
-        \mathcal L_d=
-        % Eq. (12) in the paper prints |\hat V|, but its sum and prose use
-        % unmasked nodes; the authors' code averages over keep_nodes.
-        \frac{1}{|V\setminus\hat V|}
-        \sum_{i\in V\setminus\hat V}
-        \bigl(1-\cos(z_i^D,x_i^D)\bigr)^{\gamma_2}
-      $}\\[1.1em]
-      \textbf{So sánh $z_i^D$ với $x_i^D$}\\
-      trên \textbf{nút không bị che}.\\[1.0em]
-      {\small $\cos$: độ tương đồng cosine;\\[0.4em]
-      $\gamma_2>1$: số mũ điều chỉnh loss.}
+    \begin{column}{0.47\textwidth}
+      {\setlength{\fboxsep}{7pt}\setlength{\fboxrule}{0.65pt}%
+      \fcolorbox{orange!75!black}{orange!4}{%
+        \begin{minipage}[c][4.6cm][c]{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}
+          \centering
+          \textcolor{orange!90!black}{\bfseries Loss sai khác $\mathcal L_d$}\\[0.9em]
+          {\small $\displaystyle
+            \begin{aligned}
+              \ell_i^D
+              &=\bigl(1-\cos(z_i^D,x_i^D)\bigr)^{\gamma_2},\\[0.25em]
+              % Eq. (12) prints |\hat V|, but its prose and sum use unmasked nodes.
+              \mathcal L_d
+              &=\frac{1}{|V\setminus\hat V|}
+                \sum_{i\in V\setminus\hat V}\ell_i^D
+            \end{aligned}
+          $}\\[1.0em]
+          {\small $\ell_i^D$: sai số của nút $i$;\\[0.3em]
+          $\mathcal L_d$: trung bình trên \textbf{nút không bị che}.}\\[0.9em]
+          {\small $\cos$: độ tương đồng cosine;\\[0.4em]
+          $\gamma_2>1$: số mũ điều chỉnh loss.}
+        \end{minipage}%
+      }}
     \end{column}
   \end{columns}
   \vfill
