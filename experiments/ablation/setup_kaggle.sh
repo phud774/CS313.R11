@@ -30,4 +30,5 @@ uv pip install --python "$venv/bin/python" --no-index --no-deps \
     --find-links 'https://data.pyg.org/whl/torch-2.2.0+cu121.html' \
     'torch-scatter==2.1.2+pt22cu121' 'torch-sparse==0.6.18+pt22cu121'
 
-"$venv/bin/python" -c 'import dgl, dgl.sparse, torch, torch_sparse; assert torch.cuda.is_available(), "CUDA is unavailable"; print("GPUs:", [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())]); print("Torch:", torch.__version__, "DGL:", dgl.__version__); dgl.graph(([0], [0])).to("cuda:0")'
+bash "$(dirname -- "${BASH_SOURCE[0]}")/run_kaggle_python.sh" "$workspace" \
+    -c 'import dgl, dgl.sparse, torch, torch_sparse; print("Torch:", torch.__version__, "DGL:", dgl.__version__, flush=True); assert torch.cuda.is_available(), "CUDA is unavailable"; print("GPUs:", [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())]); dgl.graph(([0], [0])).to("cuda:0")'
