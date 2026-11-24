@@ -16,3 +16,5 @@
 # file nặng, tải lại được
 resources/arXiv-2506.19343v2.tar.gz
 # 1-intro/paper.pdf
+
+connect-kaggle-mcp-daemon.sh
