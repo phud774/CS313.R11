@@ -80,6 +80,7 @@ def pretrain(config, graph, variant, protocol):
     inv_degree = (graph.in_degrees() - 1).clamp_min(1).to(features.dtype).rsqrt()
     paper = protocol == "paper"
     include_two_hop = paper and config.discrepancy_neighborhood == "one-hop-two-hop"
+    discrepancy_coefficient = 1.0 if paper and variant == "no-feature" else config.discrepancy_weight
     if use_discrepancy and not use_selection:
         fixed_targets = (
             paper_targets(features, edges, inv_degree, include_two_hop=include_two_hop)
@@ -129,12 +130,12 @@ def pretrain(config, graph, variant, protocol):
                 two_hop_loss = sce_loss(discrepancy, two_hop_target[~mask], config.gamma2)
                 discrepancy_loss = (discrepancy_loss + two_hop_loss) / 2
 
-        # Keep the original coefficient for each retained term of Eq. 13.
+        # Use the configured feature coefficient for every variant that retains it.
         loss = 0
         if use_feature:
             loss = (1 - config.discrepancy_weight) * feature_loss
         if use_discrepancy:
-            loss = loss + config.discrepancy_weight * discrepancy_loss
+            loss = loss + discrepancy_coefficient * discrepancy_loss
         if not torch.isfinite(loss):
             raise FloatingPointError(f"Non-finite loss at epoch {epoch + 1} for {variant}")
         optimizer.zero_grad(set_to_none=True)
