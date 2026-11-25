@@ -23,16 +23,81 @@
 % Metadata bài thuyết trình
 % ══════════════════════════════════════════════════════
 \title[DGMAE · Data Mining]{Discrepancy-Aware Graph Mask Auto-Encoder (DGMAE)}
-\subtitle{Môn học: Data Mining}
-\author[Nhóm 2]{Nhóm 2}
-\institute[UIT]{Báo cáo Đồ án môn học}
+\subtitle{}
+\author[Group 2]{%
+  Group 2\\[0.6em]
+  {\footnotesize
+  \begin{tabular}{@{}l@{\hspace{0.8em}}l@{\hspace{2.5em}}l@{\hspace{0.8em}}l@{}}
+    Đặng Phú Duy        & [ĐIỀN MSSV] & Trịnh Duy Hưng        & [ĐIỀN MSSV] \\
+    Đoàn Hồng Bảo       & [ĐIỀN MSSV] & Lương Huỳnh Gia Bảo   & [ĐIỀN MSSV] \\
+    Nguyễn Trường Giang & [ĐIỀN MSSV] & Trần Xuân Đạt         & [ĐIỀN MSSV] \\
+                        &             & Trần Nguyễn Khải Lạc  & [ĐIỀN MSSV] \\
+  \end{tabular}}}
+\institute[UIT]{CS313 - Data Mining and Application}
 \date{Nov 22, 2026}
 
 % ══════════════════════════════════════════════════════
 \begin{document}
 
-% ── Slide tiêu đề ──
+% ── Slide tiêu đề (kèm thành viên & MSSV) ──
 \maketitle
+
+% ── Giới thiệu đề tài ──
+\begin{frame}{Giới thiệu đề tài}
+  \begin{columns}[c]
+    \begin{column}{0.50\textwidth}
+      \begin{block}{Paper}
+        \textbf{Discrepancy-Aware Graph Mask Auto-Encoder}\\
+        {\small Ziyu Zheng, Yaming Yang, Ziyu Guan, Wei Zhao, Weigang Lu}\\
+        {\small \textbf{KDD 2025} · arXiv:2506.19343}
+      \end{block}
+      \vspace{0.4em}
+      \begin{itemize}
+        \item \textbf{Bài toán:} học biểu diễn node \textbf{không cần nhãn}
+        \item \textbf{Vấn đề:} GMAE làm các node láng giềng \textbf{giống nhau}, kém trên đồ thị dị tính
+        \item \textbf{Ý tưởng:} tái tạo thêm \textbf{sự khác biệt} (discrepancy) giữa node và láng giềng
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \centering
+      \begin{tikzpicture}[
+        scale=1.05,
+        node_a/.style={circle, fill=Theme_Color!70, draw=Theme_Color, text=white, inner sep=0pt, minimum size=17pt, font=\scriptsize\bfseries},
+        node_b/.style={circle, fill=orange!80, draw=orange!90!black, text=white, inner sep=0pt, minimum size=17pt, font=\scriptsize\bfseries},
+        node_mask/.style={circle, fill=white, draw=Theme_Color, dashed, line width=1.1pt, text=Theme_Color, inner sep=0pt, minimum size=21pt, font=\small\bfseries},
+        edge_homo/.style={thick, gray!55},
+        edge_hetero/.style={very thick, orange!85!black, dashed}
+      ]
+        \node[node_mask] (vm) at (0, 0.1) {$?$};
+        \node[node_a] (v1) at (-1.4, 1.2) {$v_1$};
+        \node[node_a] (v2) at (-1.5, -0.9) {$v_2$};
+        \node[node_b] (v3) at (1.5, 0.9) {$v_3$};
+        \node[node_b] (v4) at (1.4, -1.0) {$v_4$};
+        \node[node_a] (v5) at (-2.5, 0.2) {$v_5$};
+        \node[node_b] (v6) at (2.5, -0.1) {$v_6$};
+        \draw[edge_homo] (vm) -- (v1) node[midway, left=2pt, text=black!70, font=\scriptsize] {Cùng lớp};
+        \draw[edge_homo] (vm) -- (v2);
+        \draw[edge_homo] (v1) -- (v5);
+        \draw[edge_homo] (v2) -- (v5);
+        \draw[edge_hetero] (vm) -- (v3) node[pos=0.35, above=4pt, text=orange!90!black, font=\scriptsize\bfseries] {Khác lớp};
+        \draw[edge_hetero] (vm) -- (v4) node[pos=0.4, below left=1pt, text=orange!90!black, font=\scriptsize\bfseries] {$x_i^D$};
+        \draw[edge_homo] (v3) -- (v6);
+        \draw[edge_homo] (v4) -- (v6);
+        \draw[edge_homo] (v3) -- (v4);
+        \node[anchor=north, align=center, text width=6.2cm, font=\scriptsize, yshift=-0.4cm] at (0, -1.2) {
+          \tikz\draw[Theme_Color, dashed, line width=0.9pt, fill=white] (0,0) circle (3pt); Nút bị che \quad
+          \tikz\fill[Theme_Color!70] (0,0) circle (3pt); Cùng lớp \quad
+          \tikz\fill[orange!80] (0,0) circle (3pt); Khác lớp \\
+          \vspace{0.2em}
+          \textcolor{Theme_Color}{\textbf{DGMAE}}: bảo toàn sự khác biệt ($x_i^D$) giữa các nút dị tính
+        };
+      \end{tikzpicture}
+    \end{column}
+  \end{columns}
+  % Lời thoại: Nhóm trình bày paper DGMAE (KDD 2025). Ý chính trong 1 câu: GMAE học bằng cách tái tạo node bị che
+  % từ láng giềng, nên trên đồ thị dị tính (láng giềng khác lớp) các node bị "đồng nhất hóa". DGMAE tái tạo thêm
+  % phần khác biệt x_i^D giữa node và láng giềng để giữ lại thông tin đó.
+\end{frame}
 
 % ── Mục lục ──
 \makeoutline
@@ -41,19 +106,19 @@
 % PHẦN 1 — Mở đầu, Nền tảng, Kiến trúc
 % Người thuyết trình: A (TV2 — Đoàn Hồng Bảo)  ~8 min
 % ══════════════════════════════════════════════════════
-\IfFileExists{1-intro/slides.tex}{\input{1-intro/slides}}{}   % phần nào chưa có file thì bỏ qua
+\input{1-intro/slides}
 
 % ══════════════════════════════════════════════════════
 % PHẦN 2 — Phương pháp chính & Implement
 % Người thuyết trình: B (TV4 — Trịnh Duy Hưng)  ~7.5 min
 % ══════════════════════════════════════════════════════
-\IfFileExists{2-method/slides.tex}{\input{2-method/slides}}{}
+\input{2-method/slides}
 
 % ══════════════════════════════════════════════════════
 % PHẦN 3 — Thực nghiệm, Phân tích, Kết luận
 % Người thuyết trình: C (TV5 — Lương Huỳnh Gia Bảo)  ~9.5 min
 % ══════════════════════════════════════════════════════
-\IfFileExists{3-experiment/slides.tex}{\input{3-experiment/slides}}{}
+\input{3-experiment/slides}
 
 % ── Slide cảm ơn kết thúc ──
 \makethankyou
