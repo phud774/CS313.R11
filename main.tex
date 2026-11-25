@@ -1,0 +1,61 @@
+% !TEX program = xelatex
+% DGMAE Presentation — CS313 R11
+% Compile with: xelatex main.tex
+
+\documentclass[aspectratio=169,10pt]{beamer}
+
+% ── Giao diện (Madrid + beaver, font Latin Modern Sans) — xem theme.tex ──
+\input{theme}
+
+% ── Toán & ký hiệu ──
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{bm}
+
+% ── Đồ họa & bảng ──
+\usepackage{graphicx}
+\graphicspath{{1-intro/figures/}{2-method/figures/}{3-experiment/figures/}{figures/}}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{adjustbox}
+
+% ══════════════════════════════════════════════════════
+% Metadata bài thuyết trình
+% ══════════════════════════════════════════════════════
+\title[DGMAE · Data Mining]{Discrepancy-Aware Graph Mask Auto-Encoder (DGMAE)}
+\subtitle{Môn học: Data Mining}
+\author[Nhóm 2]{Nhóm 2}
+\institute[UIT]{Báo cáo Đồ án môn học}
+\date{Nov 22, 2026}
+
+% ══════════════════════════════════════════════════════
+\begin{document}
+
+% ── Slide tiêu đề ──
+\maketitle
+
+% ── Mục lục ──
+\makeoutline
+
+% ══════════════════════════════════════════════════════
+% PHẦN 1 — Mở đầu, Nền tảng, Kiến trúc
+% Người thuyết trình: A (TV2 — Đoàn Hồng Bảo)  ~8 min
+% ══════════════════════════════════════════════════════
+\IfFileExists{1-intro/slides.tex}{\input{1-intro/slides}}{}   % phần nào chưa có file thì bỏ qua
+
+% ══════════════════════════════════════════════════════
+% PHẦN 2 — Phương pháp chính & Implement
+% Người thuyết trình: B (TV4 — Trịnh Duy Hưng)  ~7.5 min
+% ══════════════════════════════════════════════════════
+\IfFileExists{2-method/slides.tex}{\input{2-method/slides}}{}
+
+% ══════════════════════════════════════════════════════
+% PHẦN 3 — Thực nghiệm, Phân tích, Kết luận
+% Người thuyết trình: C (TV5 — Lương Huỳnh Gia Bảo)  ~9.5 min
+% ══════════════════════════════════════════════════════
+\IfFileExists{3-experiment/slides.tex}{\input{3-experiment/slides}}{}
+
+% ── Slide cảm ơn kết thúc ──
+\makethankyou
+
+\end{document}

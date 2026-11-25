@@ -1,0 +1,43 @@
+% ══════════════════════════════════════════════════════
+% Giao diện theo mẫu slide môn học (CS313 — Course Overview):
+% Beamer Madrid + colortheme beaver (đỏ đậm trên nền xám), font Latin Modern Sans
+% (bản OpenType của Computer Modern Sans, có đủ dấu tiếng Việt). Biên dịch bằng XeLaTeX.
+% ══════════════════════════════════════════════════════
+
+\usetheme{Madrid}
+\usecolortheme{beaver}
+\usepackage{tikz}   % theme cũ (Durham) tự nạp TikZ; phần 1 có dùng
+
+% ── Font: Latin Modern Sans (nạp theo tên file để chạy được cả trên Overleaf lẫn máy cá nhân) ──
+\usepackage{fontspec}
+\setsansfont{lmsans10-regular.otf}[
+  BoldFont       = lmsans10-bold.otf,
+  ItalicFont     = lmsans10-oblique.otf,
+  BoldItalicFont = lmsans10-boldoblique.otf]
+\setmonofont{lmmono10-regular.otf}
+
+% ── Tên màu cũ vẫn được các phần slide dùng → ánh xạ sang bảng màu mới ──
+\colorlet{Theme_Color}{darkred}             % màu nhấn chính (đỏ của beaver)
+\colorlet{RiverDark}{darkred!80!black}      % đỏ đậm
+\colorlet{RiverLight}{gray!10}              % nền xám nhạt (giống nền tiêu đề slide)
+\colorlet{RiverAccent}{darkred!50}
+
+% ── Block: Madrid mặc định dùng tiêu đề xanh navy → đổi sang tông đỏ/xám cho khớp beaver ──
+\setbeamercolor{block title}{fg=white, bg=darkred!80!black}
+\setbeamercolor{block title alerted}{fg=white, bg=darkred}
+\setbeamercolor{block title example}{fg=white, bg=gray!60!black}
+\setbeamercolor{block body}{bg=gray!8}
+\setbeamercolor{block body alerted}{bg=gray!8}
+\setbeamercolor{block body example}{bg=gray!8}
+
+% ── Trang phân mục & các slide dùng chung ──
+\renewcommand{\sectionname}{Phần}
+\AtBeginSection[]{\begin{frame}\sectionpage\end{frame}}
+\newcommand{\makeoutline}{\begin{frame}{Nội dung}\tableofcontents\end{frame}}
+\newcommand{\makethankyou}{%
+  \begin{frame}
+    \centering\vfill
+    {\usebeamercolor[fg]{title}\Large Cảm ơn thầy cô và các bạn!}\\[1em]
+    Câu hỏi · Góp ý · Thảo luận
+    \vfill
+  \end{frame}}
