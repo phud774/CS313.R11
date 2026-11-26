@@ -1,0 +1,25 @@
+# Siêu tham số phân loại node.
+# [T8]  = lấy từ Table 8 của paper: lam, p_c, p_tau, gamma1, gamma2, weight_decay, lr, mask_rate, num_layers
+# [cfg] = paper không nêu -> lấy từ configs.yml của tác giả: num_hidden, heads, max_epoch, replace_rate, residual, norm
+# Chung cho mọi dataset: in_drop 0.2, attn_drop 0.1, Adam + cosine LR, linear probe lr 0.01 / wd 1e-4 / 300 epoch.
+
+cora:      {lam: 0.1, p_c: 0.3, p_tau: 0.7, gamma1: 3, gamma2: 6, weight_decay: 2.0e-4, lr: 1.0e-4, mask_rate: 0.5,  num_layers: 2,
+            num_hidden: 512,  heads: 4, max_epoch: 2000, replace_rate: 0.05}
+citeseer:  {lam: 0.1, p_c: 0.3, p_tau: 0.7, gamma1: 3, gamma2: 4, weight_decay: 5.0e-7, lr: 5.0e-5, mask_rate: 0.5,  num_layers: 2,
+            num_hidden: 1024, heads: 2, max_epoch: 1000, replace_rate: 0.1}
+pubmed:    {lam: 0.1, p_c: 0.1, p_tau: 0.9, gamma1: 3, gamma2: 1, weight_decay: 1.0e-5, lr: 1.0e-3, mask_rate: 0.75, num_layers: 2,
+            num_hidden: 1024, heads: 4, max_epoch: 2000, replace_rate: 0.0}
+texas:     {lam: 0.8, p_c: 0.3, p_tau: 0.7, gamma1: 3, gamma2: 3, weight_decay: 2.0e-4, lr: 1.0e-4, mask_rate: 0.75, num_layers: 1,
+            num_hidden: 512,  heads: 4, max_epoch: 1000, replace_rate: 0.05, residual: true}
+cornell:   {lam: 0.8, p_c: 0.5, p_tau: 0.6, gamma1: 3, gamma2: 3, weight_decay: 2.0e-4, lr: 1.0e-4, mask_rate: 0.2,  num_layers: 1,
+            num_hidden: 512,  heads: 8, max_epoch: 1000, replace_rate: 0.1,  residual: true}
+wisconsin: {lam: 0.4, p_c: 0.3, p_tau: 0.7, gamma1: 3, gamma2: 5, weight_decay: 5.0e-4, lr: 1.0e-4, mask_rate: 0.75, num_layers: 1,
+            num_hidden: 1024, heads: 8, max_epoch: 1000, replace_rate: 0.05, residual: true}
+chameleon: {lam: 0.5, p_c: 0.3, p_tau: 0.7, gamma1: 3, gamma2: 3, weight_decay: 2.0e-4, lr: 1.0e-4, mask_rate: 0.75, num_layers: 2,
+            num_hidden: 512,  heads: 4, max_epoch: 3000, replace_rate: 0.0}
+squirrel:  {lam: 0.5, p_c: 0.3, p_tau: 0.7, gamma1: 3, gamma2: 3, weight_decay: 2.0e-4, lr: 1.0e-3, mask_rate: 0.5,  num_layers: 2,
+            num_hidden: 1024, heads: 4, max_epoch: 3000, replace_rate: 0.0}
+actor:     {lam: 0.7, p_c: 0.3, p_tau: 0.7, gamma1: 3, gamma2: 3, weight_decay: 2.0e-4, lr: 1.0e-3, mask_rate: 0.9,  num_layers: 1,
+            num_hidden: 128,  heads: 4, max_epoch: 1000, replace_rate: 0.1,  residual: true, norm: batchnorm}
+roman:     {lam: 0.4, p_c: 0.3, p_tau: 0.7, gamma1: 3, gamma2: 3, weight_decay: 2.0e-4, lr: 1.0e-3, mask_rate: 0.75, num_layers: 2,
+            num_hidden: 1024, heads: 8, max_epoch: 3000, replace_rate: 0.05, norm: layernorm}
