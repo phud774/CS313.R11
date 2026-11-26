@@ -23,14 +23,20 @@ def parse_args():
         "--discrepancy-neighborhood", choices=("one-hop", "one-hop-two-hop"),
         help="Paper protocol only. Defaults to one-hop.",
     )
-    parser.add_argument("--dataset", nargs="+", choices=DATASETS, default=list(DATASETS))
+    parser.add_argument("--dataset", nargs="+", choices=(*DATASETS, "cora"), default=list(DATASETS))
     parser.add_argument("--variant", nargs="+", choices=VARIANTS, default=list(VARIANTS))
     parser.add_argument("--seeds", nargs="+", type=int, choices=range(10), metavar="0–9")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--smoke", action="store_true", help="One pretraining and two probe epochs")
     parser.add_argument("--probe-epochs", nargs="+", type=int, default=[],
                         help="Compare frozen embeddings at these epochs. A later epoch extends the schedule.")
+    parser.add_argument("--discrepancy-weight", type=float, help="Figure 10: override the Eq. 13 weight")
     args = parser.parse_args()
+    weight = args.discrepancy_weight
+    if weight is not None and (not 0 <= weight <= 1 or args.protocol != "paper" or args.variant != ["full"]):
+        parser.error("--discrepancy-weight requires a value in [0, 1], --protocol paper and --variant full")
+    if "cora" in args.dataset and weight is None:
+        parser.error("Cora requires --discrepancy-weight for the Figure 10 sweep")
     if not args.smoke and args.protocol is None:
         parser.error("choose --protocol explicitly for full runs")
     if args.protocol == "paper" and "roman" in args.dataset and not (args.roman_split or args.smoke):
@@ -66,15 +72,19 @@ def configuration(args, dataset, graph, classes):
     from graphmae.utils import load_best_configs
 
     config = SimpleNamespace(
-        dataset=DATASETS[dataset], num_features=graph.ndata["feat"].shape[1],
+        dataset=DATASETS.get(dataset, dataset), num_features=graph.ndata["feat"].shape[1],
         num_nodes=graph.num_nodes(), num_classes=classes,
         num_out_heads=1, residual=False, norm=None, negative_slope=0.2,
         concat_hidden=False, hop=2, pc=0.3, pt=0.7, discrepancy_weight=0.1, gamma2=4,
     )
     load_best_configs(config, args.upstream / "configs.yml")
     if args.protocol == "paper":
-        vars(config).update(PAPER_SETTINGS[dataset], alpha_l=3, replace_rate=0)
+        settings = (dict(discrepancy_weight=0.1, gamma2=6, mask_rate=0.5)
+                    if dataset == "cora" else PAPER_SETTINGS[dataset])
+        vars(config).update(settings, alpha_l=3, replace_rate=0)
         config.discrepancy_neighborhood = args.discrepancy_neighborhood or "one-hop"
+    if args.discrepancy_weight is not None:
+        config.discrepancy_weight = args.discrepancy_weight
     if args.smoke:
         config.max_epoch = 1
         config.max_epoch_f = 2
@@ -128,6 +138,9 @@ def main():
         output /= args.discrepancy_neighborhood
     if args.probe_epochs:
         output /= "probe-epochs-" + "-".join(map(str, args.probe_epochs))
+    figure10 = args.discrepancy_weight is not None
+    if figure10:
+        output /= f"lambda-{args.discrepancy_weight:g}"
     print(json.dumps({"experiment_commit": experiment_commit, "upstream_commit": revision, **environment}), flush=True)
 
     for dataset in args.dataset:
@@ -139,8 +152,9 @@ def main():
         split_policy = args.roman_split if dataset == "roman" else "dataset-default"
         labels = graph.ndata["label"].reshape(-1).long()
         run_settings = {
-            "paper": "doi:10.1145/3711896.3736912, Table 4",
-            "protocol": args.protocol, "dataset": dataset, "data_source": DATA_SOURCES[dataset],
+            "paper": "doi:10.1145/3711896.3736912, " + ("Figure 10" if figure10 else "Table 4"),
+            "protocol": args.protocol, "dataset": dataset,
+            "data_source": DATA_SOURCES.get(dataset, "DGL 2.1.0 CoraGraphDataset"),
             "split_policy": split_policy,
             "smoke": args.smoke, "experiment_commit": experiment_commit, "upstream_commit": revision,
             "graph_nodes": graph.num_nodes(), "graph_edges_with_self_loops": graph.num_edges(),
@@ -192,9 +206,9 @@ def main():
                                           **diagnostics[-1]}), flush=True)
                     record["epoch_probes"] = diagnostics
                 save_json(record_path, record)
-                summarize(directory, dataset, variant, args.smoke, diagnostic=bool(args.probe_epochs))
+                summarize(directory, dataset, variant, args.smoke, diagnostic=figure10 or bool(args.probe_epochs))
             if not (directory / "summary.json").is_file():
-                summarize(directory, dataset, variant, args.smoke, diagnostic=bool(args.probe_epochs))
+                summarize(directory, dataset, variant, args.smoke, diagnostic=figure10 or bool(args.probe_epochs))
 
 
 if __name__ == "__main__":

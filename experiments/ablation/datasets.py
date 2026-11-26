@@ -5,7 +5,7 @@ from pathlib import Path
 
 import dgl
 import torch
-from dgl.data import AmazonCoBuyPhotoDataset, CiteseerGraphDataset, RomanEmpireDataset
+from dgl.data import AmazonCoBuyPhotoDataset, CiteseerGraphDataset, CoraGraphDataset, RomanEmpireDataset
 from dgl.data.utils import download
 
 from graphmae.datasets.data_util import PairNorm, load_dataset
@@ -44,6 +44,10 @@ def load_graph(dataset):
         graph = data[0]
         graph.ndata["feat"] = PairNorm("PN-SCS")(graph.ndata["feat"])
         graph = dgl.add_self_loop(dgl.remove_self_loop(graph))
+        classes = data.num_classes
+    elif dataset == "cora":
+        data = CoraGraphDataset()
+        graph = dgl.add_self_loop(dgl.remove_self_loop(data[0]))
         classes = data.num_classes
     elif dataset in ("photo", "citeseer"):
         data = AmazonCoBuyPhotoDataset() if dataset == "photo" else PinnedCiteseerDataset()

@@ -73,8 +73,8 @@ def pretrain(config, graph, variant, protocol, probe_epochs=()):
         scheduler = torch.optim.lr_scheduler.LambdaLR(
             optimizer, lambda epoch: (1 + np.cos(epoch * np.pi / config.max_epoch)) * 0.5
         )
-    use_feature = variant != "no-feature"
-    use_discrepancy = variant != "no-discrepancy"
+    use_feature = variant != "no-feature" and config.discrepancy_weight < 1
+    use_discrepancy = variant != "no-discrepancy" and config.discrepancy_weight > 0
     use_selection = use_discrepancy and variant != "no-selection"
     edges = torch.stack(graph.edges(order="eid"))
     inv_degree = (graph.in_degrees() - 1).clamp_min(1).to(features.dtype).rsqrt()
