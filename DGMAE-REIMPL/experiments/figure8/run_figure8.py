@@ -119,6 +119,8 @@ def main():
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--datasets", nargs="+", choices=DATASETS, default=list(DATASETS))
     p.add_argument("--models", nargs="+", choices=MODELS, default=list(MODELS))
+    p.add_argument("--graphmae-features", choices=("standard", "raw"), default="standard",
+                   help="Use the dataset preprocessing or the raw features for GraphMAE")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     p.add_argument("--smoke", action="store_true", help="Train each selected encoder for one epoch")
@@ -174,7 +176,9 @@ def main():
                 embedding, settings = model.embed(x, graph).cpu(), cfg
                 del model
             elif name == "graphmae":
-                embedding, settings = train_graphmae(x, graph, cfg, args.seed)
+                graphmae_x = raw.to(args.device) if args.graphmae_features == "raw" else x
+                embedding, settings = train_graphmae(graphmae_x, graph, cfg, args.seed)
+                settings["input_features"] = args.graphmae_features
             else:
                 from greet_baseline import train_greet
                 embedding, settings = train_greet(dataset, raw, edges, args.seed, args.smoke)
