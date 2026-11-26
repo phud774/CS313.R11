@@ -121,6 +121,8 @@ def main():
     p.add_argument("--models", nargs="+", choices=MODELS, default=list(MODELS))
     p.add_argument("--graphmae-features", choices=("standard", "raw"), default="standard",
                    help="Use the dataset preprocessing or the raw features for GraphMAE")
+    p.add_argument("--graphmae-layers", type=int, choices=(1, 2),
+                   help="Override the GraphMAE encoder depth for the Figure 8 comparison")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     p.add_argument("--smoke", action="store_true", help="Train each selected encoder for one epoch")
@@ -177,7 +179,8 @@ def main():
                 del model
             elif name == "graphmae":
                 graphmae_x = raw.to(args.device) if args.graphmae_features == "raw" else x
-                embedding, settings = train_graphmae(graphmae_x, graph, cfg, args.seed)
+                graphmae_cfg = cfg if args.graphmae_layers is None else dict(cfg, num_layers=args.graphmae_layers)
+                embedding, settings = train_graphmae(graphmae_x, graph, graphmae_cfg, args.seed)
                 settings["input_features"] = args.graphmae_features
             else:
                 from greet_baseline import train_greet
