@@ -26,6 +26,7 @@ from train_node import build_model, pretrain
 DATASETS = ("roman", "squirrel", "actor")
 MODELS = ("graphmae", "greet", "dgmae")
 GRAPHMAE_COMMIT = "b14f080c919257b495e3cb6474286d5252d6a635"
+DGMAE_GRAPHMAE_COMMIT = "0e770864b5283b01e2597d6f092e8a812aa5031a"
 GREET_COMMIT = "8bcc94090fe5f343aaeedcda981c5344d496a7f1"
 
 
@@ -33,11 +34,15 @@ def revision(path):
     return subprocess.check_output(["git", "-C", str(path), "rev-parse", "HEAD"], text=True).strip()
 
 
-def train_graphmae(x, graph, cfg, seed):
+def train_graphmae(x, graph, cfg, seed, checkout, implementation):
     import dgl
     from graphmae.models import build_model as build_graphmae
     from graphmae.utils import create_optimizer, set_random_seed
 
+    model_path = Path(build_graphmae.__code__.co_filename).resolve()
+    if not model_path.is_relative_to(checkout.resolve()):
+        raise ImportError(f"GraphMAE loaded from {model_path}, expected {checkout}")
+    print(f"GraphMAE implementation: {implementation} ({model_path})", flush=True)
     set_random_seed(seed)
     src, dst = graph["edge_index"]
     g = dgl.graph((src, dst), num_nodes=len(x), device=x.device)
@@ -50,14 +55,15 @@ def train_graphmae(x, graph, cfg, seed):
         loss_fn="sce", concat_hidden=False, optimizer="adam", lr=cfg["lr"],
         weight_decay=cfg["weight_decay"], max_epoch=cfg["max_epoch"],
     )
-    model = build_graphmae(SimpleNamespace(**args)).to(x.device)
+    model = build_graphmae(SimpleNamespace(num_nodes=len(x), **args)).to(x.device)
     optimizer = create_optimizer(args["optimizer"], model, args["lr"], args["weight_decay"])
     schedule = torch.optim.lr_scheduler.LambdaLR(
         optimizer, lambda epoch: (1 + math.cos(epoch * math.pi / args["max_epoch"])) * 0.5,
     )
     model.train()
     for epoch in range(1, args["max_epoch"] + 1):
-        loss, _ = model(g, x)
+        result = model(g, x)
+        loss = result[1] if implementation == "dgmae-repo" else result[0]
         if not torch.isfinite(loss):
             raise FloatingPointError(f"Non-finite GraphMAE loss at epoch {epoch}")
         optimizer.zero_grad()
@@ -114,6 +120,7 @@ def plot(output, datasets):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--graphmae", type=Path)
+    p.add_argument("--graphmae-implementation", choices=("upstream", "dgmae-repo"), default="upstream")
     p.add_argument("--greet", type=Path)
     p.add_argument("--data", type=Path, required=True)
     p.add_argument("--output", type=Path, required=True)
@@ -127,7 +134,8 @@ def main():
     p.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     p.add_argument("--smoke", action="store_true", help="Train each selected encoder for one epoch")
     args = p.parse_args()
-    for model, checkout, commit in (("graphmae", args.graphmae, GRAPHMAE_COMMIT),
+    graphmae_commit = DGMAE_GRAPHMAE_COMMIT if args.graphmae_implementation == "dgmae-repo" else GRAPHMAE_COMMIT
+    for model, checkout, commit in (("graphmae", args.graphmae, graphmae_commit),
                                     ("greet", args.greet, GREET_COMMIT)):
         if model in args.models:
             if checkout is None or revision(checkout) != commit:
@@ -141,7 +149,8 @@ def main():
     config = yaml.safe_load((ROOT / "configs/node.yml").read_text())
     metadata = {
         "paper": "doi:10.1145/3711896.3736912, Figure 8",
-        "commit": revision(ROOT), "graphmae_commit": GRAPHMAE_COMMIT, "greet_commit": GREET_COMMIT,
+        "commit": revision(ROOT), "graphmae_commit": graphmae_commit,
+        "graphmae_implementation": args.graphmae_implementation, "greet_commit": GREET_COMMIT,
         "seed": args.seed, "smoke": args.smoke, "device": args.device,
         "torch": str(torch.__version__), "python": platform.python_version(),
         "gpu": torch.cuda.get_device_name() if args.device == "cuda" else None,
@@ -180,7 +189,9 @@ def main():
             elif name == "graphmae":
                 graphmae_x = raw.to(args.device) if args.graphmae_features == "raw" else x
                 graphmae_cfg = cfg if args.graphmae_layers is None else dict(cfg, num_layers=args.graphmae_layers)
-                embedding, settings = train_graphmae(graphmae_x, graph, graphmae_cfg, args.seed)
+                embedding, settings = train_graphmae(
+                    graphmae_x, graph, graphmae_cfg, args.seed, args.graphmae, args.graphmae_implementation,
+                )
                 settings["input_features"] = args.graphmae_features
             else:
                 from greet_baseline import train_greet
