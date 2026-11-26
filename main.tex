@@ -4,16 +4,8 @@
 
 \documentclass[aspectratio=169,10pt]{beamer}
 
-% ── Bảng màu sáng (Theme_Color cho Durham theme - đặt TRƯỚC \usetheme) ──
-\input{river}
-
-% ── Durham Beamer Theme ──
-\usetheme{durham}
-
-% ── Hỗ trợ tiếng Việt đầy đủ với XeLaTeX & fontspec ──
-\usepackage{fontspec}
-\IfFontExistsTF{DejaVu Sans}{\setsansfont{DejaVu Sans}}{\setsansfont{Arial}}
-\IfFontExistsTF{DejaVu Sans Mono}{\setmonofont{DejaVu Sans Mono}}{\setmonofont{Consolas}}
+% ── Giao diện Madrid + beaver giống main ──
+\input{theme}
 
 % ── Toán & ký hiệu ──
 \usepackage{amsmath,amssymb}
@@ -26,10 +18,6 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{adjustbox}
-
-% ── Tùy chỉnh thông điệp cảm ơn tiếng Việt ──
-\renewcommand{\DurhamThankYouDefaultA}{Cảm ơn thầy cô và các bạn!}
-\renewcommand{\DurhamThankYouDefaultB}{Câu hỏi · Góp ý · Thảo luận}
 
 % ══════════════════════════════════════════════════════
 % Metadata bài thuyết trình
