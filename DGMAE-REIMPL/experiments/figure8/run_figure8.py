@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 import platform
 import subprocess
@@ -81,8 +82,7 @@ def cosine_scores(embedding, pairs):
 
 
 def plot(output, datasets):
-    import matplotlib
-    matplotlib.use("Agg")
+    os.environ["MPLBACKEND"] = "Agg"
     import matplotlib.pyplot as plt
     from scipy.stats import gaussian_kde
 
