@@ -28,6 +28,8 @@ def parse_args():
     parser.add_argument("--seeds", nargs="+", type=int, choices=range(10), metavar="0–9")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--smoke", action="store_true", help="One pretraining and two probe epochs")
+    parser.add_argument("--probe-epochs", nargs="+", type=int, default=[],
+                        help="Compare frozen embeddings at these epochs. A later epoch extends the schedule.")
     args = parser.parse_args()
     if not args.smoke and args.protocol is None:
         parser.error("choose --protocol explicitly for full runs")
@@ -37,6 +39,11 @@ def parse_args():
         parser.error("upstream runs use Roman's public masks")
     if args.protocol == "upstream" and args.discrepancy_neighborhood is not None:
         parser.error("--discrepancy-neighborhood requires the paper protocol")
+    if any(epoch < 1 for epoch in args.probe_epochs):
+        parser.error("--probe-epochs must contain positive epochs")
+    if args.smoke and any(epoch != 1 for epoch in args.probe_epochs):
+        parser.error("--smoke probes only epoch 1")
+    args.probe_epochs = sorted(set(args.probe_epochs))
     args.protocol = args.protocol or "paper"
     args.roman_split = args.roman_split or "public"
     args.seeds = list(dict.fromkeys(args.seeds or ([0] if args.smoke else list(range(10)))))
@@ -74,7 +81,7 @@ def configuration(args, dataset, graph, classes):
     return config
 
 
-def summarize(output, dataset, variant, smoke):
+def summarize(output, dataset, variant, smoke, diagnostic=False):
     records = [json.loads(path.read_text()) for path in sorted(output.glob("seed-*.json"))]
     accuracy = [100 * record["test_accuracy"] for record in records]
     summary = {
@@ -83,7 +90,7 @@ def summarize(output, dataset, variant, smoke):
         "mean_accuracy_pct": statistics.mean(accuracy),
         "std_accuracy_pct": statistics.pstdev(accuracy),
     }
-    if not smoke:
+    if not smoke and not diagnostic:
         paper_mean, paper_std = PAPER_ACCURACY[variant][list(DATASETS).index(dataset)]
         summary.update(paper_mean_pct=paper_mean, paper_std_pct=paper_std, complete=len(records) == 10)
     save_json(output / "summary.json", summary)
@@ -119,12 +126,16 @@ def main():
     output = args.output / args.protocol / ("smoke" if args.smoke else "full")
     if args.discrepancy_neighborhood == "one-hop-two-hop":
         output /= args.discrepancy_neighborhood
+    if args.probe_epochs:
+        output /= "probe-epochs-" + "-".join(map(str, args.probe_epochs))
     print(json.dumps({"experiment_commit": experiment_commit, "upstream_commit": revision, **environment}), flush=True)
 
     for dataset in args.dataset:
         cpu_graph, classes = load_graph(dataset)
         graph = cpu_graph.to(device)
         config = configuration(args, dataset, graph, classes)
+        if args.probe_epochs:
+            config.max_epoch = max(config.max_epoch, args.probe_epochs[-1])
         split_policy = args.roman_split if dataset == "roman" else "dataset-default"
         labels = graph.ndata["label"].reshape(-1).long()
         run_settings = {
@@ -135,6 +146,9 @@ def main():
             "graph_nodes": graph.num_nodes(), "graph_edges_with_self_loops": graph.num_edges(),
             "configuration": vars(config),
         }
+        if args.probe_epochs:
+            run_settings["probe_epochs"] = args.probe_epochs
+            run_settings["experiment_type"] = "encoder_epoch_diagnostic"
         for variant in args.variant:
             directory = output / dataset / split_policy / variant
             directory.mkdir(parents=True, exist_ok=True)
@@ -150,21 +164,37 @@ def main():
                     continue
                 print(f"{dataset} / {variant} / seed {seed}", flush=True)
                 set_random_seed(seed)
-                embedding, losses = pretrain(config, graph, variant, args.protocol)
+                embedding, losses, snapshots = pretrain(config, graph, variant, args.protocol, args.probe_epochs)
                 splits = get_splits(cpu_graph, dataset, args.protocol, args.roman_split, seed, args.smoke)
+                splits = [(split, tuple(mask.to(device) for mask in masks)) for split, masks in splits]
                 results = []
                 set_random_seed(seed)
                 for split, masks in splits:
-                    result = probe(embedding, labels, tuple(mask.to(device) for mask in masks), config)
+                    result = probe(embedding, labels, masks, config)
                     results.append(dict(result, split=split))
                 record = {
                     "seed": seed, "environment": environment, "last_pretrain_loss": losses,
                     "splits": results, "test_accuracy": statistics.mean(item["test_accuracy"] for item in results),
                 }
+                if args.probe_epochs:
+                    diagnostics = []
+                    for epoch in args.probe_epochs:
+                        if epoch == config.max_epoch:
+                            epoch_results, epoch_losses = results, losses
+                        else:
+                            snapshot, epoch_losses = snapshots[epoch]
+                            snapshot = snapshot.to(device)
+                            set_random_seed(seed)
+                            epoch_results = [dict(probe(snapshot, labels, masks, config), split=split)
+                                             for split, masks in splits]
+                        diagnostics.append({"epoch": epoch, "pretrain_loss": epoch_losses, "splits": epoch_results})
+                        print(json.dumps({"dataset": dataset, "variant": variant, "seed": seed,
+                                          **diagnostics[-1]}), flush=True)
+                    record["epoch_probes"] = diagnostics
                 save_json(record_path, record)
-                summarize(directory, dataset, variant, args.smoke)
+                summarize(directory, dataset, variant, args.smoke, diagnostic=bool(args.probe_epochs))
             if not (directory / "summary.json").is_file():
-                summarize(directory, dataset, variant, args.smoke)
+                summarize(directory, dataset, variant, args.smoke, diagnostic=bool(args.probe_epochs))
 
 
 if __name__ == "__main__":

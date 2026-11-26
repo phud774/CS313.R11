@@ -63,7 +63,7 @@ def paper_reconstruction(model, graph, features, mask, capture_attention):
     return decoded, coefficients
 
 
-def pretrain(config, graph, variant, protocol):
+def pretrain(config, graph, variant, protocol, probe_epochs=()):
     features = graph.ndata["feat"]
     device = features.device
     model = build_model(config).to(device)
@@ -90,6 +90,8 @@ def pretrain(config, graph, variant, protocol):
 
     model.train()
     last_losses = None
+    snapshots = {}
+    probe_epochs = set(probe_epochs)
     for epoch in range(config.max_epoch):
         if paper:
             mask = torch.rand(graph.num_nodes(), device=device) < config.mask_rate
@@ -143,14 +145,20 @@ def pretrain(config, graph, variant, protocol):
         optimizer.step()
         if scheduler is not None:
             scheduler.step()
-        if epoch == 0 or (epoch + 1) % 100 == 0 or epoch + 1 == config.max_epoch:
+        epoch_number = epoch + 1
+        if epoch_number % 100 == 0 or epoch_number in (1, config.max_epoch) or epoch_number in probe_epochs:
             last_losses = {
                 "total": float(loss.detach()),
                 "feature": float(feature_loss.detach()) if use_feature else None,
                 "discrepancy": float(discrepancy_loss.detach()) if use_discrepancy else None,
             }
             print(f"  pretrain {epoch + 1}/{config.max_epoch} {last_losses}", flush=True)
+        if epoch_number in probe_epochs and epoch_number != config.max_epoch:
+            model.eval()
+            with torch.no_grad():
+                snapshots[epoch_number] = (model.embed(graph, features).cpu(), last_losses)
+            model.train()
 
     model.eval()
     with torch.no_grad():
-        return model.embed(graph, features), last_losses
+        return model.embed(graph, features), last_losses, snapshots
