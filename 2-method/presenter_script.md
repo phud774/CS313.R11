@@ -1,18 +1,26 @@
 # Kịch bản thuyết trình phương pháp DGMAE
 
-**Phạm vi:** Trang 13–19 của `main.pdf`, tương ứng bảy slide phương pháp. Đây là bản lời thoại đầy đủ để tập nói; khoảng 9–10 phút nếu đọc hết. Để giữ tổng thời lượng phần 2 khoảng 7,5 phút khi hai slide Implement được hoàn thiện, có thể lược ví dụ học giả ở trang 15 và các đoạn giải thích sâu về hai số mũ $\gamma_1,\gamma_2$; vẫn dành khoảng 30–40 giây cho sơ đồ tổng kết ở trang 19. Hai trang Implement (20–21) hiện chưa có nội dung để viết lời thoại cụ thể. Các câu in đậm ở cuối mỗi mục là lời chuyển slide.
+**Phạm vi:** Trang 14–21 của `main.pdf`, tương ứng tám slide phương pháp. Đây là bản lời thoại đầy đủ để tập nói; có thể rút gọn khi cần giữ tổng thời lượng phần 2 khoảng 7,5 phút. Ưu tiên nói ngắn phần công thức GAT ở trang 15, ví dụ học giả ở trang 17 và hai số mũ $\gamma_1,\gamma_2$; vẫn dành khoảng 30–40 giây cho sơ đồ tổng kết ở trang 21. Hai trang Implement (22–23) hiện chưa có nội dung để viết lời thoại cụ thể. Các câu in đậm ở cuối mỗi mục là lời chuyển slide.
 
-## Trang 13 — Sai khác gốc giữa nút và láng giềng
+## Trang 14 — Sai khác gốc giữa nút và láng giềng
 
 Ở phần trước, chúng ta đã thấy vấn đề của các mô hình GMAE thông thường: khi tái tạo một nút bị che từ láng giềng, mô hình có xu hướng học phần thông tin chung giữa các nút. Trên đồ thị dị tính, một cạnh vẫn có thể nối hai nút rất khác nhau. Nếu chỉ giữ phần chung, biểu diễn của chúng có thể trở nên khó phân biệt. DGMAE bổ sung một mục tiêu khác: học cả **phần khác biệt** giữa nút và vùng lân cận.
 
 [Chỉ công thức.] Với nút $i$, ta lấy đặc trưng gốc $x_i$, rồi trừ đi tổng đặc trưng của các láng giềng đã được chuẩn hóa theo bậc $d_i$ và $d_j$. Kết quả là $x_i^D$. Trực giác là phép tính này làm nổi bật phần đặc trưng của nút không được tín hiệu từ láng giềng giải thích tốt. Đây là một vector sai khác trên đồ thị, không đơn thuần là khoảng cách giữa hai nút. Hệ số theo bậc điều chỉnh đóng góp của các cạnh khi các nút có số láng giềng khác nhau.
 
-Đây là **sai khác gốc**, tính với toàn bộ láng giềng. Bước chọn cạnh ở hai trang sau sẽ tạo mục tiêu dùng cho loss sai khác. Encoder nhận $X$ hoặc phiên bản bị che $\hat X$, chứ không nhận trực tiếp $x_i^D$.
+Đây là **sai khác gốc**, tính với toàn bộ láng giềng. Bước chọn cạnh ở các trang sau sẽ tạo mục tiêu dùng cho loss sai khác. Encoder nhận $X$ hoặc phiên bản bị che $\hat X$, chứ không nhận trực tiếp $x_i^D$.
 
-**Công thức vừa rồi tính sai khác với mọi láng giềng. Nhưng không phải cạnh nào cũng mang thông tin khác biệt đáng học như nhau, nên DGMAE có thêm bước chọn cạnh.**
+**Công thức vừa rồi tính sai khác với mọi láng giềng. Trước khi chọn cạnh, ta cần biết GAT encoder tạo trọng số cho từng láng giềng như thế nào.**
 
-## Trang 14 — Attention thấp làm cạnh dễ được chọn
+## Trang 15 — GAT encoder: trọng số cho từng láng giềng
+
+GAT là một mạng nơ-ron đồ thị học mức đóng góp của từng láng giềng, thay vì cộng chúng với cùng một trọng số. Với cạnh $(i,j)$, hàm attention $a$ tạo điểm $e_{ij}$ từ biểu diễn của hai nút sau phép biến đổi $W$. Các điểm này được chuẩn hóa bằng softmax trong tập láng giềng của $i$, cho trọng số $w_{ij}$. Vì vậy, khi xét riêng nút $i$, các trọng số trên các láng giềng cộng lại bằng 1.
+
+[Chỉ công thức cuối.] GAT dùng $w_{ij}$ để tổng hợp đặc trưng của các láng giềng thành biểu diễn mới $h_i'$. Trọng số cao nghĩa là thông tin của nút $j$ đóng góp nhiều hơn vào biểu diễn của $i$ trong lượt tổng hợp này. Trong DGMAE, các trọng số đã học ở encoder còn được dùng để chọn cạnh cho mục tiêu sai khác; không cần thêm một bộ chấm điểm cạnh riêng.
+
+**Ta đã có $w_{ij}$ từ encoder. Slide tiếp theo dùng chính trọng số này để quyết định cạnh nào dễ được chọn hơn.**
+
+## Trang 16 — Attention thấp làm cạnh dễ được chọn
 
 Ý tưởng của bước này là ưu tiên các cặp nút mà mô hình xem là ít tương đồng. GAT encoder tạo ra trọng số attention $w_{ij}$ cho cạnh nối nút $i$ với nút $j$. Trong cách diễn giải của bài báo, attention thấp là dấu hiệu để ưu tiên xem xét sai khác của cặp nút đó. Đây là **tín hiệu để lấy mẫu**, không phải khẳng định chắc chắn rằng hai nút khác nhãn; quá trình học không dùng nhãn để quyết định cạnh nào được chọn.
 
@@ -22,17 +30,17 @@ Sau khi có xác suất, mô hình lấy mẫu Bernoulli để tạo $m_{ij}$. C
 
 **Ta đã có công tắc $m_{ij}$ cho từng cạnh. Slide tiếp theo cho thấy công tắc đó thay đổi mục tiêu $x_i^D$ như thế nào.**
 
-## Trang 15 — Đích sai khác chỉ dùng cạnh được chọn
+## Trang 17 — Đích sai khác chỉ dùng cạnh được chọn
 
 [Chỉ vào tổng trong công thức.] Sau bước lấy mẫu, mục tiêu của nút $i$ được tính bằng cách cộng chênh lệch $x_i-x_j$ với từng láng giềng $j$ được chọn. Mỗi chênh lệch được nhân với $m_{ij}$ và chuẩn hóa theo $\sqrt{d_i d_j}$. Đây là cách chuyển từ ý tưởng “nút khác láng giềng” sang một vector cụ thể để dùng trong huấn luyện.
 
 Hai trường hợp dưới công thức giúp đọc nó dễ hơn. Nếu $m_{ij}=0$, toàn bộ phần đóng góp của cạnh $(i,j)$ bằng không: cạnh ấy không tham gia mục tiêu sai khác ở lượt này. Nếu $m_{ij}=1$, chênh lệch đặc trưng của cặp nút được giữ lại, sau khi tính hệ số theo bậc. Chẳng hạn, trong ví dụ mạng học giả ở phần mở đầu, hai học giả có thể hợp tác nhưng nghiên cứu hai lĩnh vực khác nhau. Nếu cạnh giữa họ được chọn, DGMAE có một tín hiệu để giữ lại sự khác biệt về đặc trưng của cặp này, thay vì chỉ học phần ngữ cảnh chung.
 
-Ký hiệu vẫn là $x_i^D$, nhưng cần phân biệt hai bước: trang 13 giới thiệu phép đo ban đầu với mọi láng giềng; công thức ở đây là **mục tiêu sau khi chọn cạnh**. Ta đã xác định được điều mô hình cần học từ đặc trưng gốc. Việc còn lại là tạo ra một đại lượng tương ứng từ các biểu diễn mà mạng học được.
+Ký hiệu vẫn là $x_i^D$, nhưng cần phân biệt hai bước: trang 14 giới thiệu phép đo ban đầu với mọi láng giềng; công thức ở đây là **mục tiêu sau khi chọn cạnh**. Ta đã xác định được điều mô hình cần học từ đặc trưng gốc. Việc còn lại là tạo ra một đại lượng tương ứng từ các biểu diễn mà mạng học được.
 
 **Để tạo đại lượng đó, DGMAE xử lý đồ thị hai lần bằng cùng một encoder: một lần che đặc trưng và một lần giữ đầy đủ.**
 
-## Trang 16 — Hai nhánh huấn luyện DGMAE
+## Trang 18 — Hai nhánh huấn luyện DGMAE
 
 Từ đây ta sẽ xem DGMAE huấn luyện bằng **hai nhánh**. Chúng dùng cùng đồ thị, cùng các cạnh $A$ và cùng encoder $f_E$; điểm khác nhau là đặc trưng đầu vào có bị che hay không. Trên slide này ta chỉ nhìn tổng quan, rồi hai slide tiếp theo sẽ trình bày từng nhánh cùng loss tương ứng.
 
@@ -40,7 +48,7 @@ Từ đây ta sẽ xem DGMAE huấn luyện bằng **hai nhánh**. Chúng dùng 
 
 **Ta đi vào nhánh có che trước: nó tạo $\hat Z$ ra sao và dùng $\mathcal L_f$ như thế nào?**
 
-## Trang 17 — Nhánh đồ thị bị che: tái tạo đặc trưng
+## Trang 19 — Nhánh đồ thị bị che: tái tạo đặc trưng
 
 [Chỉ cột trái.] Ở đầu một epoch, mô hình chọn tập nút $\hat V$ để che. Với nút $i$ thuộc tập này, đặc trưng đưa vào encoder là $\hat x_i=0$. Encoder xử lý $\hat X$ cùng các cạnh $A$ để tạo $\hat H$; decoder GAT dùng ngữ cảnh láng giềng để tạo $\hat Z$. Đặc trưng gốc $x_i$ được giữ lại làm mục tiêu huấn luyện, không đưa vào lượt xử lý bị che.
 
@@ -50,9 +58,9 @@ Loss này buộc mô hình khai thác thông tin từ láng giềng. Tuy nhiên,
 
 **Loss thứ hai, $\mathcal L_d$, bổ sung tín hiệu sai khác đó và được tính trên nhóm nút còn lại.**
 
-## Trang 18 — Nhánh đồ thị không che: giữ sai khác
+## Trang 20 — Nhánh đồ thị không che: giữ sai khác
 
-[Chỉ cột trái.] Lượt thứ hai dùng đặc trưng gốc đầy đủ $X$ và cùng encoder $f_E$ để tạo $H$. Projector MLP hai lớp đưa $H$ thành $Z$ trong cùng không gian đặc trưng với $\hat Z$. Sau đó ta lấy $z_i^D=z_i-\hat z_i$. Cần nhớ $\hat z_i$ đến từ nhánh **có che** ở slide trước, chứ nhánh này không tự tạo được toàn bộ sai khác. Còn $x_i^D$ là mục tiêu sai khác tính từ đặc trưng gốc và các cạnh đã chọn ở trang 15.
+[Chỉ cột trái.] Lượt thứ hai dùng đặc trưng gốc đầy đủ $X$ và cùng encoder $f_E$ để tạo $H$. Projector MLP hai lớp đưa $H$ thành $Z$ trong cùng không gian đặc trưng với $\hat Z$. Sau đó ta lấy $z_i^D=z_i-\hat z_i$. Cần nhớ $\hat z_i$ đến từ nhánh **có che** ở slide trước, chứ nhánh này không tự tạo được toàn bộ sai khác. Còn $x_i^D$ là mục tiêu sai khác tính từ đặc trưng gốc và các cạnh đã chọn ở trang 17.
 
 [Chỉ cột phải.] Dòng đầu viết sai số của từng nút là $\ell_i^D$: so sánh $z_i^D$ và $x_i^D$ bằng cosine similarity, rồi nâng lên số mũ $\gamma_2>1$. Dòng sau lấy trung bình các sai số này trên **các nút không bị che** $V\setminus\hat V$ để được $\mathcal L_d$. Khi hai vector cùng hướng hơn, cosine tăng và loss giảm. Đây là mục tiêu giúp sai khác học được trong biểu diễn đi theo sai khác từ đặc trưng gốc.
 
@@ -60,7 +68,7 @@ Loss này buộc mô hình khai thác thông tin từ láng giềng. Tuy nhiên,
 
 **Loss sai khác này không đứng riêng: DGMAE huấn luyện nó cùng loss tái tạo đặc trưng của mô hình GMAE.**
 
-## Trang 19 — Huấn luyện DGMAE: loss và một epoch
+## Trang 21 — Huấn luyện DGMAE: loss và một epoch
 
 DGMAE có hai nhiệm vụ bổ sung cho nhau. $\mathcal L_f$ khôi phục đặc trưng của **nút bị che** từ ngữ cảnh, còn $\mathcal L_d$ bảo toàn sai khác trên **nút không bị che**. Hai slide trước đã định nghĩa riêng từng loss; ở đây ta chỉ cần nối chúng lại để thấy cách mô hình được huấn luyện.
 
