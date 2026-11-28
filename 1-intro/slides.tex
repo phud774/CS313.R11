@@ -6,77 +6,6 @@
 
 \section{Mở đầu \& Nền tảng}
 
-% ── Slide 1: Giới thiệu ──────────────────────────────
-\begin{frame}{Giới thiệu đề tài \& Nhóm thực hiện}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \textbf{Môn:} Data Mining \\[0.4em]
-      \textbf{Paper:} Discrepancy-Aware Graph Mask Auto-Encoder (DGMAE) \\[0.6em]
-      \textbf{Thành viên nhóm:}
-      \vspace{0.2em}
-
-      \small
-      \begin{tabular}{@{}ll@{}}
-        Đặng Phú Duy & 24520010 \\
-        Đoàn Hồng Bảo & 245200xx \\
-        Nguyễn Trường Giang & 24520011 \\
-        Trịnh Duy Hưng & 24520015 \\
-        Lương Huỳnh Gia Bảo & 24520006 \\
-        Trần Xuân Đạt & 24520008 \\
-        Trần Nguyễn Khải Lạc & 24520018 \\
-      \end{tabular}
-    \end{column}
-
-    \begin{column}{0.50\textwidth}
-      \centering
-      \begin{tikzpicture}[
-        scale=0.82,
-        node_a/.style={circle, fill=Theme_Color!70, draw=Theme_Color, text=white, inner sep=0pt, minimum size=17pt, font=\scriptsize\bfseries},
-        node_b/.style={circle, fill=orange!80, draw=orange!90!black, text=white, inner sep=0pt, minimum size=17pt, font=\scriptsize\bfseries},
-        node_mask/.style={circle, fill=white, draw=Theme_Color, dashed, line width=1.1pt, text=Theme_Color, inner sep=0pt, minimum size=21pt, font=\small\bfseries},
-        edge_homo/.style={thick, gray!55},
-        edge_hetero/.style={very thick, orange!85!black, dashed}
-      ]
-        % Nodes
-        \node[node_mask] (vm) at (0, 0.1) {$?$};
-        \node[node_a] (v1) at (-1.4, 1.2) {$v_1$};
-        \node[node_a] (v2) at (-1.5, -0.9) {$v_2$};
-        \node[node_b] (v3) at (1.5, 0.9) {$v_3$};
-        \node[node_b] (v4) at (1.4, -1.0) {$v_4$};
-        \node[node_a] (v5) at (-2.5, 0.2) {$v_5$};
-        \node[node_b] (v6) at (2.5, -0.1) {$v_6$};
-
-        % Edges
-        \draw[edge_homo] (vm) -- (v1) node[midway, left=2pt, text=black!70, font=\tiny] {Cùng lớp};
-        \draw[edge_homo] (vm) -- (v2);
-        \draw[edge_homo] (v1) -- (v5);
-        \draw[edge_homo] (v2) -- (v5);
-
-        \draw[edge_hetero] (vm) -- (v3) node[midway, right=2pt, text=orange!90!black, font=\tiny\bfseries] {Khác lớp};
-        \draw[edge_hetero] (vm) -- (v4) node[midway, below right=1pt, text=orange!90!black, font=\tiny\bfseries] {$x_i-x_j$};
-        \draw[edge_homo] (v3) -- (v6);
-        \draw[edge_homo] (v4) -- (v6);
-        \draw[edge_homo] (v3) -- (v4);
-
-        % Legend
-        \node[anchor=north, align=center, text width=5.2cm, font=\tiny, yshift=-0.4cm] at (0, -1.2) {
-          \tikz\draw[Theme_Color, dashed, line width=0.9pt, fill=white] (0,0) circle (3pt); Nút bị che \quad
-          \tikz\fill[Theme_Color!70] (0,0) circle (3pt); Cùng lớp \quad
-          \tikz\fill[orange!80] (0,0) circle (3pt); Khác lớp \\
-          \vspace{0.2em}
-          \textcolor{Theme_Color}{\textbf{DGMAE}}: Học sai khác đặc trưng
-        };
-      \end{tikzpicture}
-    \end{column}
-  \end{columns}
-\end{frame}
-% ── NỘI DUNG THUYẾT TRÌNH (Slide 1) ────────────────────
-% Xin chào thầy/cô và các bạn. Nhóm chúng em gồm 7 thành viên, hôm nay xin trình bày
-% bài báo "Discrepancy-Aware Graph Mask Auto-Encoder" (DGMAE) trong môn Data Mining.
-% Em là Đoàn Hồng Bảo, phụ trách Phần 1: giới thiệu bài toán, kiến thức nền tảng,
-% động lực nghiên cứu và kiến trúc tổng thể của mô hình.
-
-
 % ── Slide 2: Kiến thức nền tảng 1 — GNN & SSL ────────
 \begin{frame}{Kiến thức nền tảng: GNN \& SSL}
   \vspace{0.4em}
@@ -176,32 +105,74 @@
 
 % ── Slide 5: Đồng tính vs Dị tính — Định nghĩa ───────
 \begin{frame}{Tính đồng tính vs.\ Tính dị tính: Định nghĩa}
-  \vspace{0.4em}
+  \vspace{0.2em}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \textcolor{Theme_Color}{\textbf{\large Homophily (Đồng tính)}}
-      \vspace{0.6em}
+      \vspace{0.4em}
       \begin{itemize}
-        \setlength{\itemsep}{0.6em}
+        \setlength{\itemsep}{0.4em}
         \item Nút nối nhau $\Rightarrow$ \textbf{Cùng nhãn} ($y_i = y_j$)
         \item Tỉ lệ đồng tính $h$ \textbf{cao}
         \item \emph{VD:} Cora, Citeseer
       \end{itemize}
+      \vspace{0.5em}
+      \centering
+      \begin{tikzpicture}[
+        scale=0.85,
+        na/.style={circle, fill=Theme_Color!75, draw=Theme_Color, text=white, inner sep=0pt, minimum size=15pt, font=\scriptsize\bfseries},
+        nb/.style={circle, fill=orange!80, draw=orange!90!black, text=white, inner sep=0pt, minimum size=15pt, font=\scriptsize\bfseries},
+        ehomo/.style={thick, Theme_Color!80},
+        ehet/.style={thick, orange!85!black, dashed}
+      ]
+        \node[na] (a1) at (0, 0.9) {$A$};
+        \node[na] (a2) at (-1.1, 0) {$A$};
+        \node[na] (a3) at (1.1, 0) {$A$};
+        \node[na] (a4) at (0, -0.8) {$A$};
+        \node[nb] (b1) at (2.2, 0.5) {$B$};
+        \draw[ehomo] (a1) -- (a2);
+        \draw[ehomo] (a1) -- (a3);
+        \draw[ehomo] (a2) -- (a4);
+        \draw[ehomo] (a3) -- (a4);
+        \draw[ehomo] (a1) -- (a4);
+        \draw[ehet]  (a3) -- (b1);
+      \end{tikzpicture}
     \end{column}
 
     \begin{column}{0.48\textwidth}
       \textcolor{orange!85!black}{\textbf{\large Heterophily (Dị tính)}}
-      \vspace{0.6em}
+      \vspace{0.4em}
       \begin{itemize}
-        \setlength{\itemsep}{0.6em}
+        \setlength{\itemsep}{0.4em}
         \item Nút nối nhau $\Rightarrow$ \textbf{Khác nhãn} ($y_i \neq y_j$)
         \item Tỉ lệ đồng tính $h$ \textbf{thấp}
         \item \emph{VD:} Texas, Cornell, Squirrel
       \end{itemize}
+      \vspace{0.5em}
+      \centering
+      \begin{tikzpicture}[
+        scale=0.85,
+        na/.style={circle, fill=Theme_Color!75, draw=Theme_Color, text=white, inner sep=0pt, minimum size=15pt, font=\scriptsize\bfseries},
+        nb/.style={circle, fill=orange!80, draw=orange!90!black, text=white, inner sep=0pt, minimum size=15pt, font=\scriptsize\bfseries},
+        ehomo/.style={thick, Theme_Color!80},
+        ehet/.style={thick, orange!85!black, dashed}
+      ]
+        \node[na] (a1) at (0, 0.9) {$A$};
+        \node[nb] (b1) at (-1.1, 0) {$B$};
+        \node[nb] (b2) at (1.1, 0) {$B$};
+        \node[na] (a2) at (0, -0.8) {$A$};
+        \node[na] (a3) at (2.2, 0.5) {$A$};
+        \draw[ehet]  (a1) -- (b1);
+        \draw[ehet]  (a1) -- (b2);
+        \draw[ehet]  (b1) -- (a2);
+        \draw[ehet]  (b2) -- (a2);
+        \draw[ehet]  (b2) -- (a3);
+        \draw[ehomo] (b1) -- (b2);
+      \end{tikzpicture}
     \end{column}
   \end{columns}
 
-  \vspace{1.2em}
+  \vspace{0.6em}
   \centering
   $h = \dfrac{|\{(i,j) \in E : y_i = y_j\}|}{|E|}$
 \end{frame}

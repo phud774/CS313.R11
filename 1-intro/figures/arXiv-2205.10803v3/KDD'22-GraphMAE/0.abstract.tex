@@ -1,0 +1,64 @@
+\begin{abstract}
+
+
+
+%Recent years have witnessed the emerging success of self-supervised learning (SSL) on graphs. 
+%Particularly, contrastive learning has the
+Self-supervised learning (SSL) has been extensively explored in recent years. 
+Particularly, generative SSL has seen emerging success in natural language processing and other AI fields, such as the wide adoption of BERT and GPT.
+% Despite this, generative graph SSL is less explored, and 
+% the development of graph generative SSL has far lagged behind contrastive learning in graph, which relies on complicated training strategies.
+Despite this, contrastive learning---which heavily relies on structural data augmentation and complicated training strategies---has been the dominant approach in graph SSL, 
+%data augmentation, negative sampling, bi-encoders and other techniques to stabilize training
+while the progress of generative SSL on graphs, especially graph autoencoders (GAEs), has thus far not reached the potential as promised in other fields. 
+%the progress of graph generative SSL has relatively lagged. % behind.
+% while generative SSL is far less explored.
+% In this paper, we first systematically analyze the issues of existing graph autoencoders (GAEs), . Based on these, we present a masked graph autoencoder, GraphMAE, for self-supervised graph representation learning. 
+In this paper, we identify and examine the issues that negatively impact the development of GAEs, including their reconstruction objective, training robustness, and error metric. %, and decoder choice. 
+We present a masked graph autoencoder \model\footnote{The code is publicly available at \url{https://github.com/THUDM/GraphMAE}.} 
+that mitigates these issues for generative self-supervised graph pre-training. 
+Instead of reconstructing graph structures, we propose to focus on feature reconstruction with both a masking strategy and scaled cosine error that benefit the robust training of \model. 
+%The design choices in \model 
+%The new designs and improvement in \model unleash the power of autoencoders for graph learning.
+We conduct extensive experiments on 21 public datasets for three different graph learning tasks. %: node classification, graph classification, and transfer learning. 
+The results manifest that \model---a simple graph autoencoder with careful designs---can 
+consistently generate outperformance over both contrastive and generative state-of-the-art baselines. 
+This study provides an understanding of graph autoencoders and demonstrates the potential of generative self-supervised pre-training on graphs. 
+% generate significant performance advantages over
+% to state-of-the-art contrastive SSL approaches across three tasks. 
+%This demonstrates the potential of generative learning in graphs.
+
+
+%\dong{workign on it i}
+
+
+
+
+% Self-supervised learning (SSL) has been extensively explored in recent years. Particularly, generative SSL has seen emerging success in natural language processing and other fields, such as the wide adoption of BERT and GPT. Despite this, contrastive learning---which heavily relies on structural data augmentation and complicated training strategies---has been the dominant approach in graph SSL, while the progress of generative SSL on graphs, especially graph autoencoders (GAEs), has thus far not reached the potential as promised in other fields. In this paper, we identify and examine the issues that negatively impact the development of GAEs, including their reconstruction objective, training robustness, and error metric. We present a masked graph autoencoder GraphMAE\footnote{Our code is publicly available at \url{https://github.com/THUDM/GraphMAE}.} 
+% that mitigates these issues for generative self-supervised graph learning.
+% Instead of reconstructing structures, we propose to focus on feature reconstruction with both a masking strategy and scaled cosine error that benefit the robust training of GraphMAE. We conduct extensive experiments on 21 public datasets for three different graph learning tasks. The results manifest that GraphMAE---a simple graph autoencoder with our careful designs---can consistently generate outperformance over both contrastive and generative state-of-the-art baselines. This study provides an understanding of graph autoencoders and demonstrates the potential of generative self-supervised learning on graphs. 
+
+
+\end{abstract}
+
+
+\hide{
+
+Self-supervised learning (SSL) on graph-structured data has been attracting interest.
+Generative SSL has been gaining steadily increasing significance due to its success in natural language processing and computer vision.
+% Despite this, generative graph SSL is less explored, and 
+% the development of graph generative SSL has far lagged behind contrastive learning in graph, which relies on complicated training strategies.
+Despite this, contrastive learning, which relies on complicated training strategies, has been the dominant approach in graph SSL,
+while the development of graph generative SSL has far lagged. % behind.
+% while generative SSL is far less explored.
+% In this paper, we first systematically analyze the issues of existing graph autoencoders (GAEs), . Based on these, we present a masked graph autoencoder, GraphMAE, for self-supervised graph representation learning. 
+In this paper, we first systematically analyze the issues of existing graph autoencoders and identify the critical components. Based on these, we present a masked graph autoencoder, GraphMAE, for self-supervised graph representation learning. 
+% By identifying the critical components in GAEs, we add new designs and also improve existing strategies for GraphMAE, unleashing the power of autoencoders for graph learning.
+The new designs and improvement in \model unleashes the power of autoencoders for graph learning.
+We conduct extensive experiments on 21 datasets for three different graph learning tasks: node classification, graph classification, and transfer learning. The results manifest that our proposed method can 
+% generate significant performance advantages over
+achieve competitive or better performance to state-of-the-art contrastive SSL approaches across three tasks. 
+This demonstrates the potential of generative learning in graph.
+
+
+}

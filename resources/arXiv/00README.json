@@ -1,0 +1,28 @@
+{
+   "stamp" : true,
+   "sources" : [
+      {
+         "usage" : "toplevel",
+         "filename" : "DiffGAE.tex"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "ACM-Reference-Format.bst"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "ACM-Reference-Format1.bst"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "DiffGAE.bib"
+      },
+      {
+         "usage" : "ignore",
+         "filename" : "refs.bib"
+      }
+   ],
+   "process" : {
+      "compiler" : "pdflatex"
+   }
+}

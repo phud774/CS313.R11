@@ -1,0 +1,63 @@
+\section{Related Work}%
+\label{sec:related}
+According to model architectures and objective designs, self-supervised methods on graphs can be naturally divided into contrastive and generative domains. 
+% Traditionally, random-walk-based network embeddings~\cite{perozzi2014deepwalk,grover2016node2vec, tang2015line} can be regarded as a simple form of generative methods with shallow neural networks to recover proximity; 
+% graph kernels~\cite{shervashidze_2009_ais,shervashidze2011weisfeiler,yanardag2015deep} with designed features andmeasures can be viewed as ancestors of recent contrastive methods.
+
+%In this section, we focus on more recent self-supervised graph learning methods based on graph neural networks (GNNs).
+
+\subsection{Contrastive Self-Supervised Graph Learning}
+Contrastive self-supervised learning
+, which encourages alignment between label-invariant distributions and uniformity across other distributions, 
+has been the prevalent paradigm for graph representation learning in the last two years. 
+Its success relies heavily 
+on the elaborate designs of the following components:
+
+\vpara{Negative sampling.}
+In pursuit of uniformity, negative sampling is a must for most contrastive methods. 
+Mutual information based DGI~\cite{velivckovic2018deep} and InfoGraph~\cite{sun2019infograph} leverage corruptions to construct negative pairs.
+GCC~\cite{qiu2020gcc} follows the MoCo-style~\cite{he2020momentum} negative queues. 
+GRACE~\cite{zhu2020deep}, GCA~\cite{zhu2021graph} and GraphCL~\cite{you2020graph} use in-batch negatives. 
+Despite recent attempts for negative-sample-free contrastive learning, strong regularization from architecture designs (e.g., BGRL ~\cite{thakoor2021bootstrapped}) or 
+in-batch feature decorrelation
+(e.g. CCA-SSG~\cite{zhang2021canonical}) is necessary in their practice.
+
+\vpara{Architectures.}
+Contrastive methods can be unstable in early-stage training, and thus architecture constraints are important to tackle the challenge. 
+Asymmetric bi-encoder designs including momentum update~\cite{qiu2020gcc}, EMA, and Stop-gradient~\cite{thakoor2021bootstrapped} are widely adopted.
+
+\vpara{Data augmentation.}
+High-quality and informative data augmentation plays a central role in the success of contrastive learning, 
+including feature-oriented (partial masking~\cite{jin2020self,hu2020strategies,you2020graph,zhu2020deep,thakoor2021bootstrapped}, shuffling~\cite{velivckovic2018deep}), proximity-oriented (diffusion~\cite{hassani2020contrastive,kefato2021self}, perturbation~\cite{you2020graph,hu2020gpt,zeng2020contrastive}), and graph-sampling-based (random-walk~\cite{qiu2020gcc,hassani2020contrastive,you2020graph}, uniform~\cite{zeng2020contrastive}, ego-network~\cite{sterling2015zinc}) augmentations. 
+
+However, while augmentation in CV is usually human comprehensible, it is difficult to interpret in graphs. 
+Without a theoretical understanding of handcrafted graph augmentation strategies, it remains unverified whether they are label-invariant and optimal. 
+
+\subsection{Generative Self-Supervised Graph Learning}
+Generative self-supervised learning aims to recover missing parts of the input data. 
+It can be further classified into autoregressive and autoencoding two families. 
+In previous literature, generative methods' performance on graph representation learning falls behind contrastive methods by a large margin.
+
+\vpara{Graph autoregressive models.}
+Autoregressive models decompose joint probability distributions as a product of conditionals. 
+In supervised graph generation, previous researchers have proposed GraphRNN~\cite{you2018graphrnn}, GCPN~\cite{you2018graph}. 
+For graph representation learning, GPT-GNN~\cite{hu2020gpt} is a recent attempt to leverage graph generation as the training objective. 
+However, since most graphs do not present inherent orders, autoregressive methods make little sense on them.
+
+\vpara{Graph autoencoders (GAEs).}
+Autoencoders~\cite{hinton1994autoencoders} are designed to reconstruct certain inputs given the contexts and do not enforce any decoding orders as autoregressive methods do. 
+The earliest works trace back to GAE and VGAE~\cite{kipf2016variational} which take 2-layer GCN as encoder and dot-product for link prediction decoding. EP~\cite{garcia2017learning} proposes to recover vertex features using mean squared error without input corruption. 
+Later GAEs mostly adopt the structural reconstruction (e.g., ARVGA~\cite{pan2018adversarially}) following VGAE, or a combination of structural and feature reconstruction (e.g., MGAE~\cite{wang2017mgae}, GALA~\cite{park2019symmetric} and GATE~\cite{amin2020gate}) as their objectives. And NWR-GAE~\cite{tang2022graph} jointly predicts the node degree and neighbor feature distribution.
+
+Regardless of the successful applications in link prediction and graph clustering, 
+due to existing GAEs' reconstruction of structure or/and features without masking, 
+their results on node/graph classification benchmarks are usually unsatisfactory.
+Therefore, 
+our goal in this work is 
+% this work is 
+to identify the weaknesses of existing GAE designs and rejuvenate the idea of self-supervised GAEs on graph representation learning for classification.
+
+\vpara{\model v.s. Attribute-Masking.}
+Recently, some works~\cite{you2020does,manessi2021graph,zhu2020self,jin2020self} have been dedicated to surveying a wide range of many self-supervision objectives' effectiveness on GNNs, including masked feature reconstruction (namely Attribute-Masking).
+However, their performance lags far behind state-of-the-art contrastive methods because other critical defects of existing GAEs are not handled. 
+We present a rough comparison of algorithms and results between \model and them in Appendix~\ref{app:appendix}.

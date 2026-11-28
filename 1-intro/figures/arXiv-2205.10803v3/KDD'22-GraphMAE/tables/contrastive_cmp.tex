@@ -1,0 +1,10 @@
+
+\begin{tabular}{@{}clcccc@{}}
+\toprule[1.2pt]
+SSL                           & Methods & Bi-encoder & NegSample & DataAug    & Space \\ \midrule
+\multirow{4}{*}{Contrastive} & MVGRL~\cite{hassani2020contrastive}   & \Checkmark & \Checkmark & \Checkmark & $\mathcal{O}(N^2)$      \\
+                              & GCC~\cite{qiu2020gcc}     & \Checkmark & \Checkmark & \Checkmark & $\mathcal{O}(N)$        \\
+                              & GraphCL~\cite{you2020graph} & -          & \Checkmark & \Checkmark & $\mathcal{O}(N^2)$      \\
+                              & BGRL~\cite{thakoor2021bootstrapped}    & \Checkmark & -          & \Checkmark & $\mathcal{O}(N)$    \\ \midrule
+Generative                    & \model                      & -          & -          & -          & $\mathcal{O}(N)$    \\ \bottomrule[1.2pt]
+\end{tabular}

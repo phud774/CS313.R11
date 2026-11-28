@@ -1,0 +1,49 @@
+% \begin{tabular}{cccccccc}
+% \toprule[1.2pt]
+% \multicolumn{2}{c}{\multirow{2}{*}{Dataset}}
+%                      & \multicolumn{3}{c}{Node-Level} & \phantom{} & \multicolumn{2}{c}{Graph-Level} \\
+% \cmidrule{3-5} \cmidrule{7-8}
+%                     % & & \small{Cora}        & \small{PubMed}      & \small{Arxiv}  & \small{MUTAG}              & \small{IMDB-B}    \\
+%                     & & Cora        & PubMed      & Arxiv  && MUTAG              & IMDB-B              \\
+
+% % \cmidrule{2-7}
+% \midrule
+% \multirow{4}{*}{\rotatebox[origin=c]{90}{\small{COMP.}}}
+% & \model        & 84.16  & 81.10  & 71.75  && 88.19         & 75.52         \\
+% & \small{w/o mask} &  79.72 & 77.92 & 70.97 & & 82.58 & 74.42 \\
+% & \small{w/o re-mask}   & 82.70  & 80.02  & 71.61  && 86.29         & 74.42          \\
+% & \small{w/ MSE}                & 79.12  & 73.07  & 67.44  && 86.30         & 74.04          \\
+% \midrule
+% \multirow{4}{*}{\rotatebox[origin=c]{90}{\small{Decoder}}}
+% & MLP                   & 82.20  & 80.39  & 71.54  && 87.16         & 73.94          \\
+% & GCN                   & 81.25  & 79.06  & 71.59  && 87.78         & 74.54             \\
+% & GIN                   & 81.81  & 80.15  & 71.41  && 88.19         & 75.52          \\
+% & GAT                   & 84.16  & 81.10  & 71.75  && 86.27         & 74.04           \\
+% \bottomrule[1.2pt]
+% \end{tabular}
+
+
+
+\begin{tabular}{cccccccc}
+\toprule[1.2pt]
+\multicolumn{2}{c}{\multirow{2}{*}{Dataset}}
+                     & \multicolumn{3}{c}{Node-Level} & \phantom{} & \multicolumn{2}{c}{Graph-Level} \\
+\cmidrule{3-5} \cmidrule{7-8}
+                    & & Cora        & PubMed      & Arxiv  && MUTAG              & IMDB-B              \\
+
+\midrule
+\multirow{4}{*}{\rotatebox[origin=c]{90}{\small{COMP.}}}
+& \model        & 84.2  & 81.1  & 71.75  && 88.19         & 75.52         \\
+& \small{w/o mask} &  79.7 & 77.9 & 70.97 & & 82.58 & 74.42 \\
+& \small{w/o re-mask}   & 82.7  & 80.0  & 71.61  && 86.29         & 74.42          \\
+& \small{w/ MSE}                & 79.1  & 73.1  & 67.44  && 86.30         & 74.04          \\
+\midrule
+\multirow{4}{*}{\rotatebox[origin=c]{90}{\small{Decoder}}}
+& MLP                   & 82.2  & 80.4  & 71.54  && 87.16         & 73.94          \\
+& GCN                   & 81.3  & 79.1  & 71.59  && 87.78         & 74.54             \\
+& GIN                   & 81.8  & 80.2  & 71.41  && 88.19         & 75.52          \\
+& GAT                   & 84.2  & 81.1  & 71.75  && 86.27         & 74.04           \\
+\bottomrule[1.2pt]
+\end{tabular}
+
+
