@@ -33,24 +33,26 @@
   \tikz\node[draw=gray!60, dashed, rounded corners, minimum width=#1, minimum height=#2,
              align=center, text=gray, font=\small]{#3};}
 
-\section{Experiments}
+\section{Thực nghiệm}
 
 % ── Slide: Thiết lập thực nghiệm ─────────────────────
-\begin{frame}{Experimental Setup}
+\begin{frame}{Thiết lập thực nghiệm}
   \centering
-  \textbf{Self-supervised} pre-training $\rightarrow$ frozen encoder $\rightarrow$ evaluate embeddings (Sec.~5.3)\\[1em]
+  \textbf{Self-supervised pre-training} $\rightarrow$ đóng băng \textbf{encoder} $\rightarrow$ đánh giá \textbf{embedding} (Sec.~5.3)\\[1em]
   \renewcommand{\arraystretch}{1.4}
   \begin{tabular}{l l l}
     \toprule
-    \textbf{Task} & \textbf{Datasets} & \textbf{Evaluation} \\
+    \textbf{Tác vụ} & \textbf{Dataset} & \textbf{Đánh giá} \\
     \midrule
-    Node classification  & 7 heterophilic, 3 homophilic graphs & Logistic regression \\
-    Node clustering      & 6 heterophilic graphs               & K-means \\
+    Node classification  & 7 đồ thị heterophilic, 3 đồ thị homophilic & Logistic regression \\
+    Node clustering      & 6 đồ thị heterophilic                      & K-means \\
     Graph classification & MUTAG, PROTEINS, IMDB-M, COLLAB     & SVM (10-fold CV) \\
     \bottomrule
   \end{tabular}
-  \ketluan{We re-run \textbf{DGMAE only} (10 seeds, hyper-parameters from Table~8, Kaggle GPU).}
+  \ketluan{Kết quả phản ánh trực tiếp chất lượng \textbf{embedding} · nhóm chỉ chạy lại DGMAE, baseline lấy từ paper}
   % Lời thoại:
+  % - Encoder đóng băng + mô hình đơn giản (linear probe, K-means, SVM) → điểm số đo chất lượng embedding, không nhờ classifier mạnh.
+  % - Nhóm chạy 10 seed, hyper-parameter theo Table 8; số của mọi baseline lấy từ paper.
   % - Dị tính: Texas, Cornell, Wisconsin, Chameleon, Squirrel, Actor, Roman-empire. Đồng tính: Cora, Citeseer, Pubmed.
   % - Giao thức chuẩn của học biểu diễn tự giám sát: encoder học không nhãn rồi đóng băng; chất lượng embedding
   %   đo bằng một mô hình đơn giản đặt lên trên (linear probing). Báo cáo mean ± std của 10 lần chạy.
@@ -62,12 +64,12 @@
 \end{frame}
 
 % ── Slide: Phân loại node — dị tính (Table 1) ────────
-\begin{frame}{Node Classification on Heterophilic Graphs}
+\begin{frame}{Node Classification trên đồ thị heterophilic}
   \centering
   \resizebox{0.96\textwidth}{!}{%
     \begin{tabular}{ll ccccccc}
       \toprule
-      & \textbf{Method} & \textbf{Texas} & \textbf{Cornell} & \textbf{Wisconsin} & \textbf{Chameleon} & \textbf{Squirrel} & \textbf{Actor} & \textbf{Roman} \\
+      & \textbf{Phương pháp} & \textbf{Texas} & \textbf{Cornell} & \textbf{Wisconsin} & \textbf{Chameleon} & \textbf{Squirrel} & \textbf{Actor} & \textbf{Roman} \\
       \midrule
       \multirow{5}{*}{Contrastive}
         & DGI      & 58.53 & 45.33 & 55.21 & 60.27 & 26.44 & 28.30 & 63.71 \\
@@ -89,9 +91,14 @@
       \bottomrule
     \end{tabular}%
   }\\[0.3em]
-  {\scriptsize Accuracy (\%). Baselines from Table~1 of the paper; \underline{underline}: runner-up. GraphMAE $\approx$ DGMAE without discrepancy ($\mathcal{L}_d$).}
-  \ketluan{\textbf{Discrepancy helps:} DGMAE vs.\ GraphMAE \textbf{+24.0} on average (+6.8 to +33.0), 1st on all 7 datasets}
+  {\scriptsize Accuracy (\%). Baseline lấy từ Table~1 của paper; \underline{gạch chân}: runner-up. GraphMAE $\approx$ DGMAE khi bỏ $\mathcal{L}_d$.}
+  \ketluan{\textbf{Discrepancy giúp DGMAE vượt trội trên đồ thị heterophilic:} neighbor thường khác lớp,\\
+    nên chỉ tái tạo feature từ neighbor sẽ làm các node bị đồng nhất; $\mathcal{L}_d$ giữ lại phần\\
+    khác biệt giữa node và neighbor $\Rightarrow$ node khác lớp vẫn phân biệt được}
   % Lời thoại:
+  % - Chi tiết: hạng 1 trên cả 7 dataset; hơn GraphMAE +24.0 trung bình (+6.8 đến +33.0).
+  % - Vì sao: chỉ tái tạo feature (L_f) thì embedding của neighbor khác lớp bị kéo về giống nhau; L_d giữ lại khác biệt
+  %   → một phương pháp generative vượt cả contrastive chuyên cho heterophily (GREET, SP-GCL).
   % - DGMAE xây trên GraphMAE (cùng mask, GAT, L_f), chỉ thêm L_d → hàng GraphMAE gần như là "DGMAE không có discrepancy".
   %   Chênh lệch DGMAE − GraphMAE (số paper): Texas +33.0, Cornell +27.0, Wisconsin +32.7, Chameleon +6.8,
   %   Squirrel +27.6, Actor +11.0, Roman +29.9 → trung bình +24.0.
@@ -104,12 +111,12 @@
 \end{frame}
 
 % ── Slide: Phân cụm node (Table 3) ───────────────────
-\begin{frame}{Node Clustering on Heterophilic Graphs}
+\begin{frame}{Node Clustering trên đồ thị heterophilic}
   \centering
   \resizebox{0.96\textwidth}{!}{%
     \begin{tabular}{ll cccccc}
       \toprule
-      & \textbf{Method} & \textbf{Texas} & \textbf{Cornell} & \textbf{Wisconsin} & \textbf{Chameleon} & \textbf{Squirrel} & \textbf{Roman} \\
+      & \textbf{Phương pháp} & \textbf{Texas} & \textbf{Cornell} & \textbf{Wisconsin} & \textbf{Chameleon} & \textbf{Squirrel} & \textbf{Roman} \\
       \midrule
       \multirow{5}{*}{ACC}
         & GREET    & 52.40 & \underline{48.96} & \underline{56.65} & 34.44 & 25.64 & \underline{31.43} \\
@@ -127,9 +134,16 @@
       \bottomrule
     \end{tabular}%
   }\\[0.3em]
-  {\scriptsize K-means on embeddings (\%). Baselines from Table~3 of the paper; \underline{underline}: runner-up. ARI and F1 show the same trend.}
-  \ketluan{\textbf{Discrepancy helps:} vs.\ GraphMAE \textbf{+12.4 ACC}, \textbf{+19.0 NMI} on average · 1st in all 24 cells}
+  {\scriptsize K-means trên embedding (\%). Baseline lấy từ Table~3 của paper; \underline{gạch chân}: runner-up. ARI, F1 cùng xu hướng.}
+  \ketluan{\textbf{Discrepancy vẫn có ích trên đồ thị heterophilic} khi đánh giá bằng clustering\\
+    $\Rightarrow$ phương pháp tốt nhờ \textbf{embedding}, không phải nhờ classifier}
   % Lời thoại:
+  % - Chi tiết: hơn GraphMAE +12.4 ACC, +19.0 NMI trung bình; hạng 1 cả 24 ô.
+  % - Nhãn = lớp đúng của node (vd. Texas: trang web của sinh viên / giảng viên / môn học...). Pre-training của mọi tác vụ
+  %   đều không dùng nhãn. Classification: huấn luyện logistic regression trên embedding bằng nhãn của tập train.
+  %   Clustering: K-means chạy trên embedding, không dùng nhãn nào; nhãn chỉ dùng để chấm điểm cụm (ACC, NMI).
+  % - Các lớp tự tách thành cụm → lợi ích nằm ở chính embedding, không nhờ classifier.
+  % - Gain lớn ở Texas, Wisconsin, Roman; nhỏ ở Chameleon, Squirrel (+3).
   % - Chênh lệch DGMAE − GraphMAE (số paper), Texas / Cornell / Wisconsin / Chameleon / Squirrel / Roman:
   %   ACC +20.6 / +11.0 / +16.0 / +2.9 / +3.2 / +20.9 (TB +12.4); NMI +31.4 / +22.3 / +25.7 / +2.9 / +3.4 / +28.2 (TB +19.0).
   % - Phân cụm khó hơn phân loại vì không dùng nhãn nào. GraphMAE gần như "mù" trên Texas (NMI 6, ARI ~1).
@@ -139,7 +153,7 @@
 \end{frame}
 
 % ── Slide: Đồng tính (Table 2) & phân loại đồ thị (Table 9) — 2 cột cân nhau: mỗi bên 6 baseline + DGMAE ──
-\begin{frame}{Homophilic Graphs \& Graph Classification}
+\begin{frame}{Đồ thị homophilic \& Graph Classification}
   \begin{columns}[t]
     \begin{column}{0.49\textwidth}
       \centering
@@ -147,7 +161,7 @@
       {\scriptsize\setlength{\tabcolsep}{2.5pt}
       \begin{tabular}{l ccc}
         \toprule
-        \textbf{Method} & \textbf{Cora} & \textbf{Citeseer} & \textbf{Pubmed} \\
+        \textbf{Phương pháp} & \textbf{Cora} & \textbf{Citeseer} & \textbf{Pubmed} \\
         \midrule
         DGI      & 82.30 & 71.80 & 76.80 \\
         BGRL     & 81.10 & 71.22 & 79.99 \\
@@ -166,7 +180,7 @@
       {\scriptsize\setlength{\tabcolsep}{2.5pt}
       \begin{tabular}{l cccc}
         \toprule
-        \textbf{Method} & \textbf{MUTAG} & \textbf{PROTEINS} & \textbf{IMDB-M} & \textbf{COLLAB} \\
+        \textbf{Phương pháp} & \textbf{MUTAG} & \textbf{PROTEINS} & \textbf{IMDB-M} & \textbf{COLLAB} \\
         \midrule
         Infograph & \underline{89.01} & 74.44 & 49.69 & 70.65 \\
         GraphCL   & 86.80 & 74.39 & 48.58 & 71.36 \\
@@ -181,10 +195,12 @@
     \end{column}
   \end{columns}
   \vspace{0.5em}
-  \centering{\scriptsize Accuracy (\%). Baselines from the paper; \underline{underline}: runner-up.}
-  \ketluan{\textbf{Discrepancy does not hurt:} vs.\ GraphMAE \textbf{+0.4} (homophilic), \textbf{+0.8} (graph classification) on average\\
-    $\Rightarrow$ large gains \textbf{only when neighbors differ} (heterophily)}
+  \centering{\scriptsize Accuracy (\%). Baseline lấy từ paper; \underline{gạch chân}: runner-up.}
+  \ketluan{\textbf{Discrepancy không gây hại:} trên đồ thị homophilic (neighbor vốn giống nhau) và graph classification,\\
+    DGMAE ngang hoặc nhỉnh hơn GraphMAE $\Rightarrow$ lợi ích lớn chủ yếu đến từ đồ thị heterophilic}
   % Lời thoại:
+  % - Chi tiết: so với GraphMAE chỉ +0.4 (homophilic), +0.8 (graph classification) trung bình.
+  % - Vì sao: neighbor vốn giống nhau nên discrepancy nhỏ, L_d ít thông tin mới → gain lớn chỉ khi neighbor khác nhau.
   % - Chênh lệch DGMAE − GraphMAE (số paper): Cora +0.7, Citeseer +0.4, Pubmed 0.0; MUTAG +0.9, PROTEINS +1.2,
   %   IMDB-M +0.3, COLLAB +0.8. So với +24.0 trên đồ thị dị tính → discrepancy có ích đúng chỗ cần.
   % - DGMAE được thiết kế cho đồ thị dị tính; ở đây paper chỉ cần chứng minh "không làm hại".
@@ -219,7 +235,7 @@
 % \end{frame}
 
 % ── Slide: Tái lập — phân loại node (Table 1 & 2): chỉ DGMAE paper vs. nhóm (thay cho biểu đồ cột ở trên) ──
-\begin{frame}{Reproducibility: Node Classification}
+\begin{frame}{Tái lập: Node Classification}
   \centering
   \renewcommand{\arraystretch}{1.6}
   \resizebox{0.96\textwidth}{!}{%
@@ -238,10 +254,13 @@
       \bottomrule
     \end{tabular}%
   }\\[0.3em]
-  {\scriptsize Accuracy (\%), mean $\pm$ std over 10 seeds. $\Delta$ = reproduced $-$ paper.}
-  \ketluan{All 10 below the paper: median gap \nh{$-$2.2}, \nh{6/10} within 2.2 points (2/10 within 1 std)\\
-    Largest gaps: Squirrel ($-$16.1), Chameleon ($-$8.3)}
+  {\scriptsize Accuracy (\%), mean $\pm$ std qua 10 seed. $\Delta$ = tái lập $-$ paper.}
+  \ketluan{\textbf{Tái lập được xu hướng của paper}, nhưng số tuyệt đối thấp hơn,\\
+    nhiều khả năng do paper thiếu một số cấu hình}
   % Lời thoại:
+  % - Chi tiết: thấp hơn paper ở cả 10 dataset; 6/10 lệch ≤ 2.2 điểm (trung vị −2.2); lệch lớn ở Squirrel (−16.1), Chameleon (−8.3).
+  % - Homophilic (nơi L_d ít tác động) cũng lệch −1.3 đến −3.7 → chênh lệch nhiều khả năng do cấu hình chung
+  %   paper không công bố (hidden size, số epoch, preprocessing), không phải do L_d.
   % - Chênh lệch trung bình (nhóm − paper): phân loại node dị tính −5.2 (trung vị −2.2), đồng tính −2.3;
   %   phân cụm ACC −9.1, NMI −6.3; phân loại đồ thị −0.6. Xu hướng giữ nguyên: dị tính vẫn hơn GraphMAE rất xa.
   % - Nguyên nhân có thể: paper thiếu cấu hình (hidden size, số head, số epoch,
@@ -255,7 +274,7 @@
 \end{frame}
 
 % ── Slide: Tái lập — phân cụm (Table 3) & phân loại đồ thị (Table 9): chỉ DGMAE paper vs. nhóm ──
-\begin{frame}{Reproducibility: Clustering \& Graph Classification}
+\begin{frame}{Tái lập: Node Clustering \& Graph Classification}
   \centering
   {\small\textbf{Node clustering — Table~3}}\\[0.3em]
   {\scriptsize
@@ -285,9 +304,11 @@
     $\Delta$    & $-$1.22 & $-$0.88 & $-$0.04 & $-$0.23 \\
     \bottomrule
   \end{tabular}}
-  \ketluan{Graph classification: \nh{within 1.2} of the paper\\
-    Clustering: \nh{$-$9.1 ACC}, \nh{$-$6.3 NMI} on average · Roman matches the paper}
+  \ketluan{\textbf{Graph classification tái lập sát paper};\\
+    clustering lệch nhiều hơn vì nhạy với khác biệt nhỏ của embedding}
   % Lời thoại:
+  % - Chi tiết: graph classification lệch ≤ 1.2; clustering −9.1 ACC, −6.3 NMI trung bình; Roman khớp paper.
+  % - Vì sao clustering lệch nhiều: K-means không có classifier bù lại nên khác biệt nhỏ của embedding lộ rõ.
   % - Δ = nhóm − paper. Phân loại đồ thị tái lập tốt nhất (TB −0.6); phân cụm lệch nhiều nhất (Cornell, Wisconsin, Chameleon).
   % - Roman khớp paper (ACC 36.24 vs 36.25; NMI 40.09 > 37.57). Phân cụm nhạy với embedding hơn phân loại vì không dùng nhãn.
   % - Nguyên nhân có thể: code tác giả gán cứng λ = 0.4/0.6 cho phân cụm, không có trong Table 8 — nhóm theo Table 8.
@@ -296,12 +317,12 @@
   % - Phân loại đồ thị: encoder GIN; Table 8 không có siêu tham số cho tác vụ này → theo config tác giả.
 \end{frame}
 
-\section{Analysis}
+\section{Phân tích}
 
 % ── Slide: Ablation (Table 4) ────────────────────────
 \begin{frame}{Ablation Study}
   \centering
-  \setlength{\tabcolsep}{4pt}
+  \setlength{\tabcolsep}{2.5pt}
   \resizebox{0.96\textwidth}{!}{%
     \begin{tabular}{l cc cc cc cc}
       \toprule
@@ -309,46 +330,38 @@
         \multicolumn{2}{c}{\textbf{Actor}} & \multicolumn{2}{c}{\textbf{Citeseer}} &
         \multicolumn{2}{c}{\textbf{Photo}} \\
       \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
-      \textbf{Variant} & Paper & \textbf{Repro.} & Paper & \textbf{Repro.} &
+      \textbf{Biến thể} & Paper & \textbf{Repro.} & Paper & \textbf{Repro.} &
         Paper & \textbf{Repro.} & Paper & \textbf{Repro.} \\
       \midrule
-      w/o adaptive edge selection & 75.35 &
-        74.71 &
-        33.41 &
-        34.28 &
-        73.03 & 73.05 & 93.40 & 93.14 \\
-      w/o $\mathcal{L}_d$$^{*}$ & \textbf{36.71} &
-        \textbf{40.03} &
-        \textbf{28.14} &
-        \textbf{26.86} &
-        73.05 & 73.09 & 93.15 & 92.90 \\
-      w/o $\mathcal{L}_f$ ($\mathcal{L}_d$ only)$^{*}$ & 75.04 &
-        72.24 &
-        35.16 &
-        31.41 &
-        \textbf{58.02} & \textbf{59.92} & \textbf{92.88} & \textbf{92.76} \\
+      w/o adaptive edge selection & $75.35\!\pm\!0.30$ & $74.71\!\pm\!0.57$ &
+        $33.41\!\pm\!1.07$ & $34.28\!\pm\!1.17$ &
+        $73.03\!\pm\!0.52$ & $73.05\!\pm\!0.89$ &
+        $93.40\!\pm\!0.42$ & $93.14\!\pm\!0.22$ \\
+      w/o $\mathcal{L}_d$$^{*}$ & $\bm{36.71}\!\pm\!0.50$ & $\bm{40.03}\!\pm\!0.83$ &
+        $\bm{28.14}\!\pm\!1.12$ & $\bm{26.86}\!\pm\!1.24$ &
+        $73.05\!\pm\!0.23$ & $73.09\!\pm\!0.64$ &
+        $93.15\!\pm\!0.41$ & $92.90\!\pm\!0.25$ \\
+      w/o $\mathcal{L}_f$ ($\mathcal{L}_d$ only)$^{*}$ & $75.04\!\pm\!0.44$ & $72.24\!\pm\!0.90$ &
+        $35.16\!\pm\!0.75$ & $31.41\!\pm\!1.46$ &
+        $\bm{58.02}\!\pm\!1.33$ & $\bm{59.92}\!\pm\!1.76$ &
+        $\bm{92.88}\!\pm\!0.45$ & $\bm{92.76}\!\pm\!0.27$ \\
       \midrule
-      DGMAE (full) & 76.62 &
-        74.60 &
-        36.61 &
-        33.37 &
-        73.82 & 73.34 & 93.96 & 93.01 \\
+      DGMAE (full) & $76.62\!\pm\!0.41$ & $74.60\!\pm\!0.71$ &
+        $36.61\!\pm\!0.74$ & $33.37\!\pm\!0.81$ &
+        $73.82\!\pm\!0.64$ & $73.34\!\pm\!0.54$ &
+        $93.96\!\pm\!0.41$ & $93.01\!\pm\!0.27$ \\
       \bottomrule
     \end{tabular}%
   }\par\smallskip
   {\scriptsize
-    Each ablation removes one component. Mean test accuracy (\%) over 10 seeds.\par
-    Bold marks the largest ablation drop in each column.
-    $^{*}$Table~4 labels are inferred from Fig.~10.\par
+    Test accuracy (\%), mean $\pm$ SD qua 10 seed. \textbf{Đậm}: mức giảm lớn nhất trong mỗi cột.
+    $^{*}$Nhãn của Table~4 suy ra từ Fig.~10.\par
   }
 
-  \begin{block}{Findings}
-    \small
-    Removing $\mathcal{L}_d$ causes the largest drops on Roman
-    (\textbf{34.57 pp}) and Actor (\textbf{6.51 pp}), while removing
-    $\mathcal{L}_f$ has the largest impact on Citeseer (\textbf{13.42 pp}).
-    On Photo, removing $\mathcal{L}_f$ gives the largest drop (\textbf{0.25 pp}).
-  \end{block}
+  \ketluan{\textbf{Hai loss bổ sung cho nhau}, cùng xu hướng với paper:\\
+    bỏ $\mathcal{L}_d$ sụp trên heterophilic (Roman \nh{$-$34.6}, Actor \nh{$-$6.5}) · bỏ $\mathcal{L}_f$ sụp trên homophilic (Citeseer \nh{$-$13.4})\\
+    \textbf{Adaptive edge selection} chưa giúp ích ổn định: bỏ đi lại tăng accuracy ở \nh{3/4} dataset (paper: giảm cả 4)}
+
 
   % Lời thoại:
   % - Roman dùng split 48/32/20 tự sinh, seed 0–9. Nhánh L_d dùng trung bình
@@ -370,6 +383,7 @@
   % - Với Photo, split cùng tỷ lệ Bảng 7 nhưng paper không công bố chỉ số nút.
   %   Nhóm lấy trung bình SCE của 1-hop và 2-hop. Hai khác biệt về thiết lập
   %   này có thể ảnh hưởng điểm full, chưa xác định mức ảnh hưởng riêng.
+  % - Photo: bỏ L_f giảm nhiều nhất nhưng chỉ 0.25 điểm (93.01 → 92.76).
   % - Trên Roman và Actor, loss sai khác có thể giúp giữ thông tin phân biệt
   %   giữa các nút kề nhau thường khác nhãn. Trên Citeseer, các nút kề nhau
   %   thường tương đồng và cung cấp ngữ cảnh để tái tạo đặc trưng bị che.
@@ -388,16 +402,15 @@
   \vspace{0.35em}
   \includegraphics[width=\linewidth]{3-experiment/figures/figure8-squirrel-bandwidth-006.pdf}\par
   \vspace{0.35em}
-  {\scriptsize Phân bố cosine trên các cặp node kề nhau và khác nhãn.\par
-  Actor: GraphMAE dùng feature nhị phân và tắt residual, cho đỉnh tại \(0{,}97\).
-  Đường đỏ Actor dùng feature chuẩn hóa theo cột.\par
-  Squirrel dùng bandwidth KDE \(0{,}06\) chung cho cả bốn đường.}
-  % TODO: t-SNE
+  \ketluan{Roman, Actor: \textbf{cosine similarity} của neighbor khác nhãn \nh{thấp hơn GraphMAE} $\Rightarrow$ $\mathcal{L}_d$ giữ các lớp tách nhau\\
+    Squirrel: đỉnh \nh{$\sim$0.48} (paper $\sim$0.25) $\Rightarrow$ tách kém hơn, khớp mức lệch accuracy lớn nhất}
+  {\tiny Actor: GraphMAE dùng feature nhị phân, tắt residual; đường đỏ chuẩn hóa feature theo cột.
+    Squirrel: KDE bandwidth 0.06 cho cả bốn đường.\par}  % TODO: t-SNE
 \end{frame}
 
 
 % ── Slide: Độ nhạy λ (Fig. 10) — 2 cột cân nhau: hình paper | hình nhóm, cùng kích thước ──
-\begin{frame}{Sensitivity to $\lambda$}
+\begin{frame}{Độ nhạy theo $\lambda$}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
       \centering
@@ -406,55 +419,73 @@
     \end{column}
     \begin{column}{0.48\textwidth}
       \centering
-      {\small\textbf{\nh{Reproduced} — Cornell, Cora}}\\[0.4em]
+      {\small\textbf{\nh{Tái lập}}}\\[0.4em]
       % Khi có kết quả: thay khung dưới bằng \includegraphics[height=0.45\textheight]{lambda_nhom.pdf}
-      \hinhcho{0.85\linewidth}{0.45\textheight}{[ĐIỀN] Accuracy vs.\ $\lambda$\\ Cornell (heterophilic), Cora (homophilic)}
+      % \hinhcho{0.85\linewidth}{0.45\textheight}{[ĐIỀN] Accuracy vs.\ $\lambda$\\ Cornell (heterophilic), Cora (homophilic)}
+      \includegraphics[height=0.45\textheight]{3-experiment/figures/figure10-reproduced-overlay.png}
     \end{column}
   \end{columns}
-  \ketluan{Paper: heterophilic graphs need large $\lambda$ (0.4--0.7), homophilic graphs small $\lambda$ ($\approx$0.1) · Reproduced: [ĐIỀN]}
+  
+  \ketluan{Paper: heterophilic cần $\lambda$ lớn (0.4--0.7), homophilic cần $\lambda$ nhỏ ($\approx$0.1)\\
+    Tái lập: Roman/Actor đạt đỉnh ở \nh{$\lambda$ = 0.6}, Cora/Photo ở \nh{0/0.1} $\Rightarrow$ \textbf{càng heterophilic càng cần $\mathcal{L}_d$}\\
+    Ngoại lệ: Citeseer đạt đỉnh ở \nh{0.5} · $\lambda$ phải chỉnh theo từng dataset}
+
   % Lời thoại:
   % - λ = 0: chỉ L_f (≈ GraphMAE); λ = 1: chỉ L_d.
   % - λ cần chọn theo mức độ dị tính của đồ thị — đây cũng là một hạn chế (thêm siêu tham số).
   % - Nhóm: [ĐIỀN]. Hình của nhóm: [ĐIỀN: script vẽ, ví dụ scripts/plot_lambda.py — chưa có].
 \end{frame}
 
-\section{Conclusion}
+\section{Kết luận}
 
 % ── Slide: Key findings ──────────────────────────────
 \begin{frame}{Key Findings}
   \centering
-  \renewcommand{\arraystretch}{1.4}
-  \begin{tabular}{p{0.58\textwidth} p{0.30\textwidth}}
+  \renewcommand{\arraystretch}{1.3}
+  {\small
+  \begin{tabular}{p{0.52\textwidth} p{0.36\textwidth}}
     \toprule
-    \textbf{Finding (paper)} & \textbf{Reproduced?} \\
+    \textbf{Kết luận của paper} & \textbf{Nhóm kiểm chứng} \\
     \midrule
-    DGMAE is best on \textbf{heterophilic graphs} (classification \& clustering) & \nh{[ĐIỀN]} \\
-    \textbf{No loss} on homophilic graphs and graph classification         & \nh{[ĐIỀN]} \\
-    $\mathcal{L}_d$ is the \textbf{key component} on heterophilic graphs  & \nh{[ĐIỀN]} \\
-    $\lambda$ must be tuned to the heterophily level                       & \nh{[ĐIỀN]} \\
+    DGMAE vượt trội trên \textbf{đồ thị heterophilic}             & \nh{Một phần} — đúng xu hướng, số thấp hơn \\
+    \textbf{Không gây hại} trên đồ thị homophilic                 & \nh{Có} \\
+    $\mathcal{L}_d$ là \textbf{thành phần then chốt}               & \nh{Có} \\
+    \textbf{Adaptive edge selection} có ích                       & \nh{Chưa thấy rõ} \\
+    $\lambda$ phụ thuộc mức độ heterophily                        & \nh{Có} \\
     \midrule
-    \textbf{Overall reproducibility}                                        & \nh{[ĐIỀN]} \\
+    \textbf{Tổng thể}                                             & \nh{Tái lập được kết luận chính} \\
     \bottomrule
-  \end{tabular}
-  \ketluan{[ĐIỀN: một câu tổng kết — điều nhóm tin chắc nhất sau khi chạy lại]}
+  \end{tabular}}
+  \ketluan{\textbf{Discrepancy là chìa khóa để GMAE hoạt động trên đồ thị heterophilic}}
   % Lời thoại:
-  % - Cột "Nhóm kiểm chứng": ghi ngắn, ví dụ "Có — 5/7 dataset" / "Một phần" / "Không" (điền theo số chính thức).
   % - Slide này trả lời trực tiếp yêu cầu "key findings" của đồ án.
+  % - Dòng 1: số của nhóm vẫn hạng 1 ở Texas, Wisconsin nếu so với số baseline trong paper (khác thiết lập, chỉ tham khảo);
+  %   thấp hơn paper ở Chameleon 67.17 (paper 75.50), Squirrel 56.37 (paper 72.47). Clustering lệch paper −9.1 ACC.
+  % - Dòng 2: so sánh có kiểm soát ở slide Ablation: Citeseer 73.34 → 73.09, Photo 93.01 → 92.90 khi bỏ L_d;
+  %   graph classification lệch paper ≤ 1.2.
+  % - Dòng 3: bỏ L_d: Roman 74.60 → 40.03 (−34.6), Actor 33.37 → 26.86 (−6.5). Đây là điều nhóm tin chắc nhất
+  %   vì là so sánh có kiểm soát trên cùng code.
+  % - Dòng 4: paper (Table 4) giảm ở cả 4 dataset khi bỏ chọn cạnh; nhóm: Roman +0.11, Actor +0.91, Photo +0.13, Citeseer −0.29.
+  % - Dòng 5: heterophilic (Roman, Actor) đạt đỉnh ở λ = 0.6, homophilic (Cora, Photo) ở 0–0.1; ngoại lệ Citeseer 0.5.
+  % - Dòng 6: node classification trung vị −2.2 (TB −4.3), clustering ACC −9.1 / NMI −6.3, graph classification TB −0.6.
 \end{frame}
 
 % ── Slide: Kết luận ──────────────────────────────────
-\begin{frame}{Conclusion}
+\begin{frame}{Kết luận}
   \begin{itemize}
-    \setlength{\itemsep}{1em}
-    \item \textbf{Paper:} reconstructing the \textbf{discrepancy} $\Rightarrow$ clear gains on \textbf{heterophilic graphs},
-      no loss on homophilic graphs.
-    \item \textbf{Reproduction:} DGMAE re-implemented from the paper, without the authors' code. Result: [ĐIỀN: một câu tóm tắt mức độ tái lập]
-    \item \textbf{Limitation:} extra hyper-parameters ($\lambda$, $p_c$, $p_\tau$, $\gamma_2$) tuned per dataset
-      $\rightarrow$ future work: choose $\lambda$ \textbf{automatically} from the heterophily level.
+    \setlength{\itemsep}{0.8em}
+    \item \textbf{Paper:} học thêm \textbf{discrepancy} giúp GMAE hoạt động tốt trên \textbf{đồ thị heterophilic}
+      mà không ảnh hưởng đồ thị homophilic.
+    \item \textbf{Tái lập:} \textbf{kết luận chính được kiểm chứng}, số tuyệt đối thấp hơn paper.
+    \item \textbf{Hạn chế:} nhiều \textbf{hyper-parameter} phải chỉnh theo từng dataset; không phải thành phần nào cũng cho thấy lợi ích rõ.
+    \item \textbf{Hướng phát triển:} tự động chọn $\lambda$ theo mức độ heterophily; mở rộng cho đồ thị lớn.
   \end{itemize}
-  \ketluan{\textbf{A simple idea that works on heterophilic graphs} — [ĐIỀN: nhận xét về tính tái lập]}
+  \ketluan{\textbf{Ý tưởng đơn giản nhưng hiệu quả trên đồ thị heterophilic}}
   % Lời thoại:
-  % - Nhóm tái lập [ĐIỀN] tác vụ trên [ĐIỀN] dataset.
+  % - Tái lập: cài lại DGMAE từ paper, không dùng code tác giả; 3 tác vụ (node classification, node clustering,
+  %   graph classification), 14 dataset, 10 seed. Node classification trung vị −2.2, graph classification −0.6 so với paper.
+  % - Hạn chế: λ, p_c, p_τ, γ_2 chỉnh theo từng dataset; adaptive edge selection chưa cho gain ổn định khi tái lập.
+  % - Hướng phát triển: chọn λ tự động theo mức độ heterophily; huấn luyện mini-batch cho đồ thị lớn.
   % - Hạn chế khác của phương pháp: encoder chạy 2 lần mỗi vòng. Hướng khác: huấn luyện mini-batch cho đồ thị lớn.
   % - Hạn chế của nhóm: chưa chạy dataset lớn, chưa tái hiện Table 5, 10, 11, 12.
 \end{frame}
