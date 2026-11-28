@@ -1,7 +1,7 @@
 % ══════════════════════════════════════════════════════
 % PHẦN 1 — MỞ ĐẦU, NỀN TẢNG, KIẾN TRÚC
 % Người thuyết trình: A (TV2 — Đoàn Hồng Bảo)
-% Thời lượng: ~8 phút · 7 slides (theo Yêu cầu người thuyết trình)
+% Phong cách: Tối giản (Minimum) — Keyword + Biểu tượng
 % ══════════════════════════════════════════════════════
 
 \section{Mở đầu \& Nền tảng}
@@ -17,13 +17,13 @@
 
       \small
       \begin{tabular}{@{}ll@{}}
-        Đặng Phú Duy & [ĐIỀN MSSV] \\
-        Đoàn Hồng Bảo & [ĐIỀN MSSV] \\
-        Nguyễn Trường Giang & [ĐIỀN MSSV] \\
-        Trịnh Duy Hưng & [ĐIỀN MSSV] \\
-        Lương Huỳnh Gia Bảo & [ĐIỀN MSSV] \\
-        Trần Xuân Đạt & [ĐIỀN MSSV] \\
-        Trần Nguyễn Khải Lạc & [ĐIỀN MSSV]
+        Đặng Phú Duy & 24520010 \\
+        Đoàn Hồng Bảo & 245200xx \\
+        Nguyễn Trường Giang & 24520011 \\
+        Trịnh Duy Hưng & 24520015 \\
+        Lương Huỳnh Gia Bảo & 24520006 \\
+        Trần Xuân Đạt & 24520008 \\
+        Trần Nguyễn Khải Lạc & 24520018 \\
       \end{tabular}
     \end{column}
 
@@ -64,231 +64,351 @@
           \tikz\fill[Theme_Color!70] (0,0) circle (3pt); Cùng lớp \quad
           \tikz\fill[orange!80] (0,0) circle (3pt); Khác lớp \\
           \vspace{0.2em}
-          \textcolor{Theme_Color}{\textbf{DGMAE}}: Học sai khác đặc trưng; màu lớp chỉ để minh họa
+          \textcolor{Theme_Color}{\textbf{DGMAE}}: Học sai khác đặc trưng
         };
       \end{tikzpicture}
     \end{column}
   \end{columns}
 \end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 1) ────────────────────
+% Xin chào thầy/cô và các bạn. Nhóm chúng em gồm 7 thành viên, hôm nay xin trình bày
+% bài báo "Discrepancy-Aware Graph Mask Auto-Encoder" (DGMAE) trong môn Data Mining.
+% Em là Đoàn Hồng Bảo, phụ trách Phần 1: giới thiệu bài toán, kiến thức nền tảng,
+% động lực nghiên cứu và kiến trúc tổng thể của mô hình.
 
-% ── Slide 2: Kiến thức nền tảng 1 ────────────────────
-\begin{frame}{Kiến thức nền tảng: GNN, SSL \& GMAE vs.\ BERT}
+
+% ── Slide 2: Kiến thức nền tảng 1 — GNN & SSL ────────
+\begin{frame}{Kiến thức nền tảng: GNN \& SSL}
+  \vspace{0.4em}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \begin{block}{1. Bài toán tổng quát}
-        \footnotesize
-        \begin{itemize}
-          \item Đồ thị $G=(V,E)$: $V$ là tập nút, $E$ là tập cạnh; $X\in\mathbb{R}^{|V|\times d}$ với $d$ đặc trưng mỗi nút.
-          \item \textbf{Mục tiêu:} Học biểu diễn $H\in\mathbb{R}^{|V|\times d'}$ ($d'$ chiều nhúng) cho phân loại, phân cụm.
-        \end{itemize}
-      \end{block}
-      \vspace{-0.3em}
-      \begin{block}{2. GNN \& Học tự giám sát (SSL)}
-        \footnotesize
-        \begin{itemize}
-          \item \textbf{GNN:} Nhiều mô hình truyền thông điệp qua láng giềng, dẫn tới \textbf{làm mượt (smoothing)}.
-          \item \textbf{SSL:} Tự tạo tín hiệu giám sát từ chính cấu trúc/đặc trưng mà không cần gán nhãn.
-        \end{itemize}
-      \end{block}
-    \end{column}
-
-    \begin{column}{0.50\textwidth}
-      \begin{block}{3. So sánh: GMAE vs.\ BERT}
-        \footnotesize
-        Cùng ý tưởng \textbf{che đầu vào rồi dự đoán phần bị che}:
-        \vspace{0.2em}
-        \resizebox{\columnwidth}{!}{%
-          \begin{tabular}{p{2.2cm}p{3.1cm}p{3.1cm}}
-            \toprule
-            \textbf{Đặc điểm} & \textbf{BERT (NLP)} & \textbf{GMAE (Graph)} \\
-            \midrule
-            \textbf{Đối tượng che} & Token từ trong câu & Đặc trưng nút $X$ \\
-            \textbf{Ngữ cảnh} & Các từ xung quanh & Đặc trưng láng giềng và cấu trúc $N(i)$ \\
-            \textbf{Mục tiêu học} & Dự đoán từ bị che & Tái tạo đặc trưng nút bị che \\
-            \bottomrule
-          \end{tabular}%
-        }
-      \end{block}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-% ── Slide 3: Kiến thức nền tảng 2 ────────────────────
-\begin{frame}{Kiến thức nền tảng: Tính đồng tính vs.\ Tính dị tính}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Homophily (Đồng tính)}
-        \footnotesize
-        \begin{itemize}
-          \item Các nút nối nhau thường \textbf{cùng lớp/nhãn}.
-          \item \emph{Ví dụ:} Cora, Citeseer (mạng trích dẫn).
-          \item $y_i$ là nhãn của nút $i$.
-          \item Tỉ lệ đồng tính: $h = \frac{|\{(i,j) \in E : y_i = y_j\}|}{|E|}$; đồ thị đồng tính có $h$ cao.
-        \end{itemize}
-      \end{block}
-      \begin{block}{Heterophily (Dị tính)}
-        \footnotesize
-        \begin{itemize}
-          \item Các nút nối nhau thường \textbf{khác lớp/nhãn}.
-          \item \emph{Ví dụ:} Texas, Cornell, Squirrel, Chameleon.
-          \item Tỉ lệ đồng tính cạnh $h$ thấp.
-        \end{itemize}
-      \end{block}
-    \end{column}
-
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Ví dụ: Bộ dữ liệu Roman-empire}
-        \footnotesize
-        \begin{itemize}
-          \item Đồ thị dị tính mạnh từ Wikipedia tiếng Anh.
-          \item \textbf{Nút:} Từ trong văn bản (word embedding).
-          \item \textbf{Cạnh:} Quan hệ ngữ cảnh và cây phụ thuộc cú pháp.
-          \item \textbf{Nhãn:} Vai trò cú pháp của từ.
-          \item $\Rightarrow$ Từ nối nhau \textbf{thường có vai trò khác nhau}.
-        \end{itemize}
-      \end{block}
-      \begin{alertblock}{Vấn đề cốt lõi của GMAE}
-        \footnotesize
-        GMAE thiên về khôi phục thông tin chung từ láng giềng, nên \textbf{có thể kém hiệu quả trên đồ thị dị tính}.
-      \end{alertblock}
-    \end{column}
-  \end{columns}
-\end{frame}
-
-% ── Slide 4: Mở đầu ──────────────────────────────────
-\begin{frame}{Mở đầu: Động lực \& Điểm yếu của GMAE}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \centering
-      \includegraphics[width=\linewidth, height=0.45\textheight, keepaspectratio]{example.pdf}
-      \vspace{0.1em}
+      \textcolor{Theme_Color}{\textbf{\large Bài toán đồ thị}}
+      \vspace{0.6em}
       \begin{itemize}
-        \footnotesize
-        \item \textbf{Ví dụ từ paper (Figure 1):} Mạng cộng tác học giả.
-        \item Học giả A (AI) nối với C (AI) và B (Vật lý).
-        \item Khi che A: C mang ngữ cảnh tốt, nhưng B mang đặc trưng dị tính $\rightarrow$ \textbf{nhiễu nghiêm trọng} cho việc tái tạo A.
+        \setlength{\itemsep}{0.7em}
+        \item $G = (V, E)$, \quad $X \in \mathbb{R}^{|V|\times d}$
+        \item \textbf{Mục tiêu:} $X \xrightarrow{\text{học}} H \in \mathbb{R}^{|V|\times d'}$
+        \item \textbf{Ứng dụng:} Phân loại $\cdot$ Phân cụm
       \end{itemize}
     \end{column}
 
     \begin{column}{0.48\textwidth}
-      \begin{block}{Điểm yếu của GMAE truyền thống}
-        \footnotesize
-        \begin{itemize}
-          \item \textbf{Thiên về sự nhất quán (Consistency):} Tái tạo nút từ ngữ cảnh láng giềng.
-          \item \textbf{Thiếu tín hiệu sai khác (Discrepancy):} Chưa trực tiếp bảo toàn chênh lệch giữa các nút.
-        \end{itemize}
-      \end{block}
-      \begin{alertblock}{Hệ quả trên đồ thị dị tính}
-        \footnotesize
-        \begin{itemize}
-          \item Có thể kéo biểu diễn của các nút khác lớp lại \textbf{gần nhau} trong không gian nhúng.
-          \item Ranh giới phân lớp bị xóa nhòa $\rightarrow$ biểu diễn kém phân biệt, hiệu năng downstream giảm.
-        \end{itemize}
-      \end{alertblock}
+      \textcolor{Theme_Color}{\textbf{\large GNN \& Học tự giám sát (SSL)}}
+      \vspace{0.6em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.7em}
+        \item \textbf{GNN:} Truyền thông điệp $\rightarrow$ \textbf{Làm mượt (Smoothing)}
+        \item \textbf{SSL:} Không cần nhãn $\rightarrow$ Tự tạo tín hiệu giám sát
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 2) ────────────────────
+% Đầu tiên, về bài toán tổng quát: ta có đồ thị G = (V, E) với ma trận đặc trưng nút X.
+% Mục tiêu là học biểu diễn nhúng H có số chiều d' phục vụ các tác vụ như phân loại hay phân cụm nút.
+% Với Mạng nơ-ron đồ thị (GNN), cơ chế chính là truyền thông điệp qua các nút láng giềng,
+% điều này vô tình dẫn tới hiện tượng làm mượt (smoothing) đặc trưng giữa các nút kề nhau.
+% Để học mà không cần nhãn thủ công, Học tự giám sát (SSL) tận dụng chính cấu trúc và
+% đặc trưng sẵn có của đồ thị để tự tạo tín hiệu giám sát.
 
-% ── Slide 5: Thực nghiệm chứng minh vấn đề ──────────
-\begin{frame}{Thực nghiệm chứng minh: Hiện tượng xóa nhòa sự khác biệt}
+
+% ── Slide 3: Kiến thức nền tảng 2 — Giới thiệu GMAE ──
+\begin{frame}{Kiến thức nền tảng: Graph Masked Autoencoder (GMAE)}
+  \centering
+  \includegraphics[width=0.88\linewidth, height=0.45\textheight, keepaspectratio]{arXiv-2205.10803v3/imgs/overview.pdf}
+  \vspace{0.6em}
+
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \textcolor{Theme_Color}{\textbf{\large Cơ chế (GraphMAE)}}
+      \vspace{0.4em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.5em}
+        \item Che đặc trưng nút: $X \rightarrow \hat{X}$
+        \item Encoder $f_E$ $\rightarrow$ Decoder $f_D$
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \textcolor{Theme_Color}{\textbf{\large Điểm cốt lõi}}
+      \vspace{0.4em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.5em}
+        \item Tái tạo \textbf{đặc trưng} (không tái tạo cấu trúc)
+        \item Loss: \textbf{Scaled Cosine Error (SCE)}
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 3) ────────────────────
+% Một hướng tiếp cận nổi bật của SSL trên đồ thị là Graph Masked Autoencoder (GraphMAE).
+% Như minh họa trong bài báo GraphMAE: thay vì tái tạo cấu trúc cạnh như các GAE cũ,
+% GraphMAE tập trung tái tạo đặc trưng nút. Mô hình che ngẫu nhiên một phần đặc trưng nút X
+% thành X_hat, đưa qua Encoder f_E để học biểu diễn ẩn, rồi dùng Decoder f_D tái tạo lại
+% đặc trưng bị che và tối ưu bằng hàm mất mát Scaled Cosine Error (SCE) để huấn luyện ổn định.
+
+
+% ── Slide 4: Kiến thức nền tảng 3 — GMAE vs BERT ─────
+\begin{frame}{So sánh: BERT (NLP) vs.\ GMAE (Graph)}
+  \vspace{0.5em}
+  \centering
+  {\large \textbf{Điểm chung:} Che đầu vào $\longrightarrow$ Dự đoán phần bị che}
+  \vspace{1em}
+
+  \renewcommand{\arraystretch}{1.45}
+  \begin{tabular}{p{3.0cm}p{4.2cm}p{4.2cm}}
+    \toprule
+    \textbf{Tiêu chí} & \textbf{BERT (NLP)} & \textbf{GMAE (Graph)} \\
+    \midrule
+    \textbf{Đối tượng che} & Token từ & Đặc trưng nút $X$ \\
+    \textbf{Ngữ cảnh} & Từ xung quanh & Láng giềng $N(i)$ \\
+    \textbf{Mục tiêu} & Dự đoán từ bị che & Tái tạo đặc trưng nút \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 4) ────────────────────
+% Nếu liên hệ với xử lý ngôn ngữ tự nhiên, GMAE rất giống với mô hình BERT.
+% Cả hai đều dùng chiến lược che và dự đoán lại phần bị che.
+% Điểm khác biệt nằm ở dữ liệu: BERT che token từ và dựa vào ngữ cảnh câu xung quanh;
+% còn GMAE che đặc trưng nút X và dựa vào cấu trúc láng giềng N(i) trên đồ thị
+% để tái tạo lại đặc trưng nút đó.
+
+
+% ── Slide 5: Đồng tính vs Dị tính — Định nghĩa ───────
+\begin{frame}{Tính đồng tính vs.\ Tính dị tính: Định nghĩa}
+  \vspace{0.4em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textcolor{Theme_Color}{\textbf{\large Homophily (Đồng tính)}}
+      \vspace{0.6em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item Nút nối nhau $\Rightarrow$ \textbf{Cùng nhãn} ($y_i = y_j$)
+        \item Tỉ lệ đồng tính $h$ \textbf{cao}
+        \item \emph{VD:} Cora, Citeseer
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \textcolor{orange!85!black}{\textbf{\large Heterophily (Dị tính)}}
+      \vspace{0.6em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item Nút nối nhau $\Rightarrow$ \textbf{Khác nhãn} ($y_i \neq y_j$)
+        \item Tỉ lệ đồng tính $h$ \textbf{thấp}
+        \item \emph{VD:} Texas, Cornell, Squirrel
+      \end{itemize}
+    \end{column}
+  \end{columns}
+
+  \vspace{1.2em}
+  \centering
+  $h = \dfrac{|\{(i,j) \in E : y_i = y_j\}|}{|E|}$
+\end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 5) ────────────────────
+% Tiếp theo, ta phân biệt hai khái niệm quan trọng trên đồ thị: Đồng tính (Homophily)
+% và Dị tính (Heterophily), được đo bằng tỉ lệ đồng tính cạnh h.
+% Đồ thị đồng tính (như mạng trích dẫn Cora, Citeseer) có h cao, tức các nút nối nhau
+% thường có cùng nhãn. Ngược lại, đồ thị dị tính (như Texas, Cornell, Squirrel)
+% có h thấp, tức các nút kết nối với nhau thường mang nhãn khác nhau.
+
+
+% ── Slide 6: Đồng tính vs Dị tính — Tính chất ────────
+\begin{frame}{Tính chất đồ thị dị tính: Ví dụ Roman-empire}
+  \vspace{0.5em}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \textcolor{Theme_Color}{\textbf{\large Cấu trúc dữ liệu}}
+      \vspace{0.6em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item \textbf{Nguồn:} Wikipedia tiếng Anh
+        \item \textbf{Nút:} Từ (word embedding)
+        \item \textbf{Cạnh:} Ngữ cảnh $\cdot$ Cây cú pháp
+        \item \textbf{Nhãn:} Vai trò cú pháp
+      \end{itemize}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+      \textcolor{orange!85!black}{\textbf{\large Tính chất cốt lõi}}
+      \vspace{0.6em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item Từ nối nhau $\Rightarrow$ \textbf{Khác vai trò}
+        \item Láng giềng $\neq$ Tương đồng
+        \item Cần giữ \textbf{sự khác biệt} giữa các nút
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 6) ────────────────────
+% Để thấy rõ tính chất của đồ thị dị tính, ta xét bộ dữ liệu Roman-empire từ Wikipedia.
+% Mỗi nút là một từ, cạnh nối biểu diễn quan hệ ngữ cảnh hoặc cây phụ thuộc cú pháp,
+% còn nhãn là vai trò cú pháp của từ đó. Trong câu, các từ liên kết với nhau thường
+% đóng vai trò cú pháp khác nhau (ví dụ danh từ nối với động từ). Do đó, trên đồ thị dị tính,
+% hai nút kề nhau không đồng nghĩa với việc chúng giống nhau.
+
+
+% ── Slide 7: Vấn đề của GMAE trên đồ thị dị tính ─────
+\begin{frame}{Vấn đề: Điểm yếu của GMAE trên đồ thị dị tính}
+  \begin{columns}[T]
+    \begin{column}{0.46\textwidth}
+      \centering
+      \includegraphics[width=\linewidth, height=0.45\textheight, keepaspectratio]{example.pdf}
+      \vspace{0.4em} \\
+      \small
+      A (AI) $\leftrightarrow$ C (AI), B (Vật lý) \\
+      Che A $\rightarrow$ B gây \textcolor{orange!85!black}{\textbf{nhiễu}}
+    \end{column}
+
+    \begin{column}{0.50\textwidth}
+      \textcolor{orange!85!black}{\textbf{\large Điểm yếu cốt lõi}}
+      \vspace{0.5em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item Thiên về \textbf{nhất quán (Consistency)}
+        \item Thiếu \textbf{sai khác (Discrepancy)}
+        \item Kéo nút khác lớp lại \textbf{gần nhau}
+        \item $\Rightarrow$ Xóa nhòa ranh giới phân lớp
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 7) ────────────────────
+% Đây chính là vấn đề lớn của các GMAE truyền thống. Như minh họa ở Figure 1 trong paper:
+% xét mạng cộng tác học giả, học giả A (ngành AI) kết nối với C (cùng ngành AI) và B (ngành Vật lý).
+% Khi ta che nút A để tái tạo từ láng giềng, thông tin từ B mang đặc trưng dị tính sẽ gây nhiễu.
+% Vì GMAE chỉ tối ưu sự nhất quán (consistency) mà bỏ qua sự sai khác (discrepancy),
+% nó vô tình kéo biểu diễn của các nút khác lớp lại gần nhau, làm mờ ranh giới phân lớp.
+
+
+% ── Slide 8: Thực nghiệm chứng minh vấn đề ───────────
+\begin{frame}{Thực nghiệm chứng minh: Xóa nhòa sự khác biệt}
   \begin{columns}[T]
     \begin{column}{0.45\textwidth}
       \centering
       \includegraphics[width=\linewidth, height=0.55\textheight, keepaspectratio]{fig1.pdf}
-      \vspace{0.1em} \\
-      {\footnotesize\textit{Figure 2: Phân bố Cosine similarity cặp nút khác lớp trên Squirrel (từ paper)}}
+      \vspace{0.2em} \\
+      {\footnotesize\textit{Figure 2: Cosine similarity trên Squirrel}}
     \end{column}
 
-    \begin{column}{0.53\textwidth}
-      \begin{block}{Phân tích kết quả thực nghiệm (Squirrel)}
-        \footnotesize
-        \begin{itemize}
-          \item \textbf{Raw features:} Cosine similarity của các cặp nút kề nhau khác lớp tập trung gần \textbf{0}.
-          \item \textbf{GraphMAE:} Phân bố tập trung gần \textbf{1}; \textbf{MaskGAE:} phân bố trải rộng nhưng cũng tăng mạnh về phía \textbf{1}.
-        \end{itemize}
-      \end{block}
-      \vspace{-0.2em}
-      \begin{alertblock}{Kết luận từ tác giả}
-        \footnotesize
-        Hai GMAE được khảo sát làm \textbf{tăng độ tương đồng} của các cặp nút kề nhau khác lớp, khiến biểu diễn kém phân biệt hơn.
-      \end{alertblock}
+    \begin{column}{0.52\textwidth}
+      \textcolor{Theme_Color}{\textbf{\large Quan sát (Cặp nút khác lớp)}}
+      \vspace{0.5em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item \textbf{Raw features:} $\approx 0$
+        \item \textbf{GraphMAE / MaskGAE:} $\longrightarrow 1$
+      \end{itemize}
+
+      \vspace{0.8em}
+      \textcolor{orange!85!black}{\textbf{\large Kết luận}}
+      \vspace{0.4em}
+      \begin{itemize}
+        \item Tăng độ tương đồng nút khác lớp
+        \item Giảm khả năng phân biệt biểu diễn
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 8) ────────────────────
+% Tác giả đã chứng minh hiện tượng này bằng thực nghiệm trên tập dữ liệu dị tính Squirrel (Figure 2).
+% Với đặc trưng thô ban đầu (Raw features), độ tương đồng cosine giữa các cặp nút kề nhau
+% nhưng khác lớp tập trung gần 0. Tuy nhiên, sau khi học qua GraphMAE và MaskGAE,
+% phân bố độ tương đồng dịch chuyển mạnh về phía 1. Điều này khẳng định GMAE làm tăng
+% sự giống nhau giữa các nút khác lớp, khiến biểu diễn kém phân biệt hơn.
 
-% ── Slide 6: Thách thức & Đóng góp ───────────────────
-\begin{frame}{Thách thức kỹ thuật \& Đóng góp của paper}
+
+% ── Slide 9: Động lực phát triển DGMAE ────────────────
+\begin{frame}{Động lực phát triển: Thách thức \& Đóng góp của DGMAE}
+  \vspace{0.3em}
   \begin{columns}[T]
     \begin{column}{0.48\textwidth}
-      \begin{block}{2 Thách thức kỹ thuật chính}
-        \footnotesize
-        \begin{enumerate}
-          \item \textbf{Tính toán Discrepancy không cần nhãn:}
-            \begin{itemize}
-              \item Trong học tự giám sát, các nút không thể biết láng giềng nào thực sự dị tính và hữu ích cho việc tái tạo.
-            \end{itemize}
-            \vspace{0.3em}
-          \item \textbf{Bảo toàn Discrepancy khi bị che:}
-            \begin{itemize}
-              \item Không thể đo trực tiếp chênh lệch giữa các nút trong không gian nhúng vì một số nút đã bị che (masked).
-            \end{itemize}
-        \end{enumerate}
-      \end{block}
+      \textcolor{orange!85!black}{\textbf{\large 2 Thách thức}}
+      \vspace{0.6em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.8em}
+        \item \textbf{Không có nhãn:} Khó biết láng giềng nào dị tính
+        \item \textbf{Nút bị che:} Không đo trực tiếp sai khác trong không gian nhúng
+      \end{itemize}
     \end{column}
 
     \begin{column}{0.48\textwidth}
-      \begin{block}{3 Đóng góp cốt lõi của DGMAE}
-        \footnotesize
-        \begin{enumerate}
-          \item \textbf{Đổi mới tư duy SSL:}
-            \begin{itemize}
-              \item Chuyển từ \emph{"khôi phục sự nhất quán"} sang \textbf{"bảo toàn sự khác biệt"} (preserve discrepancies).
-            \end{itemize}
-          \item \textbf{Chọn cạnh thích ứng (Adaptive Selection):}
-            \begin{itemize}
-              \item Tận dụng attention từ encoder để ưu tiên lấy mẫu các cạnh có tín hiệu sai khác lớn, không cần biết nhãn.
-            \end{itemize}
-          \item \textbf{17 bộ dữ liệu phân loại nút:}
-            \begin{itemize}
-              \item Tốt nhất trên 16/17 bộ so với các phương pháp SSL; bài báo còn đánh giá phân cụm nút và phân loại đồ thị.
-            \end{itemize}
-        \end{enumerate}
-      \end{block}
+      \textcolor{Theme_Color}{\textbf{\large 3 Đóng góp (DGMAE)}}
+      \vspace{0.6em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.7em}
+        \item \textbf{Tư duy mới:} Consistency $\rightarrow$ \textbf{Preserve Discrepancy}
+        \item \textbf{Adaptive Selection:} Dùng attention chọn cạnh sai khác
+        \item \textbf{Hiệu năng:} Tốt nhất \textbf{16/17} bộ dữ liệu
+      \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 9) ────────────────────
+% Từ vấn đề trên, động lực ra đời của DGMAE là giải quyết 2 thách thức kỹ thuật:
+% Thứ nhất, trong học tự giám sát không có nhãn, làm sao biết láng giềng nào là dị tính?
+% Thứ hai, khi nút đã bị che, không thể đo trực tiếp độ sai khác của nó trong không gian nhúng.
+% DGMAE đóng góp 3 điểm chính: (1) chuyển tư duy từ khôi phục sự nhất quán sang bảo toàn
+% sự khác biệt; (2) đề xuất cơ chế chọn cạnh thích ứng dựa trên attention của encoder;
+% và (3) đạt kết quả vượt trội trên 16/17 bộ dữ liệu phân loại nút.
+
 
 \section{Kiến trúc DGMAE}
 
-% ── Slide 7: Kiến trúc tổng thể ──────────────────────
+% ── Slide 10: Kiến trúc tổng thể DGMAE ───────────────
 \begin{frame}{Kiến trúc tổng thể DGMAE (Figure 3)}
   \centering
-  \includegraphics[width=0.78\linewidth, height=0.32\textheight, keepaspectratio]{model.pdf}
-  \vspace{0.1em}
+  \includegraphics[width=0.92\linewidth, height=0.58\textheight, keepaspectratio]{model.pdf}
+  \vspace{0.8em}
+
+  {\large \textbf{2 Nhánh song song:} \quad Feature Recon. ($\mathcal{L}_f$) \quad $+$ \quad Discrepancy Recon. ($\mathcal{L}_d$)}
+\end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 10) ───────────────────
+% Đây là kiến trúc tổng thể của DGMAE (Figure 3 trong paper).
+% Mô hình gồm hai nhánh hoạt động song song và chia sẻ chung bộ mã hóa Encoder f_E:
+% Nhánh trên là tái tạo đặc trưng (Feature Reconstruction) với hàm mất mát L_f,
+% và nhánh dưới là tái tạo sai khác (Discrepancy Reconstruction) với hàm mất mát L_d.
+
+
+% ── Slide 11: Nhánh 1 — Tái tạo đặc trưng ─────────────
+\begin{frame}{Nhánh 1: Tái tạo đặc trưng (Feature Reconstruction)}
+  \vspace{0.5em}
+  \centering
+  {\large $\hat{X}, A \;\xrightarrow{\;f_E\;}\; H \;\xrightarrow{\;f_D\;}\; \hat{Z}$}
+  \vspace{1.2em}
 
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \begin{block}{\small Nhánh 1: Tái tạo đặc trưng (Feature Recon.)}
-        \scriptsize
-        \begin{itemize}
-          \item \textbf{Đầu vào:} $\hat X$ là đặc trưng sau che nút; $A$ là ma trận kề.
-          \item \textbf{Cơ chế (Blackbox):} Encoder $f_E$ $\rightarrow$ GAT Decoder $f_D$ $\rightarrow$ Dự đoán đặc trưng nút bị che $\hat{Z}$.
-          \item \textbf{Mục tiêu:} Tối ưu loss tái tạo đặc trưng $\mathcal{L}_f$ (Scaled Cosine Error).
-        \end{itemize}
-      \end{block}
+    \begin{column}{0.46\textwidth}
+      \textcolor{Theme_Color}{\textbf{\large Thành phần}}
+      \vspace{0.5em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item \textbf{Input:} $\hat{X}$ (đã che), $A$
+        \item \textbf{Encoder $f_E$:} Dùng chung 2 nhánh
+        \item \textbf{Decoder $f_D$:} GAT Decoder $\rightarrow \hat{Z}$
+      \end{itemize}
     \end{column}
 
     \begin{column}{0.48\textwidth}
-      \begin{block}{\small Nhánh 2: Tái tạo discrepancy (Discrepancy Recon.)}
-        \scriptsize
-        \begin{itemize}
-          \item \textbf{Đầu vào:} Đặc trưng gốc $X$ và cùng ma trận kề $A$.
-          \item \textbf{Cơ chế (Blackbox):} Encoder $f_E$ (dùng chung) $\rightarrow$ Projector $\rightarrow$ Sai lệch ngữ cảnh $Z^D = Z - \hat{Z}$.
-          \item \textbf{Mục tiêu:} Tái tạo mục tiêu sai phân thích ứng $X^D$ với loss $\mathcal{L}_d$.
-        \end{itemize}
-      \end{block}
+      \textcolor{Theme_Color}{\textbf{\large Mục tiêu tối ưu}}
+      \vspace{0.5em}
+      \begin{itemize}
+        \setlength{\itemsep}{0.6em}
+        \item \textbf{Loss:} $\mathcal{L}_f$ (Scaled Cosine Error)
+        \item Khôi phục đặc trưng nút bị che
+      \end{itemize}
     \end{column}
   \end{columns}
-  \vspace{0.2em}
-  {\scriptsize \textbf{Hàm mất mát tổng hợp:} $\mathcal{L} = (1-\lambda)\mathcal{L}_f + \lambda \mathcal{L}_d$ $\longrightarrow$ \emph{Chi tiết công thức và thuật toán do bạn B (TV4) trình bày ở Phần 2.}}
+
+  \vspace{1.2em}
+  \centering
+  {\small $\longrightarrow$ \emph{Nhánh 2 (Discrepancy Recon.) \& Hàm mất mát tổng hợp: Phần 2 (Phương pháp)}}
 \end{frame}
+% ── NỘI DUNG THUYẾT TRÌNH (Slide 11) ───────────────────
+% Ở Phần 1 này, em xin giới thiệu nhanh Nhánh 1 — Tái tạo đặc trưng (Feature Reconstruction).
+% Nhánh 1 nhận đầu vào là đặc trưng đã che X_hat và ma trận kề A, đưa qua bộ mã hóa Encoder f_E
+% (được dùng chung cho cả hai nhánh) rồi qua GAT Decoder f_D để dự đoán đặc trưng nút bị che Z_hat.
+% Hàm mất mát L_f sử dụng Scaled Cosine Error tương tự GraphMAE để khôi phục đặc trưng.
+% Phần chi tiết về Nhánh 2 (Discrepancy Reconstruction) và hàm mất mát tổng hợp
+% sẽ do bạn B trình bày tiếp ở Phần 2 (Phương pháp).
