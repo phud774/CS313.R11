@@ -30,29 +30,29 @@
 
   \textbf{1. Tính điểm attention}
   \[
-    e_{ij}^{(l)} = \operatorname{LeakyReLU}
+    e_{ij} = \operatorname{LeakyReLU}
     \left(\mathbf{a}^{\top}
-    [Wh_i^{(l)} \Vert Wh_j^{(l)}]\right)
+    [W\hat{h}_i \Vert W\hat{h}_j]\right)
   \]
 
   \textbf{2. Chuẩn hóa trọng số attention}
   \[
-    w_{ij}^{(l)} =
-    \frac{\exp(e_{ij}^{(l)})}
-         {\sum_{k\in\mathcal{N}(i)}\exp(e_{ik}^{(l)})}
+    w_{ij} =
+    \frac{\exp(e_{ij})}
+         {\sum_{k\in\mathcal{N}(i)}\exp(e_{ik})}
   \]
 
   \textbf{3. Tổng hợp thông tin láng giềng}
   \[
-    h_i^{(l+1)} = \sigma\left(
-      \sum_{j\in\mathcal{N}(i)}w_{ij}^{(l)}Wh_j^{(l)}
+    \hat{h}'_i = \sigma\left(
+      \sum_{j\in\mathcal{N}(i)}w_{ij}W\hat{h}_j
     \right)
   \]
-    \vspace{0.5cm}
+
   {\footnotesize
-    $h_i^{(l)}$: biểu diễn nút $i$ tại đầu vào lớp GAT thứ $l$;
-    $W$: ma trận tham số học được;
-    $\mathbf{a}$: vector tham số attention;
+    $\hat{h}_i$: biểu diễn nút $i$;
+    $W$: ma trận tham số;
+    $\mathbf{a}$: vector attention;
     $\Vert$: phép nối vector.
   }
 
