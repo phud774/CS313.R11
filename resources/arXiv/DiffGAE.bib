@@ -1,0 +1,735 @@
+% Journals
+
+% First the Full Name is given, then the abbreviation used in the AMS Math
+% Reviews, with an indication if it could not be found there.
+% Note the 2nd overwrites the 1st, so swap them if you want the full name.
+
+ %{AMS}
+ @String{AMSTrans = "American Mathematical Society Translations" }
+ @String{AMSTrans = "Amer. Math. Soc. Transl." }
+ @String{BullAMS = "Bulletin of the American Mathematical Society" }
+ @String{BullAMS = "Bull. Amer. Math. Soc." }
+ @String{ProcAMS = "Proceedings of the American Mathematical Society" }
+ @String{ProcAMS = "Proc. Amer. Math. Soc." }
+ @String{TransAMS = "Transactions of the American Mathematical Society" }
+ @String{TransAMS = "Trans. Amer. Math. Soc." }
+
+ %ACM
+ @String{CACM = "Communications of the {ACM}" }
+ @String{CACM = "Commun. {ACM}" }
+ @String{CompServ = "Comput. Surveys" }
+ @String{JACM = "J. ACM" }
+ @String{ACMMathSoft = "{ACM} Transactions on Mathematical Software" }
+ @String{ACMMathSoft = "{ACM} Trans. Math. Software" }
+ @String{SIGNUM = "{ACM} {SIGNUM} Newsletter" }
+ @String{SIGNUM = "{ACM} {SIGNUM} Newslett." }
+
+ @String{AmerSocio = "American Journal of Sociology" }
+ @String{AmerStatAssoc = "Journal of the American Statistical Association" }
+ @String{AmerStatAssoc = "J. Amer. Statist. Assoc." }
+ @String{ApplMathComp = "Applied Mathematics and Computation" }
+ @String{ApplMathComp = "Appl. Math. Comput." }
+ @String{AmerMathMonthly = "American Mathematical Monthly" }
+ @String{AmerMathMonthly = "Amer. Math. Monthly" }
+ @String{BIT = "{BIT}" }
+ @String{BritStatPsych = "British Journal of Mathematical and Statistical
+          Psychology" }
+ @String{BritStatPsych = "Brit. J. Math. Statist. Psych." }
+ @String{CanMathBull = "Canadian Mathematical Bulletin" }
+ @String{CanMathBull = "Canad. Math. Bull." }
+ @String{CompApplMath = "Journal of Computational and Applied Mathematics" }
+ @String{CompApplMath = "J. Comput. Appl. Math." }
+ @String{CompPhys = "Journal of Computational Physics" }
+ @String{CompPhys = "J. Comput. Phys." }
+ @String{CompStruct = "Computers and Structures" }
+ @String{CompStruct = "Comput. \& Structures" }
+ @String{CompJour = "The Computer Journal" }
+ @String{CompJour = "Comput. J." }
+ @String{CompSysSci = "Journal of Computer and System Sciences" }
+ @String{CompSysSci = "J. Comput. System Sci." }
+ @String{Computing = "Computing" }
+ @String{ContempMath = "Contemporary Mathematics" }
+ @String{ContempMath = "Contemp. Math." }
+ @String{Crelle = "Crelle's Journal" }
+ @String{GiornaleMath = "Giornale di Mathematiche" }
+ @String{GiornaleMath = "Giorn. Mat." } % didn't find in AMS MR., ibid.
+
+ %IEEE
+ @String{Computer = "{IEEE} Computer" }
+ @String{IEEETransComp = "{IEEE} Transactions on Computers" }
+ @String{IEEETransComp = "{IEEE} Trans. Comput." }
+ @String{IEEETransAC = "{IEEE} Transactions on Automatic Control" }
+ @String{IEEETransAC = "{IEEE} Trans. Automat. Control" }
+ @String{IEEESpec = "{IEEE} Spectrum" } % didn't find in AMS MR
+ @String{ProcIEEE = "Proceedings of the {IEEE}" }
+ @String{ProcIEEE = "Proc. {IEEE}" } % didn't find in AMS MR
+ @String{IEEETransAeroElec = "{IEEE} Transactions on Aerospace and Electronic
+     Systems" }
+ @String{IEEETransAeroElec = "{IEEE} Trans. Aerospace Electron. Systems" }
+
+ @String{IMANumerAna = "{IMA} Journal of Numerical Analysis" }
+ @String{IMANumerAna = "{IMA} J. Numer. Anal." }
+ @String{InfProcLet = "Information Processing Letters" }
+ @String{InfProcLet = "Inform. Process. Lett." }
+ @String{InstMathApp = "Journal of the Institute of Mathematics and
+     its Applications" }
+ @String{InstMathApp = "J. Inst. Math. Appl." }
+ @String{IntControl = "International Journal of Control" }
+ @String{IntControl = "Internat. J. Control" }
+ @String{IntNumerEng = "International Journal for Numerical Methods in
+     Engineering" }
+ @String{IntNumerEng = "Internat. J. Numer. Methods Engrg." }
+ @String{IntSuper = "International Journal of Supercomputing Applications" }
+ @String{IntSuper = "Internat. J. Supercomputing Applic." } % didn't find
+%% in AMS MR
+ @String{Kibernetika = "Kibernetika" }
+ @String{JResNatBurStand = "Journal of Research of the National Bureau
+     of Standards" }
+ @String{JResNatBurStand = "J. Res. Nat. Bur. Standards" }
+ @String{LinAlgApp = "Linear Algebra and its Applications" }
+ @String{LinAlgApp = "Linear Algebra Appl." }
+ @String{MathAnaAppl = "Journal of Mathematical Analysis and Applications" }
+ @String{MathAnaAppl = "J. Math. Anal. Appl." }
+ @String{MathAnnalen = "Mathematische Annalen" }
+ @String{MathAnnalen = "Math. Ann." }
+ @String{MathPhys = "Journal of Mathematical Physics" }
+ @String{MathPhys = "J. Math. Phys." }
+ @String{MathComp = "Mathematics of Computation" }
+ @String{MathComp = "Math. Comp." }
+ @String{MathScand = "Mathematica Scandinavica" }
+ @String{MathScand = "Math. Scand." }
+ @String{TablesAidsComp = "Mathematical Tables and Other Aids to Computation" }
+ @String{TablesAidsComp = "Math. Tables Aids Comput." }
+ @String{NumerMath = "Numerische Mathematik" }
+ @String{NumerMath = "Numer. Math." }
+ @String{PacificMath = "Pacific Journal of Mathematics" }
+ @String{PacificMath = "Pacific J. Math." }
+ @String{ParDistComp = "Journal of Parallel and Distributed Computing" }
+ @String{ParDistComp = "J. Parallel and Distrib. Comput." } % didn't find
+%% in AMS MR
+ @String{ParComputing = "Parallel Computing" }
+ @String{ParComputing = "Parallel Comput." }
+ @String{PhilMag = "Philosophical Magazine" }
+ @String{PhilMag = "Philos. Mag." }
+ @String{ProcNAS = "Proceedings of the National Academy of Sciences
+                    of the USA" }
+ @String{ProcNAS = "Proc. Nat. Acad. Sci. U. S. A." }
+ @String{Psychometrika = "Psychometrika" }
+ @String{QuartMath = "Quarterly Journal of Mathematics, Oxford, Series (2)" }
+ @String{QuartMath = "Quart. J. Math. Oxford Ser. (2)" }
+ @String{QuartApplMath = "Quarterly of Applied Mathematics" }
+ @String{QuartApplMath = "Quart. Appl. Math." }
+ @String{RevueInstStat = "Review of the International Statisical Institute" }
+ @String{RevueInstStat = "Rev. Inst. Internat. Statist." }
+
+ %SIAM
+ @String{JSIAM = "Journal of the Society for Industrial and Applied
+     Mathematics" }
+ @String{JSIAM = "J. Soc. Indust. Appl. Math." }
+ @String{JSIAMB = "Journal of the Society for Industrial and Applied
+     Mathematics, Series B, Numerical Analysis" }
+ @String{JSIAMB = "J. Soc. Indust. Appl. Math. Ser. B Numer. Anal." }
+ @String{SIAMAlgMeth = "{SIAM} Journal on Algebraic and Discrete Methods" }
+ @String{SIAMAlgMeth = "{SIAM} J. Algebraic Discrete Methods" }
+ @String{SIAMAppMath = "{SIAM} Journal on Applied Mathematics" }
+ @String{SIAMAppMath = "{SIAM} J. Appl. Math." }
+ @String{SIAMComp = "{SIAM} Journal on Computing" }
+ @String{SIAMComp = "{SIAM} J. Comput." }
+ @String{SIAMMatrix = "{SIAM} Journal on Matrix Analysis and Applications" }
+ @String{SIAMMatrix = "{SIAM} J. Matrix Anal. Appl." }
+ @String{SIAMNumAnal = "{SIAM} Journal on Numerical Analysis" }
+ @String{SIAMNumAnal = "{SIAM} J. Numer. Anal." }
+ @String{SIAMReview = "{SIAM} Review" }
+ @String{SIAMReview = "{SIAM} Rev." }
+ @String{SIAMSciStat = "{SIAM} Journal on Scientific and Statistical
+     Computing" }
+ @String{SIAMSciStat = "{SIAM} J. Sci. Statist. Comput." }
+
+ @String{SoftPracExp = "Software Practice and Experience" }
+ @String{SoftPracExp = "Software Prac. Experience" } % didn't find in AMS MR
+ @String{StatScience = "Statistical Science" }
+ @String{StatScience = "Statist. Sci." }
+ @String{Techno = "Technometrics" }
+ @String{USSRCompMathPhys = "{USSR} Computational Mathematics and Mathematical
+     Physics" }
+ @String{USSRCompMathPhys = "{U. S. S. R.} Comput. Math. and Math. Phys." }
+ @String{VLSICompSys = "Journal of {VLSI} and Computer Systems" }
+ @String{VLSICompSys = "J. {VLSI} Comput. Syst." }
+ @String{ZAngewMathMech = "Zeitschrift fur Angewandte Mathematik und
+     Mechanik" }
+ @String{ZAngewMathMech = "Z. Angew. Math. Mech." }
+ @String{ZAngewMathPhys = "Zeitschrift fur Angewandte Mathematik und Physik" }
+ @String{ZAngewMathPhys = "Z. Angew. Math. Phys." }
+
+% Publishers % ================================================= |
+
+ @String{Academic = "Academic Press" }
+ @String{ACMPress = "{ACM} Press" }
+ @String{AdamHilger = "Adam Hilger" }
+ @String{AddisonWesley = "Addison-Wesley" }
+ @String{AllynBacon = "Allyn and Bacon" }
+ @String{AMS = "American Mathematical Society" }
+ @String{Birkhauser = "Birkha{\"u}ser" }
+ @String{CambridgePress = "Cambridge University Press" }
+ @String{Chelsea = "Chelsea" }
+ @String{ClaredonPress = "Claredon Press" }
+ @String{DoverPub = "Dover Publications" }
+ @String{Eyolles = "Eyolles" }
+ @String{HoltRinehartWinston = "Holt, Rinehart and Winston" }
+ @String{Interscience = "Interscience" }
+ @String{JohnsHopkinsPress = "The Johns Hopkins University Press" }
+ @String{JohnWileySons = "John Wiley and Sons" }
+ @String{Macmillan = "Macmillan" }
+ @String{MathWorks = "The Math Works Inc." }
+ @String{McGrawHill = "McGraw-Hill" }
+ @String{NatBurStd = "National Bureau of Standards" }
+ @String{NorthHolland = "North-Holland" }
+ @String{OxfordPress = "Oxford University Press" }  %address Oxford or London?
+ @String{PergamonPress = "Pergamon Press" }
+ @String{PlenumPress = "Plenum Press" }
+ @String{PrenticeHall = "Prentice-Hall" }
+ @String{SIAMPub = "{SIAM} Publications" }
+ @String{Springer = "Springer-Verlag" }
+ @String{TexasPress = "University of Texas Press" }
+ @String{VanNostrand = "Van Nostrand" }
+ @String{WHFreeman = "W. H. Freeman and Co." }
+@article{gcn,
+  title={Semi-supervised classification with graph convolutional networks},
+  author={Kipf, Thomas N and Welling, Max},
+  journal={arXiv:1609.02907},
+  year={2016}
+}
+
+@article{gat,
+  title={Graph attention networks},
+  author={Veli{\v{c}}kovi{\'c}, Petar and Cucurull, Guillem and Casanova, Arantxa and Romero, Adriana and Lio, Pietro and Bengio, Yoshua},
+  journal={arXiv:1710.10903},
+  year={2017}
+}
+
+@inproceedings{NWR-GAE,
+  title={Graph Auto-Encoder via Neighborhood Wasserstein Reconstruction},
+  author={Tang, Mingyue and Li, Pan and Yang, Carl},
+  booktitle={International Conference on Learning Representations},
+  year={2021}
+}
+@article{dssl,
+  title={Decoupled self-supervised learning for graphs},
+  author={Xiao, Teng and Chen, Zhengyu and Guo, Zhimeng and Zhuang, Zeyang and Wang, Suhang},
+  journal={Advances in Neural Information Processing Systems},
+  volume={35},
+  pages={620--634},
+  year={2022}
+}
+
+@article{graphacl,
+  title={Simple and asymmetric graph contrastive learning without augmentations},
+  author={Xiao, Teng and Zhu, Huaisheng and Chen, Zhengyu and Wang, Suhang},
+  journal={Advances in Neural Information Processing Systems},
+  volume={36},
+  year={2024}
+}
+@inproceedings{greet,
+  title={Beyond smoothing: Unsupervised graph representation learning with edge heterophily discriminating},
+  author={Liu, Yixin and Zheng, Yizhen and Zhang, Daokun and Lee, Vincent CS and Pan, Shirui},
+  booktitle={Proceedings of the AAAI conference on artificial intelligence},
+  volume={37},
+  number={4},
+  pages={4516--4524},
+  year={2023}
+}
+@inproceedings{graphmae,
+  title={Graphmae: Self-supervised masked graph autoencoders},
+  author={Hou, Zhenyu and Liu, Xiao and Cen, Yukuo and Dong, Yuxiao and Yang, Hongxia and Wang, Chunjie and Tang, Jie},
+  booktitle={Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining},
+  pages={594--604},
+  year={2022}
+}
+@inproceedings{maskgae,
+  title={What's Behind the Mask: Understanding Masked Graph Modeling for Graph Autoencoders},
+  author={Li, Jintang and Wu, Ruofan and Sun, Wangbin and Chen, Liang and Tian, Sheng and Zhu, Liang and Meng, Changhua and Zheng, Zibin and Wang, Weiqiang},
+  booktitle={Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining},
+  pages={1268--1279},
+  year={2023}
+}
+@article{augmae,
+  title={Rethinking Graph Masked Autoencoders through Alignment and Uniformity},
+  author={Wang, Liang and Tao, Xiang and Liu, Qiang and Wu, Shu},
+  journal={arXiv preprint arXiv:2402.07225},
+  year={2024}
+}
+
+@article{u-mae,
+  title={How mask matters: Towards theoretical understandings of masked autoencoders},
+  author={Zhang, Qi and Wang, Yifei and Wang, Yisen},
+  journal={Advances in Neural Information Processing Systems},
+  volume={35},
+  pages={27127--27139},
+  year={2022}
+}
+
+@article{h2gnn,
+  title={Beyond homophily in graph neural networks: Current limitations and effective designs},
+  author={Zhu, Jiong and Yan, Yujun and Zhao, Lingxiao and Heimann, Mark and Akoglu, Leman and Koutra, Danai},
+  journal={Advances in neural information processing systems},
+  volume={33},
+  pages={7793--7804},
+  year={2020}
+}
+@article{linkx,
+  title={Large scale learning on non-homophilous graphs: New benchmarks and strong simple methods},
+  author={Lim, Derek and Hohne, Felix and Li, Xiuyu and Huang, Sijia Linda and Gupta, Vaishnavi and Bhalerao, Omkar and Lim, Ser Nam},
+  journal={Advances in Neural Information Processing Systems},
+  volume={34},
+  pages={20887--20902},
+  year={2021}
+}
+@article{dgi,
+  title={Deep graph infomax},
+  author={Veli{\v{c}}kovi{\'c}, Petar and Fedus, William and Hamilton, William L and Li{\`o}, Pietro and Bengio, Yoshua and Hjelm, R Devon},
+  journal={arXiv preprint arXiv:1809.10341},
+  year={2018}
+}
+@article{vgae,
+  title={Variational graph auto-encoders},
+  author={Kipf, Thomas N and Welling, Max},
+  journal={arXiv preprint arXiv:1611.07308},
+  year={2016}
+}
+@article{grace,
+  title={Deep graph contrastive representation learning},
+  author={Zhu, Yanqiao and Xu, Yichen and Yu, Feng and Liu, Qiang and Wu, Shu and Wang, Liang},
+  journal={arXiv preprint arXiv:2006.04131},
+  year={2020}
+}
+@inproceedings{MAE,
+  title={Masked autoencoders are scalable vision learners},
+  author={He, Kaiming and Chen, Xinlei and Xie, Saining and Li, Yanghao and Doll{\'a}r, Piotr and Girshick, Ross},
+  booktitle={Proceedings of the IEEE/CVF conference on computer vision and pattern recognition},
+  pages={16000--16009},
+  year={2022}
+}
+@article{linkpred,
+  title={Link prediction with contextualized self-supervision},
+  author={Zhang, Daokun and Yin, Jie and Philip, S Yu},
+  journal={IEEE transactions on knowledge and data engineering},
+  year={2022},
+  publisher={IEEE}
+}
+@inproceedings{cluster,
+  title={Adversarially regularized graph autoencoder for graph embedding},
+  author={Pan, Shirui and Hu, Ruiqi and Long, Guodong and Jiang, Jing and Yao, Lina and Zhang, Chengqi},
+  booktitle={Proceedings of the 27th International Joint Conference on Artificial Intelligence},
+  pages={2609--2615},
+  year={2018}
+}
+@inproceedings{s2gae,
+  title={S2GAE: self-supervised graph autoencoders are generalizable learners with graph masking},
+  author={Tan, Qiaoyu and Liu, Ninghao and Huang, Xiao and Choi, Soo-Hyun and Li, Li and Chen, Rui and Hu, Xia},
+  booktitle={Proceedings of the sixteenth ACM international conference on web search and data mining},
+  pages={787--795},
+  year={2023}
+}
+@inproceedings{geom-gcn,
+  title={Geom-GCN: Geometric Graph Convolutional Networks},
+  author={Pei, Hongbin and Wei, Bingzhe and Chang, Kevin Chen-Chuan and Lei, Yu and Yang, Bo},
+  booktitle={International Conference on Learning Representations},
+  year={2019}
+}
+@article{squchame,
+  title={Multi-scale attributed node embedding},
+  author={Rozemberczki, Benedek and Allen, Carl and Sarkar, Rik},
+  journal={Journal of Complex Networks},
+  volume={9},
+  number={2},
+  pages={cnab014},
+  year={2021},
+  publisher={Oxford University Press}
+}
+@inproceedings{roman,
+  title={A critical look at the evaluation of GNNs under heterophily: Are we really making progress?},
+  author={Platonov, Oleg and Kuznedelev, Denis and Diskin, Michael and Babenko, Artem and Prokhorenkova, Liudmila},
+  booktitle={The Eleventh International Conference on Learning Representations},
+  year={2022}
+}
+@article{collective,
+  title={Collective classification in network data},
+  author={Sen, Prithviraj and Namata, Galileo and Bilgic, Mustafa and Getoor, Lise and Galligher, Brian and Eliassi-Rad, Tina},
+  journal={AI magazine},
+  volume={29},
+  number={3},
+  pages={93--93},
+  year={2008}
+}
+@inproceedings{photo,
+  title={Image-based recommendations on styles and substitutes},
+  author={McAuley, Julian and Targett, Christopher and Shi, Qinfeng and Van Den Hengel, Anton},
+  booktitle={Proceedings of the 38th international ACM SIGIR conference on research and development in information retrieval},
+  pages={43--52},
+  year={2015}
+}
+@article{cs,
+  title={Pitfalls of graph neural network evaluation},
+  author={Shchur, Oleksandr and Mumme, Maximilian and Bojchevski, Aleksandar and G{\"u}nnemann, Stephan},
+  journal={arXiv preprint arXiv:1811.05868},
+  year={2018}
+}
+@article{wiki,
+  title={Wiki-CS: A Wikipedia-Based Benchmark for Graph Neural Networks},
+  author={Mernyei, P{\'e}ter and Cangea, C{\u{a}}t{\u{a}}lina},
+  journal={arXiv preprint arXiv:2007.02901},
+  year={2020}
+}
+@inproceedings{graphsaint-iclr20,
+title={{GraphSAINT}: Graph Sampling Based Inductive Learning Method},
+author={Hanqing Zeng and Hongkuan Zhou and Ajitesh Srivastava and Rajgopal Kannan and Viktor Prasanna},
+booktitle={International Conference on Learning Representations},
+year={2020},
+url={https://openreview.net/forum?id=BJe8pkHFwS}
+}
+@inproceedings{homophily,
+  title={Is Homophily a Necessity for Graph Neural Networks?},
+  author={Ma, Yao and Liu, Xiaorui and Shah, Neil and Tang, Jiliang},
+  booktitle={International Conference on Learning Representations},
+  year={2021}
+}
+@article{arvga,
+  title={Learning graph embedding with adversarial training methods},
+  author={Pan, Shirui and Hu, Ruiqi and Fung, Sai-fu and Long, Guodong and Jiang, Jing and Zhang, Chengqi},
+  journal={IEEE transactions on cybernetics},
+  volume={50},
+  number={6},
+  pages={2475--2487},
+  year={2019},
+  publisher={IEEE}
+}
+@inproceedings{GCA,
+  title={Graph contrastive learning with adaptive augmentation},
+  author={Zhu, Yanqiao and Xu, Yichen and Yu, Feng and Liu, Qiang and Wu, Shu and Wang, Liang},
+  booktitle={Proceedings of the Web Conference 2021},
+  pages={2069--2080},
+  year={2021}
+}
+@inproceedings{BGRL,
+  title={Large-Scale Representation Learning on Graphs via Bootstrapping},
+  author={Thakoor, Shantanu and Tallec, Corentin and Azar, Mohammad Gheshlaghi and Azabou, Mehdi and Dyer, Eva L and Munos, Remi and Veli{\v{c}}kovi{\'c}, Petar and Valko, Michal},
+  booktitle={International Conference on Learning Representations},
+  year={2021}
+}
+@article{ccassg,
+  title={From canonical correlation analysis to self-supervised graph neural networks},
+  author={Zhang, Hengrui and Wu, Qitian and Yan, Junchi and Wipf, David and Yu, Philip S},
+  journal={Advances in Neural Information Processing Systems},
+  volume={34},
+  pages={76--89},
+  year={2021}
+}
+@article{homophilyassumption,
+  title={Birds of a feather: Homophily in social networks},
+  author={McPherson, Miller and Smith-Lovin, Lynn and Cook, James M},
+  journal={Annual review of sociology},
+  volume={27},
+  number={1},
+  pages={415--444},
+  year={2001},
+  publisher={Annual Reviews 4139 El Camino Way, PO Box 10139, Palo Alto, CA 94303-0139, USA}
+}
+@inproceedings{ud-gnn,
+  title={Ud-gnn: Uncertainty-aware debiased training on semi-homophilous graphs},
+  author={Liu, Yang and Ao, Xiang and Feng, Fuli and He, Qing},
+  booktitle={Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining},
+  pages={1131--1140},
+  year={2022}
+}
+@inproceedings{gpt-gnn,
+  title={Gpt-gnn: Generative pre-training of graph neural networks},
+  author={Hu, Ziniu and Dong, Yuxiao and Wang, Kuansan and Chang, Kai-Wei and Sun, Yizhou},
+  booktitle={Proceedings of the 26th ACM SIGKDD international conference on knowledge discovery \& data mining},
+  pages={1857--1867},
+  year={2020}
+}
+@inproceedings{attributed,
+  title={Attributed graph clustering: a deep attentional embedding approach},
+  author={Wang, Chun and Pan, Shirui and Hu, Ruiqi and Long, Guodong and Jiang, Jing and Zhang, Chengqi},
+  booktitle={Proceedings of the 28th International Joint Conference on Artificial Intelligence},
+  pages={3670--3676},
+  year={2019}
+}
+@inproceedings{zhangattributed,
+  title={Attributed graph clustering via adaptive graph convolution},
+  author={Zhang, Xiaotong and Liu, Han and Li, Qimai and Wu, Xiao-Ming},
+  booktitle={Proceedings of the 28th International Joint Conference on Artificial Intelligence},
+  pages={4327--4333},
+  year={2019}
+}
+@inproceedings{node,
+  title={Representation learning on graphs with jumping knowledge networks},
+  author={Xu, Keyulu and Li, Chengtao and Tian, Yonglong and Sonobe, Tomohiro and Kawarabayashi, Ken-ichi and Jegelka, Stefanie},
+  booktitle={International conference on machine learning},
+  pages={5453--5462},
+  year={2018},
+  organization={PMLR}
+}
+@inproceedings{cluster1,
+  title={Deep graph clustering via dual correlation reduction},
+  author={Liu, Yue and Tu, Wenxuan and Zhou, Sihang and Liu, Xinwang and Song, Linxuan and Yang, Xihong and Zhu, En},
+  booktitle={Proceedings of the AAAI conference on artificial intelligence},
+  volume={36},
+  number={7},
+  pages={7603--7611},
+  year={2022}
+}
+@article{cluster2,
+  title={Multiple kernel clustering with neighbor-kernel subspace segmentation},
+  author={Zhou, Sihang and Liu, Xinwang and Li, Miaomiao and Zhu, En and Liu, Li and Zhang, Changwang and Yin, Jianping},
+  journal={IEEE transactions on neural networks and learning systems},
+  volume={31},
+  number={4},
+  pages={1351--1362},
+  year={2019},
+  publisher={IEEE}
+}
+@inproceedings{graphmae2,
+  title={Graphmae2: A decoding-enhanced masked self-supervised graph learner},
+  author={Hou, Zhenyu and He, Yufei and Cen, Yukuo and Liu, Xiao and Dong, Yuxiao and Kharlamov, Evgeny and Tang, Jie},
+  booktitle={Proceedings of the ACM Web Conference 2023},
+  pages={737--746},
+  year={2023}
+}
+@article{infograph,
+  title={Infograph: Unsupervised and semi-supervised graph-level representation learning via mutual information maximization},
+  author={Sun, Fan-Yun and Hoffmann, Jordan and Verma, Vikas and Tang, Jian},
+  journal={arXiv preprint arXiv:1908.01000},
+  year={2019}
+}
+@article{citation,
+  title={Collective classification in network data},
+  author={Sen, Prithviraj and Namata, Galileo and Bilgic, Mustafa and Getoor, Lise and Galligher, Brian and Eliassi-Rad, Tina},
+  journal={AI magazine},
+  volume={29},
+  number={3},
+  pages={93--93},
+  year={2008}
+}
+@inproceedings{glove,
+  title={Glove: Global vectors for word representation},
+  author={Pennington, Jeffrey and Socher, Richard and Manning, Christopher D},
+  booktitle={Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP)},
+  pages={1532--1543},
+  year={2014}
+}
+@inproceedings{gin,
+  title={How Powerful are Graph Neural Networks?},
+  author={Xu, Keyulu and Hu, Weihua and Leskovec, Jure and Jegelka, Stefanie},
+  booktitle={International Conference on Learning Representations},
+  year={2018}
+}
+@inproceedings{gcla,
+  title={Graph contrastive learning automated},
+  author={You, Yuning and Chen, Tianlong and Shen, Yang and Wang, Zhangyang},
+  booktitle={International Conference on Machine Learning},
+  pages={12121--12132},
+  year={2021},
+  organization={PMLR}
+}
+@article{san,
+  title={Graph substructure assembling network with soft sequence and context attention},
+  author={Yang, Yaming and Guan, Ziyu and Zhao, Wei and Lu, Weigang and Zong, Bo},
+  journal={IEEE Transactions on Knowledge and Data Engineering},
+  volume={35},
+  number={5},
+  pages={4894--4907},
+  year={2022},
+  publisher={IEEE}
+}
+@inproceedings{fagcn,
+  title={Beyond low-frequency information in graph convolutional networks},
+  author={Bo, Deyu and Wang, Xiao and Shi, Chuan and Shen, Huawei},
+  booktitle={Proceedings of the AAAI conference on artificial intelligence},
+  volume={35},
+  number={5},
+  pages={3950--3957},
+  year={2021}
+}
+@article{acmgnn,
+  title={Revisiting heterophily for graph neural networks},
+  author={Luan, Sitao and Hua, Chenqing and Lu, Qincheng and Zhu, Jiaqi and Zhao, Mingde and Zhang, Shuyuan and Chang, Xiao-Wen and Precup, Doina},
+  journal={Advances in neural information processing systems},
+  volume={35},
+  pages={1362--1375},
+  year={2022}
+}
+@article{rare,
+  title={RARE: Robust masked graph autoencoder},
+  author={Tu, Wenxuan and Liao, Qing and Zhou, Sihang and Peng, Xin and Ma, Chuan and Liu, Zhe and Liu, Xinwang and Cai, Zhiping and He, Kunlun},
+  journal={IEEE Transactions on Knowledge and Data Engineering},
+  year={2023},
+  publisher={IEEE}
+}
+@inproceedings{glognn,
+  title={Finding global homophily in graph neural networks when meeting heterophily},
+  author={Li, Xiang and Zhu, Renyu and Cheng, Yao and Shan, Caihua and Luo, Siqiang and Li, Dongsheng and Qian, Weining},
+  booktitle={International Conference on Machine Learning},
+  pages={13242--13256},
+  year={2022},
+  organization={PMLR}
+}
+@inproceedings{GPRGNN,
+  title={Adaptive Universal Generalized PageRank Graph Neural Network},
+  author={Chien, Eli and Peng, Jianhao and Li, Pan and Milenkovic, Olgica},
+  booktitle={International Conference on Learning Representations},
+  year={2020}
+}
+
+@inproceedings{bandana,
+  title={Masked Graph Autoencoder with Non-discrete Bandwidths},
+  author={Zhao, Ziwen and Li, Yuhua and Zou, Yixiong and Tang, Jiliang and Li, Ruixuan},
+  booktitle={Proceedings of the ACM on Web Conference 2024},
+  pages={377--388},
+  year={2024}
+}
+@inproceedings{seegera,
+  title={Seegera: Self-supervised semi-implicit graph variational auto-encoders with masking},
+  author={Li, Xiang and Ye, Tiandi and Shan, Caihua and Li, Dongsheng and Gao, Ming},
+  booktitle={Proceedings of the ACM web conference 2023},
+  pages={143--153},
+  year={2023}
+}
+
+@article{sp-gcl,
+  title={Single-pass contrastive learning can work for both homophilic and heterophilic graph},
+  author={Wang, Haonan and Zhang, Jieyu and Zhu, Qi and Huang, Wei and Kawaguchi, Kenji and Xiao, Xiaokui},
+  journal={arXiv preprint arXiv:2211.10890},
+  year={2022}
+}
+
+@inproceedings{lsgnn,
+  author       = {Yuhan Chen and
+                  Yihong Luo and
+                  Jing Tang and
+                  Liang Yang and
+                  Siya Qiu and
+                  Chuan Wang and
+                  Xiaochun Cao},
+  title        = {{LSGNN:} Towards General Graph Neural Network in Node Classification
+                  by Local Similarity},
+  booktitle    = {Proceedings of the Thirty-Second International Joint Conference on
+                  Artificial Intelligence, {IJCAI} 2023, 19th-25th August 2023, Macao,
+                  SAR, China},
+  pages        = {3550--3558},
+  publisher    = {ijcai.org},
+  year         = {2023},
+  url          = {https://doi.org/10.24963/ijcai.2023/395},
+  doi          = {10.24963/IJCAI.2023/395},
+  timestamp    = {Mon, 28 Aug 2023 17:23:07 +0200},
+  biburl       = {https://dblp.org/rec/conf/ijcai/ChenLT0Q0C23.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@inproceedings{aero-gnn,
+  title={Towards deep attention in graph neural networks: Problems and remedies},
+  author={Lee, Soo Yong and Bu, Fanchen and Yoo, Jaemin and Shin, Kijung},
+  booktitle={International Conference on Machine Learning},
+  pages={18774--18795},
+  year={2023},
+  organization={PMLR}
+}
+
+@inproceedings{Dink_net,
+  title={Dink-Net: Neural Clustering on Large Graphs},
+  author={Liu, Yue and Liang, Ke and Xia, Jun and Zhou, Sihang and Yang, Xihong and and Liu, Xinwang and Li, Z. Stan},
+  booktitle={Proc. of ICML},
+  year={2023}
+}
+
+
+@inproceedings{HSAN,
+  title={Hard Sample Aware Network for Contrastive Deep Graph Clustering},
+  author={Liu, Yue and Yang, Xihong and Zhou, Sihang and Liu, Xinwang and Wang, Zhen and Liang, Ke and Tu, Wenxuan and Li, Liang and Duan, Jingcan and Chen, Cancan},
+  booktitle={Proc. of AAAI},
+  year={2023}
+}
+
+
+@article{SCGC,
+  title={Simple contrastive graph clustering},
+  author={Liu, Yue and Yang, Xihong and Zhou, Sihang and Liu, Xinwang},
+  journal={IEEE Transactions on Neural Networks and Learning Systems},
+  year={2023},
+  publisher={IEEE}
+}
+
+@article{simgop,
+  title={Contextual features online prediction for self-supervised graph representation},
+  author={Duan, Haoran and Xie, Cheng and Tang, Peng and Yu, Beibei},
+  journal={Expert Systems with Applications},
+  volume={238},
+  pages={122075},
+  year={2024},
+  publisher={Elsevier}
+}
+
+
+
+
+
+@ARTICLE{skipnode,
+  author={Lu, Weigang and Zhan, Yibing and Lin, Binbin and Guan, Ziyu and Liu, Liu and Yu, Baosheng and Zhao, Wei and Yang, Yaming and Tao, Dacheng},
+  journal={IEEE Transactions on Knowledge and Data Engineering}, 
+  title={SkipNode: On Alleviating Performance Degradation for Deep Graph Convolutional Networks}, 
+  year={2024},
+  volume={36},
+  number={11},
+  pages={7030-7043},
+  keywords={Degradation;Smoothing methods;Resists;Computational modeling;Adaptation models;Training;Electronic mail;Deep graph convolutional networks;over-smoothing;performance degradation},
+  doi={10.1109/TKDE.2024.3374701}}
+
+@article{Nodemixup, title={NodeMixup: Tackling Under-Reaching for Graph Neural Networks}, volume={38}, url={https://ojs.aaai.org/index.php/AAAI/article/view/29328}, DOI={10.1609/aaai.v38i13.29328}, abstractNote={Graph Neural Networks (GNNs) have become mainstream methods for solving the semi-supervised node classification problem. However, due to the uneven location distribution of labeled nodes in the graph, labeled nodes are only accessible to a small portion of unlabeled nodes, leading to the under-reaching issue. In this study, we firstly reveal under-reaching by conducting an empirical investigation on various well-known graphs. Then, we demonstrate that under-reaching results in unsatisfactory distribution alignment between labeled and unlabeled nodes through systematic experimental analysis, significantly degrading GNNs’ performance. To tackle under-reaching for GNNs, we propose an architecture-agnostic method dubbed NodeMixup. The fundamental idea is to (1) increase the reachability of labeled nodes by labeled-unlabeled pairs mixup, (2) leverage graph structures via fusing the neighbor connections of intra-class node pairs to improve performance gains of mixup, and (3) use neighbor label distribution similarity incorporating node degrees to determine sampling weights for node mixup. Extensive experiments demonstrate the efficacy of NodeMixup in assisting GNNs in handling under-reaching. The source code is available at https://github.com/WeigangLu/NodeMixup.}, number={13}, journal={Proceedings of the AAAI Conference on Artificial Intelligence}, author={Lu, Weigang and Guan, Ziyu and Zhao, Wei and Yang, Yaming and Jin, Long}, year={2024}, month={Mar.}, pages={14175-14183} }
+
+@article{AGMixup, title={AGMixup: Adaptive Graph Mixup for Semi-supervised Node Classification}, volume={39}, url={https://ojs.aaai.org/index.php/AAAI/article/view/34107}, DOI={10.1609/aaai.v39i18.34107}, abstractNote={Mixup is a data augmentation technique that enhances model generalization by interpolating between data points using a mixing ratio lambda in the image domain. Recently, the concept of mixup has been adapted to the graph domain through node-centric interpolations. However, these approaches often fail to address the complexity of interconnected relationships, potentially damaging the graph’s natural topology and undermining node interactions. Furthermore, current graph mixup methods employ a one-size-fits-all strategy with a randomly sampled lambda for all mixup pairs, ignoring the diverse needs of different pairs. This paper proposes an Adaptive Graph Mixup (AGMixup) framework for semi-supervised node classification. AGMixup introduces a subgraph-centric approach, which treats each subgraph similarly to how images are handled in Euclidean domains, thus facilitating a more natural integration of mixup into graph-based learning. We also propose an adaptive mechanism to tune the mixing ratio lambda for diverse mixup pairs, guided by the contextual similarity and uncertainty of the involved subgraphs. Extensive experiments across seven datasets on semi-supervised node classification benchmarks demonstrate AGMixup’s superiority over state-of-the-art graph mixup methods.}, number={18}, journal={Proceedings of the AAAI Conference on Artificial Intelligence}, author={Lu, Weigang and Guan, Ziyu and Zhao, Wei and Yang, Yaming and Zhan, Yibing and Lu, Yiheng and Tao, Dapeng}, year={2025}, month={Apr.}, pages={19143-19151} }
+
+@inproceedings{adagmlp,
+author = {Lu, Weigang and Guan, Ziyu and Zhao, Wei and Yang, Yaming},
+title = {AdaGMLP: AdaBoosting GNN-to-MLP Knowledge Distillation},
+year = {2024},
+isbn = {9798400704901},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3637528.3671699},
+doi = {10.1145/3637528.3671699},
+abstract = {Graph Neural Networks (GNNs) have revolutionized graph-based machine learning, but their heavy computational demands pose challenges for latency-sensitive edge devices in practical industrial applications. In response, a new wave of methods, collectively known as GNN-to-MLP Knowledge Distillation, has emerged. They aim to transfer GNN-learned knowledge to a more efficient MLP student, which offers faster, resource-efficient inference while maintaining competitive performance compared to GNNs. However, these methods face significant challenges in situations with insufficient training data and incomplete test data, limiting their applicability in real-world applications. To address these challenges, we propose AdaGMLP, an AdaBoosting GNN-to-MLP Knowledge Distillation framework. It leverages an ensemble of diverse MLP students trained on different subsets of labeled nodes, addressing the issue of insufficient training data. Additionally, it incorporates a Node Alignment technique for robust predictions on test data with missing or incomplete features. Our experiments on seven benchmark datasets with different settings demonstrate that AdaGMLP outperforms existing G2M methods, making it suitable for a wide range of latency-sensitive real-world applications. We have submitted our code to the GitHub repository (https://github.com/WeigangLu/AdaGMLP-KDD24).},
+booktitle = {Proceedings of the 30th ACM SIGKDD Conference on Knowledge Discovery and Data Mining},
+pages = {2060–2071},
+numpages = {12},
+keywords = {gnn-to-mlp knowledge distillation, graph neural networks, knowledge distillation},
+location = {Barcelona, Spain},
+series = {KDD '24}
+}
+
+
+@article{liuyue_deep_graph_clustering_survey,
+  title={A Survey of Deep Graph Clustering: Taxonomy, Challenge, Application, and Open Resource},
+  author={Liu, Yue and Xia, Jun and Zhou, Sihang and Yang, Xihong and Liang, Ke and Fan, Chenchen and Zhuang, Yan and Li, Stan Z and Liu, Xinwang and He, Kunlun},
+  journal={arXiv preprint arXiv:2211.12875},
+  year={2022}
+}
+
+
+@inproceedings{DCRN,
+  title={Deep Graph Clustering via Dual Correlation Reduction},
+  author={Liu, Yue and Tu, Wenxuan and Zhou, Sihang and Liu, Xinwang and Song, Linxuan and Yang, Xihong and Zhu, En},
+  booktitle={Proc. of AAAI},
+  volume={36},
+  number={7},
+  pages={7603-7611},
+  year={2022}
+}
+
+
+@inproceedings{RGC,
+  title={Reinforcement Graph Clustering with Unknown Cluster Number},
+  author={Liu, Yue and Liang, Ke and Xia, Jun and Yang, Xihong and Zhou, Sihang and Liu, Meng and Liu, Xinwang and Li, Stan Z},
+  booktitle={Proceedings of the 31st ACM International Conference on Multimedia},
+  pages={3528--3537},
+  year={2023}
+}

@@ -1,0 +1,18 @@
+\begin{tabular}{@{}lccccccc@{}}
+\toprule[1.2pt]
+Methods  & \makecell[c]{Feat.\\Loss}   & AE         & \makecell[c]{No\\Struc.}  & \makecell[c]{Mask\\Feat.} & \makecell[c]{GNN\\Decoder}    & \makecell[c]{Re-mask\\Dec.}   & Space              \\ \midrule
+VGAE~\cite{kipf2016variational} & n/a      & \Checkmark & -          & -          & -             & -    & $\mathcal{O}(N^2)$ \\
+% EP~\cite{garcia2017learning}       & MSE    & \Checkmark & \Checkmark & -          & -            & -    & $\mathcal{O}(N^2)$ \\
+ARVGA~\cite{pan2018adversarially}    & n/a      & \Checkmark & -          & -          & -          & -    & $\mathcal{O}(N^2)$ \\
+MGAE~\cite{wang2017mgae}     & MSE    & \Checkmark & -          & \Checkmark & -                    & -    & $\mathcal{O}(N)$ \\
+GALA~\cite{park2019symmetric}     & MSE    & \Checkmark & \Checkmark & -          & \Checkmark      & -    & $\mathcal{O}(N)$  \\
+GATE~\cite{amin2020gate}     & MSE    & \Checkmark & -          & -          & \Checkmark           & -    & $\mathcal{O}(N)$   \\
+AttrMask~\cite{hu2020strategies} & CE     & \Checkmark & \Checkmark & \Checkmark & -                & -    & $\mathcal{O}(N)$   \\
+GPT-GNN~\cite{hu2020gpt}  & MSE    & -          & -          & \Checkmark & -                       & -    & $\mathcal{O}(N)$   \\
+AGE~\cite{cui2020adaptive}     & n/a      & \Checkmark & -          & -          & -                & -    & $\mathcal{O}(N^2)$  \\
+NodeProp~\cite{jin2020self} & MSE    & \Checkmark & \Checkmark & \Checkmark & -                     & -    & $\mathcal{O}(N)$ \\
+% RASSL~\cite{zhu2020self}    & MSE    & \Checkmark & -          & -          & -           & $\mathcal{O}(N^2)$   \\ 
+\midrule
+% \model   & Cosine & \Checkmark & \Checkmark & \Checkmark & \Checkmark  & $\mathcal{O}(N)$ \\ \bottomrule[1.2pt]
+\model   & SCE & \Checkmark & \Checkmark & \Checkmark & \Checkmark  & \Checkmark & $\mathcal{O}(N)$ \\ \bottomrule[1.2pt]
+\end{tabular}

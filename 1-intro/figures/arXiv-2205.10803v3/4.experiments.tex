@@ -1,0 +1,1043 @@
+\section{Experiments}%
+\label{sec:experiments}
+
+In this section, we demonstrate that \model  is a general self-supervised framework for various graph learning tasks, including:
+\begin{itemize}[leftmargin=*,itemsep=0pt,parsep=0.5em,topsep=0.3em,partopsep=0.3em]
+    \item Unsupervised representation learning for \textit{node classification};
+    \item Unsupervised representation learning for \textit{graph classification};
+    \item \textit{Transfer learning} on molecular property prediction.
+\end{itemize}
+% \noindent We compare \model with state-of-the-art methods on these three tasks. 
+Extensive experiments on various datasets are conducted to evaluate 
+%\noindent We comprehensively evaluate 
+the performance of \model against state-of-the-art (SOTA) contrastive and generative methods on these three tasks. 
+In each task, we follow exactly the same experimental procedure, e.g., data splits, evaluation protocol, as the  standard settings~\cite{velivckovic2018deep,zhang2021canonical,sun2019infograph,hu2020strategies}. 
+% \dong{to ZY: add at least 1 for each task}
+
+%For reproducibility,  our code is available in \url{https://anonymous.4open.science/r/GraphMAE}.
+
+\subsection{Node Classification}
+
+%\subsubsection{Node classification}\hfill
+
+
+\vpara{Setup.}
+The node classification task is to predict the unknown node labels in networks. 
+We test the performance of \model on 6 standard benchmarks: Cora, Citeseer, PubMed~\cite{yang2016revisiting}, Ogbn-arxiv~\cite{hu2020open}, PPI, and Reddit. 
+% are citation networks where nodes correspond to documents and edges represent citations. 
+% PPI is a protein-protein interaction dataset and  Reddit contains posts belonging to different communities with user comments. 
+Following the inductive setup in GraphSage~\cite{hamilton2017inductive}, the testing for Reddit and PPI is carried out on unseen nodes and graphs, while the other networks are used for transductive learning.
+
+For the evaluation protocol, we follow the experimental setting in ~\cite{velivckovic2018deep,hassani2020contrastive,thakoor2021bootstrapped,zhang2021canonical}. 
+First, we train a GNN encoder by the proposed \model without supervision. 
+Then we freeze the parameters of the encoder and generate all the nodes' embeddings. 
+For evaluation, we train a linear classifier and report the mean accuracy on the test nodes through 20 random initializations. 
+We follow the public data splits ~\cite{velivckovic2018deep,hassani2020contrastive,zhang2021canonical}  of Cora, Citeseer, and PubMed. 
+The graph encoder $f_E$ and decoder $f_D$ are both specified as standard GAT. 
+Detailed hyper-parameters can be found in  Appendix \ref{app:appendix}.
+
+
+\vpara{Results.} 
+We compare  \model with SOTA  contrastive self-supervised models, DGI~\cite{velivckovic2018deep}, MVGRL~\cite{hassani2020contrastive}, GRACE~\cite{zhu2020deep}, BGRL~\cite{thakoor2021bootstrapped}, InfoGCL~\cite{Xu2021InfoGCLIG}, and CCA-SSG~\cite{zhang2021canonical}, as well as supervised baselines GCN and GAT. 
+We also report the results of previous generative self-supervised models, GAE~\cite{kipf2016variational}, GPT-GNN~\cite{hu2020gpt}, and GATE~\cite{amin2020gate}.
+We report results from previous works with the same experimental setup if available.
+If results are not previously reported and codes are provided, we implement them based on the official codes and conduct a hyper-parameter search. 
+Table~\ref{tab:node_clf} lists the results. 
+\model achieves the best or competitive results compared to the SOTA self-supervised approaches in all benchmarks. 
+Notably, \model outperforms existing generative methods by a large margin. 
+The results in the inductive setting of PPI and Reddit suggest the self-supervised \model technique provides strong generalization to unseen nodes. 
+% Previous studies often report a large gap between supervised and self-supervised results on PPI. 
+% We find that increasing the model size could significantly boost the performance in the self-supervised setting and help fill the gap, as shown in Figure ~\ref{fig:ppi_hidden} of Appendix \ref{app:ppi}. 
+
+% \dong{zy to fix, something missing}
+% As shown in Figure~\ref{fig:ppi_hidden}, \model even outperforms supervised counter-part, although the model would be too much larger. This might indicate the potential of large-scale GNNs in pre-training.
+
+
+% Generally, the performance in PPI gets better with higher model capacity. But even with a similar or much larger hidden dimension, previous SOTA methods couldn't achieve competitive results as \model. 
+
+
+
+\subsection{Graph Classification}
+
+
+\vpara{Setup.}
+For graph classification,  we conduct experiments on 7 benchmarks: MUTAG, IMDB-B, IMDB-M, PROTEINS, COLLAB, REDDIT-B, and NCI1~\cite{yanardag2015deep}.
+% which are widely used in recent graph classification models. 
+Each dataset is a collection of graphs where each graph is associated with a label.
+% MUTAG, PROTEINS, and NCI1 have node labels as input features, while IMDB-B, IMDB-M, REDDIT-B, and COLLAB use node degrees as input features.
+Node labels are used as input features in MUTAG, PROTEINS, and NCI1, whereas node degrees are used in IMDB-B, IMDB-M, REDDIT-B, and COLLAB.
+
+For the evaluation protocol, after generating graph embeddings with \model's encoder and readout function, we feed encoded graph-level representations into a downstream LIBSVM~\cite{chang2011libsvm} classifier to predict the label, and report the mean 10-fold cross-validation accuracy with standard deviation after 5 runs.  We adopt GIN~\cite{xu2019powerful}, which is commonly used in previous graph classification works, as the backbone of encoder and decoder.
+% Detailed hyper-parameters can be found in Table 6 in the Appendix.
+
+\vpara{Results.}
+In addition to classical graph kernel methods---Weisfeiler-Lehman sub-tree kernel (WL)~\cite{shervashidze2011weisfeiler} and deep graph kernel (DGK)~\cite{yanardag2015deep}, we also compare \model with SOTA unsupervised and contrastive methods, 
+GCC~\cite{qiu2020gcc}, graph2vec~\cite{narayanan2017graph2vec}, Infograph~\cite{sun2019infograph}, GraphCL~\cite{you2020graph}, JOAO~\cite{you2021graph},  MVGRL~\cite{hassani2020contrastive}, and InfoGCL~\cite{Xu2021InfoGCLIG}. 
+The supervised baselines, GIN~\cite{xu2019powerful} and DiffPool~\cite{ying2018hierarchical}, are also included. 
+Per graph classification research tradition, we report results from previous papers if available.
+The results are shown in Table~\ref{tab:graph_clf}.
+% We find that \model outperforms all unsupervised baselines on 5 out of 7 of the datasets and has competitive results in two of the others.
+We find that \model outperforms all self-supervised baselines on five out of seven datasets and has competitive results on the other two.
+The node features of these seven datasets are all one-hot vectors representing node-labels or degrees, which are considered to be less informative than node features in node classification. The results manifest that generative auto-encoders could learn meaningful information and offer potentials in graph-level tasks.
+
+
+
+
+
+
+
+
+
+\begin{table*}[htbp]
+    \centering
+    \caption{Experiment results in unsupervised representation learning for \underline{node classification}. \textmd{We report the Micro-F1 (\%) score for PPI and accuracy (\%) for the other datasets. }
+    }
+    \begin{threeparttable}
+    \renewcommand\tabcolsep{10pt}
+    \renewcommand\arraystretch{1.05}
+    \begin{tabular}{c|c|cccccc}
+        \toprule[1.2pt]
+            & Dataset &   Cora      & CiteSeer      & PubMed                & Ogbn-arxiv        & PPI               & Reddit        \\
+        % \midrule
+        % \multirow{3}{*}{Statistics}
+
+         \midrule
+        \multirow{2}{*}{Supervised} 
+        & GCN     &  81.5          & 70.3          & 79.0                   & 71.74$\pm$0.29    & 75.7$\pm$0.1    & 95.3$\pm$0.1           \\
+        & GAT     &  83.0$\pm$0.7  & 72.5$\pm$0.7  & 79.0$\pm$0.3           & 72.10$\pm$0.13     & 97.30$\pm$0.20    & 96.0$\pm$0.1           \\
+        \midrule
+        \multirow{10}{*}{Self-supervised} 
+        & GAE     &  71.5$\pm$0.4  & 65.8$\pm$0.4  & 72.1$\pm$0.5           & -               & -           & - \\
+        & GPT-GNN &  80.1$\pm$1.0  & 68.4$\pm$1.6  & 76.3$\pm$0.8 & - & - & -\\
+        & GATE    &  83.2$\pm$0.6  & 71.8$\pm$0.8  & 80.9$\pm$0.3           & -                 & -             & -   \\ 
+        & DGI     &  82.3$\pm$0.6  & 71.8$\pm$0.7  & 76.8$\pm$0.6           & 70.34$\pm$0.16 & 63.80$\pm$0.20     & 94.0$\pm$0.10 \\
+        & MVGRL   & 83.5$\pm$0.4   & 73.3$\pm$0.5  & 80.1$\pm$0.7           & -               & - & - \\
+        & GRACE$^{1}$   & 81.9$\pm$0.4   & 71.2$\pm$0.5  & 80.6$\pm$0.4           & 71.51$\pm$0.11  & 69.71$\pm$0.17  &    94.72$\pm$0.04\\  
+        & BGRL$^{1}$    & 82.7$\pm$0.6   & 71.1$\pm$0.8  & 79.6$\pm$0.5           & \underline{71.64$\pm$0.12}   & \underline{73.63$\pm$0.16}  & 94.22$\pm$0.03         \\
+        & InfoGCL  & 83.5$\pm$0.3   & \bf 73.5$\pm$0.4  & 79.1$\pm$0.2  & - & - & - \\
+        & CCA-SSG$^{1}$ & \underline{84.0$\pm$0.4}   & 73.1$\pm$0.3  & \underline{81.0$\pm$0.4}  & 71.24$\pm$0.20  & 73.34$\pm$0.17  & \underline{95.07$\pm$0.02}   \\
+        \cmidrule{2-8}
+        %  & \model  & \bf 84.16±0.44  & \underline{73.35±0.42}  & \bf 81.10±0.41  & \bf 71.75$\pm$0.17 & \bf 74.50$\pm$0.29    & \bf 96.01$\pm$0.08    \\
+         & \model  & \bf 84.2±0.4  & \underline{73.4±0.4}  & \bf 81.1±0.4  & \bf 71.75$\pm$0.17 & \bf 74.50$\pm$0.29    & \bf 96.01$\pm$0.08    \\
+
+        \bottomrule[1.2pt]
+    \end{tabular}
+     \begin{tablenotes}
+        \footnotesize
+        \item[] The results not reported are due to unavailable code or out-of-memory.
+        \item[1] Results are from reproducing using authors' official code, as they did not report the results in part of datasets. The result of PPI is a bit different from what the authors' reported. This is because we train the linear classifier until convergence, rather than for a small fixed number of epochs during evaluation, using the official code.
+    \end{tablenotes}
+
+    \end{threeparttable}
+    \label{tab:node_clf}
+\end{table*}
+
+\begin{table*}[htbp]
+    \centering
+    \caption{Experiment results in unsupervised representation learning for \underline{graph classification}. \textmd{We report accuracy (\%) for all datasets.}}
+    \begin{threeparttable}
+    \renewcommand\arraystretch{1.05}
+    \begin{tabular}{c|c|ccccccc}
+        \toprule[1.2pt]
+              & Dataset  & IMDB-B     & IMDB-M     & PROTEINS   & COLLAB     & MUTAG      & REDDIT-B   & NCI1     \\ % & DD         \\ 
+        % \midrule
+        % \multirow{3}{*}{Statistics}
+
+        \midrule
+        \multirow{2}{*}{Supervised}
+        & GIN         & 75.1$\pm$5.1   & 52.3$\pm$2.8   & 76.2$\pm$2.8   & 80.2$\pm$1.9   & 89.4$\pm$5.6   & 92.4$\pm$2.5   & 82.7$\pm$1.7 \\ % & -   \\
+        & DiffPool    & 72.6$\pm$3.9 &  -           &  75.1$\pm$3.5   & 78.9$\pm$2.3 & 85.0$\pm$10.3 & 92.1$\pm$2.6 & - \\
+        \midrule
+        \multirow{2}{*}{Graph Kernels}
+        & WL          & 72.30$\pm$3.44 & 46.95$\pm$0.46 & 72.92$\pm$0.56 & - & 80.72$\pm$3.00 & 68.82$\pm$0.41 & 80.31$\pm$0.46 \\ % & - \\
+        & DGK         & 66.96$\pm$0.56 & 44.55$\pm$0.52 & 73.30$\pm$0.82 & - & 87.44$\pm$2.72 & 78.04$\pm$0.39 & 80.31$\pm$0.46 \\ % & -  \\
+        \midrule
+        \multirow{8}{*}{Self-supervised}
+        & graph2vec   & 71.10$\pm$0.54 & 50.44$\pm$0.87 & 73.30$\pm$2.05 & -              & 83.15$\pm$9.25 & 75.78$\pm$1.03 & 73.22$\pm$1.81 \\ % & -        \\
+        & Infograph   & 73.03$\pm$0.87 & 49.69$\pm$0.53 & 74.44$\pm$0.31 & 70.65$\pm$1.13 & 89.01$\pm$1.13 & 82.50$\pm$1.42 & 76.20$\pm$1.06 \\%& 72.85$\pm$1.78 \\
+        & GraphCL     & 71.14$\pm$0.44 & 48.58$\pm$0.67 & 74.39$\pm$0.45 & 71.36$\pm$1.15 & 86.80$\pm$1.34 & \underline{89.53$\pm$0.84} & 77.87$\pm$0.41 \\%& 78.62$\pm$0.40 \\
+        & JOAO        & 70.21$\pm$3.08 & 49.20$\pm$0.77     & \underline{74.55$\pm$0.41} & 69.50$\pm$0.36 & 87.35$\pm$1.02 & 85.29$\pm$1.35 & 78.07$\pm$0.47 \\%& 77.32$\pm$0.54  \\
+        & GCC         & 72.0           & 49.4           & -    & 78.9    &  - & \bf 89.8 & - \\%& - \\ 
+        & MVGRL       & 74.20$\pm$0.70   & 51.20$\pm$0.50   & -              & -              & \underline{89.70$\pm$1.10}   & 84.50$\pm$0.60   & -               \\%& -              \\
+        & InfoGCL     & \underline{75.10$\pm$0.90}   & \underline{51.40$\pm$0.80}   &  -             & \underline{80.00$\pm$1.30}   & \bf 91.20$\pm$1.30   & -              &  \underline{80.20$\pm$0.60}   \\%& -  \\
+        \cmidrule{2-9}
+        & \model      & \bf 75.52$\pm$0.66 & \bf 51.63$\pm$0.52 & \bf 75.30$\pm$0.39 & \bf 80.32$\pm$0.46 & 88.19$\pm$1.26 & 88.01$\pm$0.19 & \bf 80.40$\pm$0.30  \\%& 78.17$\pm$0.72 \\
+        \bottomrule[1.2pt]
+    \end{tabular}
+        \begin{tablenotes}
+            \footnotesize
+            \item[]   The reported results of baselines are from previous papers if available.
+        \end{tablenotes}
+    \end{threeparttable}
+    \label{tab:graph_clf}
+\end{table*}
+
+
+\begin{table*}[htp]
+\caption{Experiment results in \underline{transfer learning} on molecular property prediction benchmarks. \textmd{The model is first pre-trained on ZINC15 and then finetuned on the following datasets. We report ROC-AUC scores (\%).}}
+\label{tab:mol_clf}
+\renewcommand\tabcolsep{8pt}
+\renewcommand\arraystretch{1.05}
+\begin{tabular}{c|cccccccc|c}
+\toprule[1.2pt]
+                        & BBBP       & Tox21      & ToxCast    & SIDER      & ClinTox    & MUV        & HIV        & BACE & Avg.      \\
+\midrule
+    No-pretrain         & 65.5±1.8   & 74.3±0.5   & 63.3±1.5   & 57.2±0.7   & 58.2±2.8   & 71.7±2.3   & 75.4±1.5   & 70.0±2.5 & 67.0  \\
+\midrule    
+    ContextPred         & 64.3±2.8   & \underline{75.7±0.7}   & 63.9±0.6   & 60.9±0.6   & 65.9±3.8   & 75.8±1.7   & 77.3±1.0   & 79.6±1.2 & 70.4 \\
+    AttrMasking         & 64.3±2.8   & \bf 76.7±0.4   & \bf 64.2±0.5   &  \underline{61.0±0.7}   & 71.8±4.1   & 74.7±1.4   & 77.2±1.1   & 79.3±1.6 & 71.1 \\
+    Infomax             & 68.8 ±0.8  & 75.3 ±0.5  & 62.7 ±0.4  & 58.4 ±0.8  & 69.9±3.0  & 75.3 ±2.5  & 76.0 ±0.7  & 75.9 ±1.6 & 70.3 \\
+    % GraphCL             & 69.68±0.67 & 73.87±0.66 & 62.40±0.57 & 60.53±0.88 & 75.99±2.65 & 69.80±2.66 & \bf 78.47±1.22 & 75.38±1.44 & \\
+    % JOAO                & 70.22±0.98 & 74.98±0.29 & 62.94±0.48 & 59.97±0.79 & \underline{81.32±2.49} & 71.66±1.43 & 76.73±1.23 & 77.34±0.48 & \\
+    GraphCL             & 69.7±0.7 & 73.9±0.7 & 62.4±0.6 & 60.5±0.9 & 76.0±2.7 & 69.8±2.7 & \bf 78.5±1.2 & 75.4±1.4 & 70.8 \\
+    JOAO                & 70.2±1.0 & 75.0±0.3 & 62.9±0.5 & 60.0±0.8 & \underline{81.3±2.5} & 71.7±1.4 & 76.7±1.2 & 77.3±0.5 & 71.9 \\
+    GraphLoG            & \bf 72.5±0.8 &  \underline{75.7±0.5}  &  63.5±0.7     & \bf 61.2±1.1  & 76.7±3.3   & \underline{76.0±1.1}    & \underline{77.8±0.8}  & \bf 83.5±1.2 & \underline{73.4} \\ 
+\midrule
+    % GraphMAE (ac)   & 71.43±0.68 & 75.48±0.52 & 63.82±0.33 & 58.99±0.66 & 80.86±2.55 & 72.23±1.82 & 77.49±0.78 & 80.73±0.77 \\
+    % GraphMAE (a)    & 70.79±0.94 & 75.11±0.46 & 64.35±0.39 & 59.66±0.62 & 82.88±1.49 & 73.83±1.70 & 77.41±1.08 & 80.44±0.77 \\
+    % GraphMAE            & \underline{72.04±0.66} & 75.51±0.61 & \underline{64.06±0.29} & 60.25±1.13 & \bf 82.32±1.15 & \bf 76.26±2.39 & 77.19±0.95 & \underline{83.13±0.86} & \bf 73.81 \\
+    GraphMAE            & \underline{72.0±0.6} & 75.5±0.6 & \underline{64.1±0.3} & 60.3±1.1 & \bf 82.3±1.2 & \bf 76.3±2.4 & 77.2±1.0 & \underline{83.1±0.9} & \bf 73.8 \\
+\bottomrule[1.2pt]
+\end{tabular}
+\end{table*}
+
+
+
+
+
+\subsection{Transfer Learning}
+
+
+
+\vpara{Setup.} To evaluate the transferability of the proposed method, we test the performance on transfer learning on molecular property prediction, following the setting of ~\cite{hu2020strategies,you2020graph,you2021graph}. The model is first pre-trained in  2 million unlabeled molecules sampled from the ZINC15~\cite{sterling2015zinc}, and then finetuned in 8 classification benchmark datasets contained in MoleculeNet~\cite{wu2018moleculenet}. The downstream datasets are split by scaffold-split to mimic real-world use cases. Input node features are the atom number and chirality tag, and edge features are the bond type and direction. 
+% In our experiments, we only consider reconstructing node features.
+
+For the evaluation protocol,  we run experiments for 10 times and report the mean and standard deviation of ROC-AUC scores (\%). Following the default setting in ~\cite{hu2020strategies},  we adopt a 5-layer GIN as the encoder and a single-layer GIN as the decoder.
+
+
+\vpara{Results.}
+We evaluate \model against methods including Infomax, AttrMasking and ContextPred~\cite{hu2020strategies} , and SOTA contrastive learning methods, GraphCL~\cite{you2020graph}, JOAO~\cite{you2021graph}, and GraphLoG~\cite{xu2021self}. Table \ref{tab:graph_clf} shows that the performance on downstream tasks is comparable to SOTA methods, in which \model achieves the best average scores and has a small edge over previous best results in two tasks. 
+% This shows the robust transfer of \model. 
+This demonstrates the robust transferability of \model.
+
+
+% it is noteworthy 
+To summarize,  the self-supervised \model  method achieves  competitive performance on node classification, graph classification, and transfer learning across 21 benchmarks. % using a unified learning approach. 
+Note that we do not customize a dedicated \model for each task. 
+The consistent results on the three tasks demonstrate that \model is an effective and universal self-supervised graph pre-training framework for various applications. 
+
+
+
+
+
+
+
+
+
+
+% \begin{table}
+%     \centering
+%     \caption{Performance on PPI using GAT with 4 attention heads, compared to other unsupervised and supervised baselines. \model could ourperform supervised }
+%     \begin{tabular}{c|c|c|c|c}
+%     \toprule
+%                 &  hd=256*4    &   hd=512*4    &   hd=1024*4   &   hd=2048*4   \\
+%     \midrule
+%         BGRL    & 73.63$\pm$0.16 & 81.94$\pm$0.24 & 89.75$\pm$0.69 & 93.51$\pm$1.05 \\
+%         CCA-SSG & 73.34$\pm$0.17 & 83.75$\pm$0.64 & 92.16$\pm$0.63 & 96.99$\pm$0.16 \\
+%         \model  &  74.50±0.24  & 85.81±0.26    & 94.14±0.30    &   97.79±0.06 \\
+%     \bottomrule
+%     \end{tabular}
+%     \label{tab:ppi_hd}
+% \end{table}
+
+
+\hide{
+\begin{figure}
+    \centering
+    \includegraphics[width=0.43\textwidth]{imgs/ppi_hidden.pdf}
+    \vspace{-4mm}
+    \caption{Performance on PPI using GAT with 4 attention heads, compared to other baselines. Self-supervised methods benefit much from larger model size, and \model could outperform supervised model. }
+    \label{fig:ppi_hidden}
+\end{figure}
+}
+
+
+\subsection{Ablation Studies}
+To verify the effects of the main components in \model, we further conduct several ablation studies. Without loss of generalization, we choose three datasets from node classification and two datasets from graph classification for experiments.
+
+
+\vpara{Effect of reconstruction criterion.} 
+We study the influence of reconstruction criterion, and Table \ref{tab:ablation} shows the results of MSE and the SCE loss function.
+% The observation from Table \ref{tab:ablation} varies between node classification and graph classification.
+Generally, the input features in node classification lie in continuous or high-dimensional discrete space, containing more discriminative information.
+% The performance using MSE degrades after training, which indicates that using MSE as criterion may mislead learning and harm performance. 
+The results manifest that SCE has a significant advantage over MSE,
+% , as it brings 3.1\% $\sim$ 6.0\% absolute gain.
+with an absolute gain of 1.5\% $\sim$ 8.0\%.
+%SCE forces the reconstructed embedding and node feature to be aligned in the unit sphere, while MSE measures the reconstruction quality in Euclidean space. 
+In graph classification, pre-training with either MSE or SCE improves accuracy. 
+The input features % lie in discrete value space, and 
+are discrete one-hot encoding in these benchmarks, 
+representing either node degrees or node labels. 
+Reconstructing one-hot encoding with MSE is
+similar to classification tasks, thus MSE also works. Nevertheless, SCE offers a performance edge (though limited) over MSE. %, as shown in the Table.
+% This suggests that the a proper criterion is critical to the success of generative SSL.
+% These experiments manifest that SCE could be a better choice for both both discrete and continous vector input features. 
+
+
+Figure \ref{fig:ablation} shows the influence of scaling factor $\gamma$.  We observe that $\gamma > 1$ offers benefits in most cases, especially in node classification. However, in MUTAG, a larger $\gamma$ value harms the performance. In our experiments, we notice that the training loss in node classification is much higher than that in graph classification. 
+This further demonstrates that aligning continuous vectors in a unit sphere is more challenging. Therefore, scaling $\gamma$ brings improvements. 
+
+
+
+
+
+\begin{table}[t]
+\caption{Ablation studies of the decoder type, re-mask and reconstruction criterion on node- and graph-level datasets.}
+\label{tab:ablation}
+\renewcommand\tabcolsep{4pt}
+\input{tables/ablation}
+\vspace{-2mm}
+\end{table}
+
+
+
+
+
+\vpara{Effect of mask and re-mask.} Masking plays an important role in the proposed \model method. \model employs two masking strategies --- masking input feature before encoder, and re-masking encoded code before decoder. Table \ref{tab:ablation} studies the designs. We observe a significant drop in performance if not masking input features, indicating that masking inputs is vital to avoid  the trivial solution. For the re-mask strategy, the accuracy drops by 0.1\%$\sim$1.9\% without it. 
+% In such case, it behaves like training a $K+1$ layer GNN and adopting the output of the $K$-th layer as the encoding representations. 
+Re-mask is designed for the GNN decoder and can be regarded as regularization, which makes the self-supervised task more challenging.
+
+
+
+
+
+
+\hide{
+\begin{table}
+\centering
+\caption{Experiment results using different encoder backbones in node classification.}
+\renewcommand\tabcolsep{3pt}
+\begin{tabular}{c|cccc}
+\toprule[1.2pt]
+          & Cora & Citeseer & Pubmed & Ogbn-arxiv \\
+\midrule
+BGRL (GCN)    &   82.7$\pm$0.6    &  71.1$\pm$0.7        & 79.4$\pm$0.6       &  71.64$\pm$0.12      \\
+BGRL (GAT)    &   82.8$\pm$0.5    &   71.1$\pm$0.8       &  79.6$\pm$0.5      &   70.07$\pm$0.02 \\
+CCA-SSG (GCN) &   84.0$\pm$0.4      &  73.1$\pm$0.3         &  81.0$\pm$0.4        &  70.81$\pm$0.13  \\
+CCA-SSG (GAT) &   83.8$\pm$0.5    &  72.6$\pm$0.7        &   79.9$\pm$1.1     &  71.24$\pm$0.20  \\
+\model (GCN)  &   82.9$\pm$0.6             &  72.5$\pm$0.5                 &  81.0$\pm$0.5               &  \bf 71.87$\pm$0.21\\   
+\model (GAT)  &   \bf 84.2$\pm$0.4        &  \bf 73.4$\pm$0.4       & \bf 81.1$\pm$0.4      &  71.75$\pm$0.17 \\
+\bottomrule[1.2pt]
+\end{tabular}
+\vspace{-2mm}
+\label{tab:backbone}
+\end{table}
+}
+
+
+
+\begin{figure}
+    \centering
+    \begin{minipage}[t]{0.235\textwidth}
+        \includegraphics[width=\textwidth]{imgs/gmae_mask_ratio.pdf}
+        % \caption{Mask ratio ablation.}
+    \end{minipage}
+    \begin{minipage}[t]{0.235\textwidth}
+        \includegraphics[width=\textwidth]{imgs/gamma_value.pdf}
+        % \caption{Gamma ablation.}
+    \end{minipage}
+    \vspace{-6mm}
+    \caption{Ablation studies of mask ratio and scaling factor.}
+    \label{fig:ablation}
+    \vspace{-4mm}
+\end{figure}
+
+
+
+
+
+
+
+
+\vpara{Effect of mask ratio.} 
+Figure \ref{fig:ablation} shows the influence of mask ratio. 
+% Similar to the observation in ~\cite{he2021masked}, 
+% In most cases, the reconstruction task with a low mask ratio (0.1) is not challenging enough to learn useful features.
+In most cases, the reconstruction task with a low mask ratio (0.1) is not challenging enough to learn useful features.
+% while it would be too difficult if the ratio is too high (0.9). 
+% Different from the behavior in BERT and MAE,
+The optimal ratio varies across graphs. 
+Results on Ogbn-arxiv and IMDB-B can be found in Appendix \ref{app:appendix}. 
+In Cora, increasing the mask ratio by more than 0.5 degrades the performance, while \model still works with a surprisingly high ratio (0.7$\sim$0.9) in PubMed and MUTAG. 
+This can be connected with the information redundancy in graphs. 
+Large node degrees or high homogeneity may lead to heavy information redundancy, in which missing node features may be recovered from very few neighboring nodes with little high-level understanding of
+features and local context. 
+% Masking a very high portion of node features is necessary to learn useful representations. 
+In contrast, lower redundancy means that an excessively high mask ratio would make it impossible to recover features, thus degrading the performance. 
+% As for how to measure information redundancy, we leave it for future work. 
+
+
+
+
+
+
+
+
+\vpara{Effect of decoder type.} 
+In Table \ref{tab:ablation}, we compare different decoder types, including MLP, GCN, GIN, and GAT. The re-mask strategy is only used for GNN decoders. As the results show, using GNN decoder typically boosts the performance. Compared to MLP, which reconstructs original features from latent representations, GNN enforces masked nodes to extract information relevant to their original features from the neighborhood. One reasonable assumption is that GNN avoids the representation tending to be the same as original features.
+% as the learned representations are expected to be discriminative in downstream tasks. 
+MLP also works in \model, which might be partly attribute to the usage of the SCE metric.
+% The type of decoder matters in training, and 
+
+Among different GNNs, GIN performs better in graph-level tasks and GAT is a more reasonable option for node classification. It is observed that replacing GAT with GCN causes a significant drop, especially in Cora ($\sim$2.9\%) and PubMed ($\sim$2.0\%). 
+We speculate that the attention mechanism matters in reconstructing continuous features with the re-mask strategy.
+% when the latent representations vary in neighbors with re-masked ones.
+
+
+
+
+
+
+
+
+
+
+
+\hide{
+\vpara{Effect of encoder architecture.}  In node classification, \model uses GAT as the encoder. To have a fair comparison and investigate the influence of different GNN backbones, we compare the best baselines, BGRL and CCA-SSG, in node classification datasets using GCN and GAT as the encoder. The results are shown in Table \ref{tab:backbone}. We observe that \model still outperforms the baselines with the same GAT backbone. 
+In addition, the results manifest that attention mechanism would not always benefit graph self-supervised learning, as GCN is inferior to GAT, for instance, in (Cora, CCA-SSG) and (Ogbn-arxiv, \model). Under the training setting of \model, GAT could be a better option in most cases.
+}
+
+% To we also implement previous SOTA contrastive methods based on GAT and , as shown in Table \ref{tab:node_clf}. GAT doesn't always outperform GCN, indicating that GAT is not a absolute winner in self-supervised learning. 
+
+% \vpara{Effect of scaling factor $\gamma$.} 
+
+
+
+
+% \begin{table}
+% \centering
+% \small
+% \caption{Experiment results using different encoder backbones in node classification.}
+% \renewcommand\tabcolsep{3pt}
+% \begin{tabular}{c|cccc}
+% \toprule
+%           & Cora & Citeseer & Pubmed & Ogbn-arxiv \\
+% \midrule
+% BGRL (GCN)    &   82.66$\pm$0.60    &  71.06$\pm$0.66        & 79.44$\pm$0.58       &  71.64$\pm$0.12      \\
+% BGRL (GAT)    &   82.75$\pm$0.52    &   71.08$\pm$0.79       &  79.55$\pm$0.50      &   70.07$\pm$0.02 \\
+% CCA-SSG (GCN) &   84.0$\pm$0.4      &  73.1$\pm$0.3          &  80.9$\pm$0.4        &  70.81$\pm$0.13  \\
+% CCA-SSG (GAT) &   83.78$\pm$0.48    &  72.59$\pm$0.66        &   79.91$\pm$1.09     &  71.24$\pm$0.20  \\
+% \model (GCN)  &   82.91$\pm$0.56             &  72.50$\pm$0.45                 &  81.05$\pm$0.54               &  \bf 71.87$\pm$0.21\\   
+% \model (GAT)  &   \bf 84.16±0.44        &  \bf 73.35$\pm$0.42       & \bf 81.10$\pm$0.41      &  71.75$\pm$0.17 \\
+% \bottomrule
+% \end{tabular}
+% \label{tab:backbone}
+% \end{table}
+
+
+
+
+
+% \begin{table}
+%     \centering
+%     \caption{Re-mask ablation.}
+%     \label{tab:abl_remask}
+%     \begin{tabular}{c|c|c|c|c|c}
+%     \toprule
+%                     & Cora       & PubMed     & \textcolor{gray}{Ogbn-arxiv} & MUTAG & IMDB-B \\
+%     \midrule
+%         w/ re-mask  & 84.16±0.44 & 81.10±0.41 & 71.75±0.17 & 88.19$\pm$1.26 & 75.52$\pm$ 0.35 \\
+%         w/o re-mask & 81.84±0.58 & 80.02±0.40 & 71.61±0.13 & 86.29$\pm$2.32 & 74.42$\pm$0.32 \\
+%     \bottomrule
+%     \end{tabular}
+% \end{table}
+
+
+% \begin{table}
+%     \centering
+%     \caption{Decoder ablation.}
+%     \begin{tabular}{c|c|c|c|c|c}
+%         \toprule
+%         Decoder     & Cora       & PubMed     & \textcolor{gray}{Ogbn-arxiv} & MUTAG   & IMDB-B \\
+%         \midrule
+%         MLP         & 81.47±0.65 & 80.39±0.68 & 71.54±0.17 & 87.01±1.28 & 73.94±0.45 \\
+%         GCN(GIN)    & 81.25±0.93 & 79.06±0.77 & 71.59±0.27 & 88.19±1.26 & 75.52±0.35 \\
+%         GAT         & 84.16±0.44 & 81.10±0.41 & 71.73±0.24 & 85.75±1.74 & 74.04±0.38 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+
+% \begin{table}[]
+%     \centering
+%     \caption{Reconstruction ablation. }
+%     \label{tab:loss}
+%     \begin{tabular}{c|c|c|c|c|c}
+%         \toprule
+%                   & Cora       & PubMed     & \textcolor{gray}{Ogbn-arxiv} & MUTAG      & IMDB-B     \\
+%         \midrule
+%         SCE(ours) & 84.16±0.44 & 81.10±0.41 & 71.75±0.17 & 88.19±1.26 & 75.52±0.35 \\
+%         MSE & 68.49±3.65 & 73.07±1.41 & 67.44±0.38 & 86.30±1.54 & 74.04±0.32 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+
+% \begin{table}[htbp]
+% \begin{tabular}{cccc|cc}
+% \toprule
+%                       & \multicolumn{3}{c}{Node-classification} & \multicolumn{2}{l}{Graph-classification} \\
+% \cmidrule{2-6}
+%                       & Cora        & PubMed      & Ogbn-arxiv  & MUTAG              & IMDB-B              \\
+% \cmidrule{2-6}
+% \model & 84.16±0.44  & 81.10±0.41  & 71.75±0.17  & 88.19±1.26         & 75.52± 0.35         \\
+% w/o re-mask           & 81.84±0.58  & 80.02±0.40  & 71.61±0.13  & 86.29±2.32         & 74.42±0.32          \\
+% w/ MSE                & 68.49±3.65  & 73.07±1.41  & 67.44±0.38  & 86.30±1.54         & 74.04±0.32          \\
+% \midrule
+% MLP                 & 81.47±0.65  & 80.39±0.68  & 71.54±0.17  & 87.01±1.28         & 73.94±0.45          \\
+% GCN                 & 81.25±0.93  & 79.06±0.77  & 71.59±0.27  &                    &                     \\
+% GIN                 &             &             &             & 88.19±1.26         & 75.52±0.35          \\
+% GAT                 & 84.16±0.44  & 81.10±0.41  & 71.73±0.24  & 85.75±1.74         & 74.04±0.38           \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+
+% \begin{table}[htbp]
+% \small
+% \begin{tabular}{cccc|cc}
+% \toprule
+%                       & \multicolumn{3}{c}{Node-classification} & \multicolumn{2}{l}{Graph-classification} \\
+% \cmidrule{2-6}
+%                       & Cora        & PubMed      & Ogbn-arxiv  & MUTAG              & IMDB-B              \\
+% \cmidrule{2-6}
+% \model                & 84.2±0.4  & 81.1±0.4  & 71.8±0.2    & 88.2±1.3         & 75.5± 0.4         \\
+% w/o re-mask           & 81.8±0.6  & 80.0±0.4  & 71.6±0.1    & 86.3±2.3         & 74.4±0.3          \\
+% w/ MSE                & 68.5±3.6  & 73.1±1.4  & 67.4±0.2    & 86.3±1.5         & 74.0±0.3          \\
+% \midrule
+% MLP                   & 81.5±0.7  & 80.4±0.7  & 71.5±0.2    & 87.0±1.3         & 73.9±0.5          \\
+% GCN                   & 81.2±0.9  & 79.1±0.8  & 71.6±0.27   &                  &                     \\
+% GIN                   &           &           &             & 88.2±1.3         & 75.5±0.4          \\
+% GAT                   & 84.2±0.4  & 81.1±0.4  & 71.75±0.2   & 85.8±1.7         & 74.0±0.4           \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+
+
+% \begin{figure}
+%     \subfigure[name of the subfigure]{   %第一张子图
+%     % \begin{minipage}[t]
+%     % \centering    %子图居中
+%     \includegraphics[width=0.22\textwidth]{imgs/gmae_mask_ratio.pdf}  
+%     % \end{minipage}
+%     }
+%     \subfigure[name of the subfigure]{   %第一张子图
+%     % \begin{minipage}[t]
+%     % \centering    %子图居中
+%     \includegraphics[width=0.22\textwidth]{imgs/gmae_mask_ratio.pdf}  
+%     % \end{minipage}
+%     }
+%     \caption{Ablation study of mask ratio and scale coefficient $\gamma$.}
+%     \label{fig:my_label}
+% \end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\hide{%start of hide================================
+
+\section{Experiments}%
+\label{sec:experiments}
+
+In this section, we show our proposed \model is a general self-supervised framework for a wide range of graph tasks, including:
+\begin{itemize}[leftmargin=*,itemsep=0pt,parsep=0.5em,topsep=0.3em,partopsep=0.3em]
+    \item Unsupervised representation learning for \textit{node classification}
+    \item Unsupervised representation learning for \textit{graph classification}
+    \item \textit{Transfer learning} on molecular property prediction.
+\end{itemize}
+% \noindent We compare \model with state-of-the-art methods on these three tasks. 
+\noindent We comprehensively evaluate the performance of \model against state-of-the-art methods on these three tasks. 
+
+\subsection{Task Evalution}
+
+\subsubsection{Node classification}\hfill
+
+
+\vpara{Setup.}
+The node classification task is to predict unknown node labels in  network. We analyze the performance of \model on a set of 6 standard transductive and inductive benchmarks. Cora, Citeseer, PubMed, and Ogbn-arxiv are citation networks where nodes correspond to documents and edges
+represent citations. 
+PPI is a protein-protein interaction dataset and  Reddit contains posts belonging to different communities with user comments. 
+Following the inductive setup in ~\cite{hamilton2017inductive}, the testing for Reddit and PPI is carried out on unseen (untrained) nodes and graphs, while the citation networks are used for transductive learning.
+
+For evaluation protocol, we follow experiment settings in ~\cite{velivckovic2018deep,hassani2020contrastive,thakoor2021bootstrapped,zhang2021canonical}. We first train the model using the method proposed in this paper, without supervision. Then we freeze the parameters of the encoder and obtain all the nodes' embeddings. For the evaluation, we train a linear classifier and report the mean classification accuracy with standard deviation on the test nodes through 20 random initialization. We follow the public data split ~\cite{velivckovic2018deep,hassani2020contrastive,zhang2021canonical}  of Cora/Citeseer/PubMed. The graph encoder $f_E(·|\theta)$ is specified as a standard GAT model and the decoder $f_D(·|\phi)$ is a single-layer GAT. To have a fair comparison, we also implement previous SOTA contrastive methods based on GAT and conduct hyper-parameter search, as shown in Table \ref{tab:node_clf}. GAT doesn't always outperform GCN, indicating that GAT is not a absolute winner in self-supervised learning. Under the training setting of \model, GAT could be a better option.
+Detailed hyper-parameters can be found in the Appendix.
+
+
+\vpara{Experiment results.} 
+We compare our \model with state-of-the-art (SOTA) contrastive self-supervised models, DGI~\cite{velivckovic2018deep}, MVGRL~\cite{hassani2020contrastive}, GRACE~\cite{zhu2020deep}, BGRL~\cite{thakoor2021bootstrapped}, and CCA-SSG~\cite{zhang2021canonical}, and supervised baselines GCN and GAT. We also report the results of previous generative self-supervised models, GAE~\cite{kipf2016variational}, GPT-GNN~\cite{hu2020gpt}, and GATE~\cite{amin2020gate}.
+We report results from previous papers with the same experimental setup if available. If results are not previously reported and codes are provided, we implement them based on the official codes and conduct a hyper-parameter search. Otherwise we only report the results on Cora/Citeseer/PubMed using our re-implemented codes according to the paper. Table~\ref{tab:node_clf} represents the results, and it shows that our approach achieves the best or competitive results compared to the state-of-the-art self-supervised approaches. To test the influence of different GNN backbones, we also compare the best baselines, BGRL and CCA-SSG, in citation networks using GCN and GAT as the backbone. The results is shown in Table \ref{tab:backbone}. On the one hand, we observe that \model still outperforms the baselines with the same GAT backbone. 
+On the other hand, the results manifest that, attention mechanism would not always bring benefits in graph self-supervised learning, as GCN is inferior to GAT, for instance, in (Cora, CCA-SSG) and (Ogbn-arxiv, \model).
+% as indicated in NLP and CV, graph neural networks with attention mechanism would gain excellent performance in generative self-supervised learning. 
+Besides, the results in the inductive setting of PPI and Reddit substantiates the ability of generalization to unseen nodes. \model successfully outperformed all the competing self-supervised methods.  
+% It is observed that \model achieves a significant improvement ($\sim$10\%) over previous unsupervised  methods in PPI dataset ($\sim$4\% absolute gain). 
+Previous studies often reports a large gap between supervised and self-supervised results on PPI. We found that increasing the number of model parameters helps little in supervised setting, but could highly boost the performance in self-supervised setting. As show in Table~\ref{tab:ppi_hd}, \model even outperforms supervised counter-part, although the model would be too much larger. This might indicate the potential of large-scale GNNs in pre-training.
+
+% Generally, the performance in PPI gets better with higher model capacity. But even with a similar or much larger hidden dimension, previous SOTA methods couldn't achieve competitive results as \model. 
+
+
+
+\begin{table}
+\centering
+\small
+\caption{Experiment results using different encoder backbones in node classification.}
+\renewcommand\tabcolsep{3pt}
+\begin{tabular}{c|cccc}
+\toprule
+          & Cora & Citeseer & Pubmed & Ogbn-arxiv \\
+\midrule
+BGRL (GCN)    &   82.66$\pm$0.60    &  71.06$\pm$0.66        & 79.44$\pm$0.58       &  71.64$\pm$0.12      \\
+BGRL (GAT)    &   82.75$\pm$0.52    &   71.08$\pm$0.79       &  79.55$\pm$0.50      &   70.07$\pm$0.02 \\
+CCA-SSG (GCN) &   84.0$\pm$0.4      &  73.1$\pm$0.3          &  80.9$\pm$0.4        &  70.81$\pm$0.13  \\
+CCA-SSG (GAT) &   83.78$\pm$0.48    &  72.59$\pm$0.66        &   79.91$\pm$1.09     &  71.24$\pm$0.20  \\
+\model (GCN)  &   82.91$\pm$0.56             &  72.50$\pm$0.45                 &  81.05$\pm$0.54               &  \bf 71.87$\pm$0.21\\   
+\model (GAT)  &   \bf 84.16±0.44        &  \bf 73.35$\pm$0.42       & \bf 81.10$\pm$0.41      &  71.75$\pm$0.17 \\
+\bottomrule
+\end{tabular}
+\label{tab:backbone}
+\end{table}
+
+
+
+
+\subsubsection{Graph classification}\hfill
+
+
+\vpara{Setup.}
+For unsupervised learning for graph classification,  we conduct experiments on 8 well-known benchmarks: MUTAG, IMDB-B, IMDB-M, PROTEINS, COLLAB, REDDIT-B, DD, and NCI1~\cite{yanardag2015deep}, which are widely used in recent graph classification models. Each dataset is a set of graphs where each graph is associated with a label. MUTAG, PROTEINS, DD, and NCI1 have node labels as input features, while IMDB-B, IMDB-M, REDDIT-B, and COLLAB use node degrees as input features. 
+
+For evaluation protocol, after generating graph embeddings with \model's encoder, we feed encoded graph-level representation into a down-stream LIBSVM~\cite{chang2011libsvm} classifier to predict the label, and report the mean 10-fold cross validation accuracy with standard deviation after 5 runs.  We adopt GIN~\cite{xu2019powerful}, which is commonly used in previous graph classification works, as the backbone of encoder and decoder.
+% Detailed hyper-parameters can be found in Table 6 in the Appendix.
+
+\vpara{Experiment results.}
+Aside from classical graph kernel methods, Weisfeiler-Lehman sub-tree kernel (WL)~\cite{shervashidze2011weisfeiler} and deep graph kernel (DGK)~\cite{yanardag2015deep}, we also compare \model with SOTA unsupervised and contrastive learning methods, graph2vec~\cite{narayanan2017graph2vec}, Infograph~\cite{sun2019infograph}, GraphCL~\cite{you2020graph}, JOAO~\cite{you2021graph}, and InfoGCL~\cite{Xu2021InfoGCLIG}. The performance of supervised baselines, GIN~\cite{xu2019powerful} and DGCNN~\cite{Zhang2018AnED} is also included. We report results from previous papers if available.
+The results are shown in Table~\ref{tab:graph_clf}.
+We find that \model outperforms all unsupervised baselines on 4 out of 7 of the datasets, and has competitive results in two of the other. In these benchmarks, node features are all one-hot vectors, representing node-labels or degrees, which are often considered to be less informative compared with node features in node classification.  The results manifest that generative auto-encoding could also learn meaningful information and be potentional in graph-level tasks.
+
+
+
+
+
+
+
+
+
+\begin{table*}[htbp]
+    \centering
+    \caption{\textmd{Experiment results in unsupervised representation learning for \textbf{\textit{node classification}}. We report Micro-F1(\%) score for PPI and accuracy(\%) for the other datasets. }}
+    \begin{threeparttable}
+    \renewcommand\tabcolsep{8pt}
+    \begin{tabular}{c|c|cccccc}
+        \toprule[1.2pt]
+            & Dataset &   Cora      & CiteSeer      & PubMed                & Ogbn-arxiv        & PPI               & Reddit        \\
+        % \midrule
+        % \multirow{3}{*}{Statistics}
+
+         \midrule
+        \multirow{2}{*}{Supervised} 
+        & GCN     &  81.5          & 70.3          & 79.0                   & 71.74$\pm$0.29    & 75.7$\pm$0.1    & 95.4           \\
+        & GAT     &  83.0$\pm$0.7  & 72.5$\pm$0.7  & 79.0$\pm$0.3           & 72.1$\pm$0.13     & 97.30$\pm$0.20    & 96.5           \\
+        \midrule
+        \multirow{10}{*}{Self-supervised} 
+        & GAE     &  71.5$\pm$0.4  & 65.8$\pm$0.4  & 72.1$\pm$0.5           & OOM               & OOM           & OOM \\
+        & GPT-GNN &  80.1$\pm$1.0  & 68.4$\pm$1.6  & 76.3$\pm$0.8 & - & - & -\\
+        & GATE    &  83.2$\pm$0.6  & 71.8$\pm$0.8  & \underline{80.9$\pm$0.3}           & -                 & -             & -   \\ 
+        & DGI     &  82.3$\pm$0.6  & 71.8$\pm$0.7  & 76.8$\pm$0.6           & 70.34$\pm$0.16 & 63.8$\pm$0.20     & 94.0$\pm$0.10 \\
+        & MVGRL   & 83.5$\pm$0.4   & 73.3$\pm$0.5  & 80.1$\pm$0.7           & OOM               & OOM & OOM \\
+        & GRACE$^{1}$   & 81.9$\pm$0.4   & 71.2$\pm$0.5  & 80.6$\pm$0.4           & 71.51$\pm$0.11  & 69.71$\pm$0.17  &    94.72$\pm$0.04\\  
+        & BGRL$^{1}$    & 82.7$\pm$0.6   & 71.1$\pm$0.8  & 79.6$\pm$0.5           & \underline{71.64$\pm$0.12}   & \underline{73.63$\pm$0.16}  & 94.22$\pm$0.03         \\
+        & InfoGCL$^2$  & 83.5$\pm$0.3   & \bf 73.5$\pm$0.4  & 79.1$\pm$0.2  & - & - & - \\
+        & CCA-SSG$^{1}$ & \underline{84.0$\pm$0.4}   & 73.1$\pm$0.3  & \underline{80.9$\pm$0.4}  & 71.24$\pm$0.20  & 73.34$\pm$0.17  & \underline{95.07$\pm$0.02}   \\
+        \cmidrule{2-8}
+         & \model  & \bf 84.16$\pm$0.44  & \underline{73.35$\pm$0.42}  & \bf 81.10$\pm$0.41  & \bf 71.75$\pm$0.17 & \bf 74.50$\pm$0.29    & \bf 96.01$\pm$0.08    \\
+        \bottomrule[1.2pt]
+    \end{tabular}
+     \begin{tablenotes}
+        \footnotesize
+        \item[1] Results are from our reproducing with authors’ public code, as they didn't report the results in part of these datasets. The result of PPI is a bit different from that the authers' reported. This is because we use the authors' public code, and train the linear classifier until convergence, instead for a fixed number of epochs, in downstream evaluation.
+        \item[2] The code is not publicly available.
+    \end{tablenotes}
+
+    \end{threeparttable}
+    \label{tab:node_clf}
+\end{table*}
+
+\begin{table*}[htbp]
+    \centering
+    \caption{\textmd{Experiment results in unsupervised representation learning for \textbf{\textit{graph classification}}. We report accuracy(\%) for all datasets.}}
+    \begin{threeparttable}
+    \begin{tabular}{c|c|ccccccc}
+        \toprule[1.2pt]
+              & Dataset  & IMDB-B     & IMDB-M     & PROTEINS   & COLLAB     & MUTAG      & REDDIT-B   & NCI1     \\ % & DD         \\ 
+        % \midrule
+        % \multirow{3}{*}{Statistics}
+
+        \midrule
+        \multirow{2}{*}{Supervised}
+        & GIN         & 75.1$\pm$5.1   & 52.3$\pm$2.8   & 76.2$\pm$2.8   & 80.2$\pm$1.9   & 89.4$\pm$5.6   & 92.4$\pm$2.5   & 82.7$\pm$1.7 \\ % & -   \\
+        & DiffPool \\
+        \midrule
+        \multirow{2}{*}{Graph Kernels}
+        & WL          & 72.30$\pm$3.44 & 46.95$\pm$0.46 & 72.92$\pm$0.56 & - & 80.72$\pm$3.00 & 68.82$\pm$0.41 & 80.31$\pm$0.46 \\ % & - \\
+        & DGK         & 66.96$\pm$0.56 & 44.55$\pm$0.52 & 73.30$\pm$0.82 & - & 87.44$\pm$2.72 & 78.04$\pm$0.39 & 80.31$\pm$0.46 \\ % & -  \\
+        \midrule
+        \multirow{8}{*}{Self-supervised}
+        & graph2vec   & 71.10$\pm$0.54 & 50.44$\pm$0.87 & 73.30$\pm$2.05 & -              & 83.15$\pm$9.25 & 75.78$\pm$1.03 & 73.22$\pm$1.81 \\ % & -        \\
+        & Infograph   & 73.03$\pm$0.87 & 49.69$\pm$0.53 & 74.44$\pm$0.31 & 70.65$\pm$1.13 & 89.01$\pm$1.13 & 82.50$\pm$1.42 & 76.20$\pm$1.06 \\%& 72.85$\pm$1.78 \\
+        & GraphCL     & 71.14$\pm$0.44 & 48.58$\pm$0.67 & 74.39$\pm$0.45 & 71.36$\pm$1.15 & 86.80$\pm$1.34 & \underline{89.53$\pm$0.84} & 77.87$\pm$0.41 \\%& 78.62$\pm$0.40 \\
+        & JOAO        & 70.21$\pm$3.08 & 49.20$\pm$0.77     & \underline{74.55$\pm$0.41} & 69.50$\pm$0.36 & 87.35$\pm$1.02 & 85.29$\pm$1.35 & 78.07$\pm$0.47 \\%& 77.32$\pm$0.54  \\
+        & GCC         & 72.0           & 49.4           & -    & 78.9    &  - & \bf 89.8 & - \\%& - \\ 
+        & MVGRL       & 74.2$\pm$0.7   & 51.2$\pm$0.5   & -              & -              & \underline{89.7$\pm$1.1}   & 84.5$\pm$0.6   & -               \\%& -              \\
+        & InfoGCL     & \underline{75.1$\pm$0.9}   & \underline{51.4$\pm$0.8}   &  -             & \underline{80.0$\pm$1.3}   & \bf 91.2$\pm$1.3   & -              &  \underline{80.2$\pm$0.6}   \\%& -  \\
+        \cmidrule{2-9}
+        & \model      & \bf 75.52$\pm$0.66 & \bf 51.63$\pm$0.52 & \bf 75.30$\pm$0.39 & \bf 80.32$\pm$0.46 & 88.19$\pm$1.26 & 88.01$\pm$0.19 & \bf 80.40$\pm$0.30  \\%& 78.17$\pm$0.72 \\
+        \bottomrule[1.2pt]
+    \end{tabular}
+        \begin{tablenotes}
+            \footnotesize
+            \item[]   The reported results of baselines are from previous papers if available.
+        \end{tablenotes}
+    \end{threeparttable}
+    \label{tab:graph_clf}
+\end{table*}
+
+
+\begin{table*}[htp]
+\caption{\textmd{Experiment results in \textbf{\textit{transfer learning}} on molecular property prediction benchmarks. The model is first pre-trained on ZINC15 and then finetuned on the following datasets. We report ROC-AUC(\%) scores.}}
+\label{tab:mol_clf}
+\renewcommand\tabcolsep{6pt}
+\begin{tabular}{c|cccccccc}
+\toprule[1.2pt]
+                        & BBBP       & Tox21      & ToxCast    & SIDER      & ClinTox    & MUV        & HIV        & BACE       \\
+\midrule
+    No-pretrain         & 65.5$\pm$1.8   & 74.3$\pm$0.5   & 63.3$\pm$1.5   & 57.2$\pm$0.7   & 58.2$\pm$2.8   & 71.7$\pm$2.3   & 75.4$\pm$1.5   & 70.0$\pm$2.5   \\
+    ContextPred         & 64.3$\pm$2.8   & 75.7$\pm$0.7   & 63.9$\pm$0.6   & 60.9$\pm$0.6   & 65.9$\pm$3.8   & 75.8$\pm$1.7   & 77.3$\pm$1.0   & 79.6$\pm$1.2   \\
+    AttrMasking         & 64.3$\pm$2.8   & 76.7$\pm$0.4   & 64.2$\pm$0.5   & 61.0$\pm$0.7   & 71.8$\pm$4.1   & 74.7$\pm$1.4   & 77.2$\pm$1.1   & 79.3$\pm$1.6   \\
+    Infomax             & 68.8$\pm$0.8  & 75.3$\pm$0.5  & 62.7$\pm$0.4  & 58.4 $\pm$0.8  & 69.9$\pm$3.0  & 75.3$\pm$2.5  & 76.0$\pm$0.7  & 75.9$\pm$1.6  \\
+    % GPT-GNN             & 67.5±1.3   & 76.1±0.4   & 63.1±0.5   & 59.3±0.8   & 74.9±2.7   & 75.0±2.5   & 77.0±1.7   & 78.5±0.9   \\
+    GraphCL             & 69.68$\pm$0.67 & 73.87$\pm$0.66 & 62.40$\pm$0.57 & 60.53$\pm$0.88 & 75.99$\pm$2.65 & 69.80$\pm$2.66 & 78.47$\pm$1.22 & 75.38$\pm$1.44 \\
+    JOAO                & 70.22$\pm$0.98 & 74.98$\pm$0.29 & 62.94$\pm$0.48 & 59.97$\pm$0.79 & 81.32$\pm$2.49 & 71.66$\pm$1.43 & 76.73$\pm$1.23 & 77.34$\pm$0.48 \\
+    % GCC                 & 66.9±0.7   & 76.6±0.5   & 63.5±0.4   & 58.0±0.9   & 73.2±2.6   & 74.1±1.4   & 75.5±0.8   & 75.0±1.5   \\
+    % Grover              & 68.0±1.5   & 76.3±0.6   & 63.4±0.6   & 60.7±0.5   & 76.9±1.9   & 75.8±1.7   & 77.8±1.4   & 79.5±1.1   \\
+    % MGSSL               & 69.7±0.9   & 76.5±0.3   & 64.1±0.7   & 61.8±0.8   & 80.7±2.1   & 78.7±1.5   & 78.8±1.2   & 79.1±0.9   \\
+    GraphLog \\ 
+\midrule
+    % GraphMAE (ac)   & 71.43±0.68 & 75.48±0.52 & 63.82±0.33 & 58.99±0.66 & 80.86±2.55 & 72.23±1.82 & 77.49±0.78 & 80.73±0.77 \\
+    % GraphMAE (a)    & 70.79±0.94 & 75.11±0.46 & 64.35±0.39 & 59.66±0.62 & 82.88±1.49 & 73.83±1.70 & 77.41±1.08 & 80.44±0.77 \\
+    GraphMAE        & 72.04$\pm$0.66 & 75.51$\pm$0.61 & 64.06$\pm$0.29 & 60.25$\pm$1.13 & 82.32$\pm$1.15 & 76.26$\pm$2.39 & 77.19$\pm$0.95 & 83.13$\pm$0.86 \\
+\bottomrule[1.2pt]
+\end{tabular}
+\end{table*}
+
+
+
+
+
+\subsubsection{Transfer Learning}\hfill
+
+
+
+\vpara{Setup.} To evaluate the transferability of our proposed method, we test the performance on transfer learning on molecular property prediction in chemistry, following the setting of ~\cite{hu2020strategies,you2020graph,you2021graph}. The model is first pre-trained in  2 million unlabeled molecules sampled from the ZINC15 database~\cite{sterling2015zinc}, and then finetuned in 8 binary classification benchmark datasets contained in MoleculeNet~\cite{wu2018moleculenet}. The downstream datasets are splitted by scaffold-split to mimic real-world use case.  Atom number and chirality tag are input as node features and bond type and direction are regarded as edge features. In our experiments, we only consider reconstructing node features.
+
+For evaluation protocal,  we run experiments for 10 times and report the mean and standard deviation of ROC-AUC scores(\%). Following the default setting in ~\cite{hu2020strategies},  we adopt a 5-layer GIN as backbone of the encoder, and a single-layer GIN as the decoder.
+
+
+\vpara{Experiment results.}
+We evaluate the performance of \model against SOTA self-supervised pre-training methods for GNNs, AttrMasking~\cite{hu2020strategies} and ContextPred~\cite{hu2020strategies} , and SOTA contrastive learning methods, GraphCL~\cite{you2020graph}, JOAO~\cite{you2021graph}, and Grover~\cite{rong2020self}. We also report the result of another generating pre-training method, GPT-GNN~\cite{hu2020gpt}. Table \ref{tab:graph_clf} shows that the performance on downstream molecular property prediction tasks is comparable to SOTA self-supervised methods, in which our model has a small edge over previous best results in 4 datasets. 
+
+
+% it is noteworthy 
+To summarize, our \model achieves the competitive performance on node, graph classification, and transfer learning benchmarks using a unified learning approach. and we do not devise a specialized self-supervised learning method for each task. The results in three tasks demonstrate that \model is effective and universal approach for various applications. 
+
+
+
+
+
+
+
+
+
+
+% \begin{table}
+%     \centering
+%     \caption{Performance on PPI using GAT with 4 attention heads, compared to other unsupervised and supervised baselines. \model could ourperform supervised }
+%     \begin{tabular}{c|c|c|c|c}
+%     \toprule
+%                 &  hd=256*4    &   hd=512*4    &   hd=1024*4   &   hd=2048*4   \\
+%     \midrule
+%         BGRL    & 73.63$\pm$0.16 & 81.94$\pm$0.24 & 89.75$\pm$0.69 & 93.51$\pm$1.05 \\
+%         CCA-SSG & 73.34$\pm$0.17 & 83.75$\pm$0.64 & 92.16$\pm$0.63 & 96.99$\pm$0.16 \\
+%         \model  &  74.50±0.24  & 85.81±0.26    & 94.14±0.30    &   97.79±0.06 \\
+%     \bottomrule
+%     \end{tabular}
+%     \label{tab:ppi_hd}
+% \end{table}
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.45\textwidth]{imgs/ppi_hidden.pdf}
+    \vspace{-4mm}
+    \caption{Performance on PPI using GAT with 4 attention heads, compared to other baselines. Self-supervised methods benefit much from larger model size, and \model could outperform supervised model. }
+    \label{fig:ppi_hidden}
+\end{figure}
+
+
+
+\subsection{Ablation Studies}
+To verify the effects of main components of our model, we further conduct a series of ablation studies. Without loss of generalization, we choose 3 datasets from node classification and 2 datasets from graph classification as the study objects.
+
+
+
+\vpara{Effect of reconstruction criterion.} We study the influence of reconstruction criterion, and Table \ref{tab:ablation} shows the results of MSE and our proposed SCE loss function. Node features are normalized in preprocessing. This helps reconstruction and improves performance in downstream evaluation. The conclusion from Table \ref{tab:ablation} varies between node classification and graph classification.
+Generally, input features in node classification lie in continuous space, containing more discriminative information.
+% The performance using MSE degrades after training, which indicates that using MSE as criterion may mislead learning and harm performance. 
+The results manifest that SCE has significant advantage over MSE as replacing MSE with SCE brings 4.1\% $\sim$ 15.6\% absolute gain.
+%SCE forces the reconstructed embedding and node feature to be aligned in the unit sphere, while MSE measures the reconstruction quality in Euclidean space. 
+In graph classification, pre-training with either MSE or SCE as criterion improves accuracy. The input features typically lie in discrete value space, and are one-hot encoding in these benchmarks, representing degree or node-label. Reconstructing one-hot feature is, to some extent, similar to a classification task, and MSE works in this setting of discrete node feature.  Nevertheless, SCE has a small edge over MSE, as indicated by the results.
+The same may also apply to transfer learning of molecule graphs. 
+This suggests that a proper criterion is the cornerstone of the success of generative graph self-supervised learning.
+
+
+Figure \ref{fig:ablation} shows the influence of scaling factor $\gamma$.  We observe that $\gamma > 1$ benefits in most cases, especially in node classification. However, in IMDB-B, it seems that a larger $\gamma$ value harms the performance. In our experiments, we noticed that the training error in node classification is much higher than that in graph classification. This further demonstrates that aligning continuous vectors in unit sphere is more challenging thus scaling $\gamma$ brings improvement. 
+
+
+\vpara{Effect of decoder type.} Previous GAEs typically follow BERT and use an MLP as the decoder. In Table \ref{tab:ablation}, we compare different decoder types, including MLP/GCN/GAT for node classification, and MLP/GIN/GAT for graph classification. The re-mask strategy is not used for MLP decoder.  The type of decoder matters in the training, and using GNN decoder typically achieves better performance in downstream tasks. Compared to MLP, which reconstructs original node feature from latent representation, GNN aims at forcing the masked nodes to extract information about its original feature from neighbors' representations. One reasonable assumption is that GNN avoids the output of encoder being aligned with original features. The learned representations is expected to be discriminative in downstream classification tasks. Therefore, the encoder could learn meaningful latent representations. MLP also works in our framework, and this may attribute to the design of our criterion.
+
+Among different GNNs, GIN performs better in graph-level tasks, and GAT is a more reasonable option for node classification. It is observed that replacing GAT with GCN causes a significant drop, especially in Cora ($\sim$2.9\%) and PubMed ($\sim$2.0\%). We speculate that attention mechanism plays an important role when the latent representations vary in neighbors with re-masked ones.
+
+
+
+\begin{table}[htbp]
+\caption{Ablation study of decoder type, re-mask and reconstruction criterion on node- and graph-level benchmarks.}
+\label{tab:ablation}
+\renewcommand\tabcolsep{4pt}
+% \begin{tabular}{cccccccc}
+% \toprule[1.2pt]
+% \multicolumn{2}{c}{\multirow{2}{*}{Dataset}}
+%                      & \multicolumn{3}{c}{Node-Level} & \phantom{} & \multicolumn{2}{c}{Graph-Level} \\
+% \cmidrule{3-5} \cmidrule{7-8}
+%                     % & & \small{Cora}        & \small{PubMed}      & \small{Arxiv}  & \small{MUTAG}              & \small{IMDB-B}    \\
+%                     & & Cora        & PubMed      & Arxiv  && MUTAG              & IMDB-B              \\
+
+% % \cmidrule{2-7}
+% \midrule
+% \multirow{3}{*}{\rotatebox[origin=c]{90}{\small{COMP.}}}
+% & \small{\model}        & 84.16  & 81.10  & 71.75  && 88.19         & 75.52         \\
+% & \small{w/o re-mask}   & 81.84  & 80.02  & 71.61  && 86.29         & 74.42          \\
+% & w/ MSE                & 68.49  & 73.07  & 67.44  && 86.30         & 74.04          \\
+% \midrule
+% \multirow{4}{*}{\rotatebox[origin=c]{90}{\small{Decoder}}}
+% & MLP                   & 81.47  & 80.39  & 71.54  && 87.01         & 73.94          \\
+% & GCN                   & 81.25  & 79.06  & 71.59  &&   -           &  -             \\
+% & GIN                   &    -   &  -     &  -     && 88.19         & 75.52          \\
+% & GAT                   & 84.16  & 81.10  & 71.73  && 85.75         & 74.04           \\
+% \bottomrule[1.2pt]
+% \end{tabular}
+\input{tables/ablation}
+\end{table}
+
+
+
+\vpara{Effect of mask and re-mask.} \textit{Mask} plays an important role in our method. \model employ two mask strategies special --- masking input feature before encoder, and \textit{re-mask} latent representations before decoder. Table \ref{tab:ablation} studies the designs. We observe a significant drop in performance if without masking input features, indicating that input masking is vital to avoid trivial solution. For the re-mask strategy, the accuracy drops by 0.1\%$\sim$2.9\% if removing the operation. In such case, it behaves like training a $K+1$ layer GNN and adopting the output of the $K$-th layer as the encoding representations. Re-mask is designed for GNN decoder and could be regarded as regularization, making the self-supervisory task more challenging.
+
+
+
+\vpara{Effect of mask ratio.} Figure \ref{fig:ablation} shows the influence of mask ratio. Similar to the observation in ~\cite{he2021masked}, in most cases, the reconstruction task is not challenging enough to learn useful features with low mask ratio (0.1), and would be too difficult if the mask ratio is too high (0.9). Different from the behavior in BERT and MAE, the optimal ratio varies in different graphs. In Cora and IMDB-B, increasing the mask ratio degrades the performance after the optimal value ($\sim$0.5), while \model still works with a surprisingly high ratio (0.7$\sim$0.9) in PubMed, Ogbn-arxiv and MUTAG. This motivates us to think about information redundancy in graphs. Large node degree and high homogeneity may lead to heavy information redundancy, in which a missing node feature can be recovered from very few neighboring nodes with little high-level understanding of local structure and features. Masking a very high portion of node features is necessary to learn useful representations. In contrast, lower redundancy means excessively high mask ratio would make it impossible to recover features and degrade the performance. As for how to measure information redundancy, we leave it for future work. 
+
+
+% \vpara{Effect of scaling factor $\gamma$.} 
+
+
+
+
+
+
+% \begin{table}
+%     \centering
+%     \caption{Re-mask ablation.}
+%     \label{tab:abl_remask}
+%     \begin{tabular}{c|c|c|c|c|c}
+%     \toprule
+%                     & Cora       & PubMed     & \textcolor{gray}{Ogbn-arxiv} & MUTAG & IMDB-B \\
+%     \midrule
+%         w/ re-mask  & 84.16±0.44 & 81.10±0.41 & 71.75±0.17 & 88.19$\pm$1.26 & 75.52$\pm$ 0.35 \\
+%         w/o re-mask & 81.84±0.58 & 80.02±0.40 & 71.61±0.13 & 86.29$\pm$2.32 & 74.42$\pm$0.32 \\
+%     \bottomrule
+%     \end{tabular}
+% \end{table}
+
+
+% \begin{table}
+%     \centering
+%     \caption{Decoder ablation.}
+%     \begin{tabular}{c|c|c|c|c|c}
+%         \toprule
+%         Decoder     & Cora       & PubMed     & \textcolor{gray}{Ogbn-arxiv} & MUTAG   & IMDB-B \\
+%         \midrule
+%         MLP         & 81.47±0.65 & 80.39±0.68 & 71.54±0.17 & 87.01±1.28 & 73.94±0.45 \\
+%         GCN(GIN)    & 81.25±0.93 & 79.06±0.77 & 71.59±0.27 & 88.19±1.26 & 75.52±0.35 \\
+%         GAT         & 84.16±0.44 & 81.10±0.41 & 71.73±0.24 & 85.75±1.74 & 74.04±0.38 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+
+% \begin{table}[]
+%     \centering
+%     \caption{Reconstruction ablation. }
+%     \label{tab:loss}
+%     \begin{tabular}{c|c|c|c|c|c}
+%         \toprule
+%                   & Cora       & PubMed     & \textcolor{gray}{Ogbn-arxiv} & MUTAG      & IMDB-B     \\
+%         \midrule
+%         SCE(ours) & 84.16±0.44 & 81.10±0.41 & 71.75±0.17 & 88.19±1.26 & 75.52±0.35 \\
+%         MSE & 68.49±3.65 & 73.07±1.41 & 67.44±0.38 & 86.30±1.54 & 74.04±0.32 \\
+%         \bottomrule
+%     \end{tabular}
+% \end{table}
+
+
+% \begin{table}[htbp]
+% \begin{tabular}{cccc|cc}
+% \toprule
+%                       & \multicolumn{3}{c}{Node-classification} & \multicolumn{2}{l}{Graph-classification} \\
+% \cmidrule{2-6}
+%                       & Cora        & PubMed      & Ogbn-arxiv  & MUTAG              & IMDB-B              \\
+% \cmidrule{2-6}
+% \model & 84.16±0.44  & 81.10±0.41  & 71.75±0.17  & 88.19±1.26         & 75.52± 0.35         \\
+% w/o re-mask           & 81.84±0.58  & 80.02±0.40  & 71.61±0.13  & 86.29±2.32         & 74.42±0.32          \\
+% w/ MSE                & 68.49±3.65  & 73.07±1.41  & 67.44±0.38  & 86.30±1.54         & 74.04±0.32          \\
+% \midrule
+% MLP                 & 81.47±0.65  & 80.39±0.68  & 71.54±0.17  & 87.01±1.28         & 73.94±0.45          \\
+% GCN                 & 81.25±0.93  & 79.06±0.77  & 71.59±0.27  &                    &                     \\
+% GIN                 &             &             &             & 88.19±1.26         & 75.52±0.35          \\
+% GAT                 & 84.16±0.44  & 81.10±0.41  & 71.73±0.24  & 85.75±1.74         & 74.04±0.38           \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+
+% \begin{table}[htbp]
+% \small
+% \begin{tabular}{cccc|cc}
+% \toprule
+%                       & \multicolumn{3}{c}{Node-classification} & \multicolumn{2}{l}{Graph-classification} \\
+% \cmidrule{2-6}
+%                       & Cora        & PubMed      & Ogbn-arxiv  & MUTAG              & IMDB-B              \\
+% \cmidrule{2-6}
+% \model                & 84.2±0.4  & 81.1±0.4  & 71.8±0.2    & 88.2±1.3         & 75.5± 0.4         \\
+% w/o re-mask           & 81.8±0.6  & 80.0±0.4  & 71.6±0.1    & 86.3±2.3         & 74.4±0.3          \\
+% w/ MSE                & 68.5±3.6  & 73.1±1.4  & 67.4±0.2    & 86.3±1.5         & 74.0±0.3          \\
+% \midrule
+% MLP                   & 81.5±0.7  & 80.4±0.7  & 71.5±0.2    & 87.0±1.3         & 73.9±0.5          \\
+% GCN                   & 81.2±0.9  & 79.1±0.8  & 71.6±0.27   &                  &                     \\
+% GIN                   &           &           &             & 88.2±1.3         & 75.5±0.4          \\
+% GAT                   & 84.2±0.4  & 81.1±0.4  & 71.75±0.2   & 85.8±1.7         & 74.0±0.4           \\
+% \bottomrule
+% \end{tabular}
+% \end{table}
+
+
+
+
+\begin{figure}
+    \centering
+    \begin{minipage}[t]{0.235\textwidth}
+        \includegraphics[width=\textwidth]{imgs/gmae_mask_ratio.pdf}
+        % \caption{Mask ratio ablation.}
+    \end{minipage}
+    \begin{minipage}[t]{0.235\textwidth}
+        \includegraphics[width=\textwidth]{imgs/gamma_value.pdf}
+        % \caption{Gamma ablation.}
+    \end{minipage}
+    \caption{Ablation study of mask ratio and scaling factor $\gamma$.}
+    \label{fig:ablation}
+\end{figure}
+
+
+% \begin{figure}
+%     \subfigure[name of the subfigure]{   %第一张子图
+%     % \begin{minipage}[t]
+%     % \centering    %子图居中
+%     \includegraphics[width=0.22\textwidth]{imgs/gmae_mask_ratio.pdf}  
+%     % \end{minipage}
+%     }
+%     \subfigure[name of the subfigure]{   %第一张子图
+%     % \begin{minipage}[t]
+%     % \centering    %子图居中
+%     \includegraphics[width=0.22\textwidth]{imgs/gmae_mask_ratio.pdf}  
+%     % \end{minipage}
+%     }
+%     \caption{Ablation study of mask ratio and scale coefficient $\gamma$.}
+%     \label{fig:my_label}
+% \end{figure}
+
+
+
+}%=-=---------------------------------------------------------------
