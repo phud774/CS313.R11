@@ -49,14 +49,13 @@
     Graph classification & MUTAG, PROTEINS, IMDB-M, COLLAB     & SVM (10-fold CV) \\
     \bottomrule
   \end{tabular}
-  \ketluan{We re-run \textbf{DGMAE only} (10 seeds, hyper-parameters from Table~8, Kaggle GPU) ·
-    baselines: \textbf{numbers reported in the paper}}
+  \ketluan{We re-run \textbf{DGMAE only} (10 seeds, hyper-parameters from Table~8, Kaggle GPU).}
   % Lời thoại:
   % - Dị tính: Texas, Cornell, Wisconsin, Chameleon, Squirrel, Actor, Roman-empire. Đồng tính: Cora, Citeseer, Pubmed.
   % - Giao thức chuẩn của học biểu diễn tự giám sát: encoder học không nhãn rồi đóng băng; chất lượng embedding
   %   đo bằng một mô hình đơn giản đặt lên trên (linear probing). Báo cáo mean ± std của 10 lần chạy.
   % - Split: Planetoid public; dị tính 10 split Geom-GCN (48/32/20); Roman 10 split (50/25/25).
-  % - Code cài lại từ đầu (PyTorch, GAT tự viết), không dùng code tác giả. GPU Kaggle [ĐIỀN: P100/T4] (paper: TITAN RTX 24 GB).
+  % - Code cài lại từ đầu (PyTorch, GAT tự viết), không dùng code tác giả. GPU Kaggle Tesla T4 16 GB (paper: TITAN RTX 24 GB).
   % - Paper không nêu hidden size, số head, số epoch, tiền xử lý, cấu hình linear probe → nhóm lấy theo config tác giả;
   %   linear probe: Adam, lr 0.01, wd 1e-4, 300 epoch, chọn epoch theo tập val.
   % - Không chạy: Crocodile, Amazon, Coauthor, WikiCS, Flickr và 5 đồ thị lớn ở Table 11 (thời gian, GPU).
@@ -70,12 +69,16 @@
       \toprule
       & \textbf{Method} & \textbf{Texas} & \textbf{Cornell} & \textbf{Wisconsin} & \textbf{Chameleon} & \textbf{Squirrel} & \textbf{Actor} & \textbf{Roman} \\
       \midrule
-      \multirow{3}{*}{Contrastive}
+      \multirow{5}{*}{Contrastive}
+        & DGI      & 58.53 & 45.33 & 55.21 & 60.27 & 26.44 & 28.30 & 63.71 \\
+        & BGRL     & 52.77 & 50.33 & 51.23 & 64.86 & 36.22 & 28.80 & 68.66 \\
         & GREET    & \underline{82.70} & 73.78 & \underline{82.94} & 63.64 & 42.29 & \underline{36.55} & 50.69 \\
         & SP-GCL   & 80.36 & \underline{78.33} & 78.26 & 65.28 & 52.10 & 28.94 & 70.88 \\
         & GraphACL & 71.08 & 59.33 & 69.22 & 69.12 & 54.05 & 30.03 & \underline{74.91} \\
       \midrule
-      \multirow{3}{*}{Generative}
+      \multirow{5}{*}{Generative}
+        & VGAE     & 50.27 & 48.73 & 55.67 & 42.65 & 29.13 & 26.99 & 50.89 \\
+        & MaskGAE  & 64.86 & 43.24 & 46.67 & 61.36 & 50.40 & 26.32 & 49.98 \\
         & NWR-GAE  & 69.62 & 58.64 & 68.23 & 72.04 & \underline{64.81} & 30.17 & 46.35 \\
         & AUG-MAE  & 72.97 & 65.14 & 76.47 & \underline{72.19} & 53.23 & 26.36 & 51.13 \\
         & GraphMAE & 55.14 & 51.62 & 55.69 & 68.67 & 44.91 & 25.61 & 46.73 \\
@@ -83,18 +86,21 @@
       & \dg{DGMAE (paper)}
         & \dg{88.11}\pmstd{5.16} & \dg{78.65}\pmstd{4.59} & \dg{88.43}\pmstd{3.56} & \dg{75.50}\pmstd{1.17}
         & \dg{72.47}\pmstd{1.77} & \dg{36.61}\pmstd{0.74} & \dg{76.62}\pmstd{0.41} \\
-      & \nh{DGMAE (repro.)} & \dien & \dien & \dien & \dien & \dien & \dien & \dien \\
       \bottomrule
     \end{tabular}%
   }\\[0.3em]
-  {\scriptsize Accuracy (\%). Baselines from Table~1 of the paper; \underline{underline}: runner-up.}
-  \ketluan{Paper: DGMAE \textbf{ranks 1st on all 7 datasets} · Reproduced: [ĐIỀN: hạng 1 ở bao nhiêu dataset?]}
+  {\scriptsize Accuracy (\%). Baselines from Table~1 of the paper; \underline{underline}: runner-up. GraphMAE $\approx$ DGMAE without discrepancy ($\mathcal{L}_d$).}
+  \ketluan{\textbf{Discrepancy helps:} DGMAE vs.\ GraphMAE \textbf{+24.0} on average (+6.8 to +33.0), 1st on all 7 datasets}
   % Lời thoại:
-  % - Bảng chỉ giữ các phương pháp đứng thứ hai ở ít nhất một dataset (và GraphMAE để so sánh).
-  %   Std của các phương pháp khác xem Table 1 của paper.
+  % - DGMAE xây trên GraphMAE (cùng mask, GAT, L_f), chỉ thêm L_d → hàng GraphMAE gần như là "DGMAE không có discrepancy".
+  %   Chênh lệch DGMAE − GraphMAE (số paper): Texas +33.0, Cornell +27.0, Wisconsin +32.7, Chameleon +6.8,
+  %   Squirrel +27.6, Actor +11.0, Roman +29.9 → trung bình +24.0.
+  % - Lưu ý: GraphMAE trong Table 1 dùng siêu tham số riêng, không hoàn toàn là λ = 0; so sánh có kiểm soát ở slide Ablation.
+  % - Bảng giữ 10/15 baseline: các phương pháp hạng 2 ở ít nhất một dataset, GraphMAE, và 4 phương pháp kinh điển
+  %   (DGI, BGRL, VGAE, MaskGAE). Bỏ GCA, CCA-SSG, DSSL, SeeGera, Bandana; bỏ cột Crocodile (nhóm không chạy).
+  %   Std của các baseline xem Table 1 của paper.
   % - Paper kết luận: DGMAE vượt cả các phương pháp contrastive thiết kế riêng cho đồ thị dị tính
   %   → L_d giải quyết được vấn đề đồng nhất hóa của GMAE.
-  % - Nhóm: [ĐIỀN: so số của nhóm với các baseline của paper — thua phương pháp nào, ở dataset nào].
 \end{frame}
 
 % ── Slide: Phân cụm node (Table 3) ───────────────────
@@ -105,97 +111,189 @@
       \toprule
       & \textbf{Method} & \textbf{Texas} & \textbf{Cornell} & \textbf{Wisconsin} & \textbf{Chameleon} & \textbf{Squirrel} & \textbf{Roman} \\
       \midrule
-      \multirow{4}{*}{ACC}
-        & GREET    & 52.40 & 48.96 & 56.65 & 34.44 & 25.64 & 31.43 \\
-        & GraphMAE & 46.28 & 46.12 & 52.67 & 37.02 & 27.61 & 15.38 \\
+      \multirow{5}{*}{ACC}
+        & GREET    & 52.40 & \underline{48.96} & \underline{56.65} & 34.44 & 25.64 & \underline{31.43} \\
+        & NWR-GAE  & \underline{55.03} & 36.12 & 48.53 & 27.01 & 23.81 & 18.82 \\
+        & MaskGAE  & 46.78 & 40.98 & 42.55 & 30.70 & 26.19 & 15.76 \\
+        & GraphMAE & 46.28 & 46.12 & 52.67 & \underline{37.02} & \underline{27.61} & 15.38 \\
         & \dg{DGMAE (paper)} & \dg{66.83}\pmstd{6.19} & \dg{57.16}\pmstd{5.99} & \dg{68.69}\pmstd{4.52} & \dg{39.96}\pmstd{1.74} & \dg{30.83}\pmstd{0.71} & \dg{36.25}\pmstd{0.86} \\
-        & \nh{DGMAE (repro.)}  & \dien & \dien & \dien & \dien & \dien & \dien \\
       \midrule
-      \multirow{4}{*}{NMI}
-        & GREET    & 37.19 & 28.19 & 22.57 & 14.99 &  3.22 & 37.00 \\
-        & GraphMAE &  6.06 & 12.07 & 18.54 & 19.47 &  4.58 &  9.33 \\
+      \multirow{5}{*}{NMI}
+        & GREET    & \underline{37.19} & \underline{28.19} & \underline{22.57} & 14.99 &  3.22 & \underline{37.00} \\
+        & NWR-GAE  & 12.97 &  3.36 &  9.35 &  3.65 &  0.97 & 12.81 \\
+        & MaskGAE  &  7.66 & 12.91 & 10.03 &  5.96 &  2.79 & 12.90 \\
+        & GraphMAE &  6.06 & 12.07 & 18.54 & \underline{19.47} & \underline{4.58} &  9.33 \\
         & \dg{DGMAE (paper)} & \dg{37.41}\pmstd{7.20} & \dg{34.41}\pmstd{7.88} & \dg{44.19}\pmstd{2.19} & \dg{22.39}\pmstd{0.43} & \dg{8.00}\pmstd{0.73} & \dg{37.57}\pmstd{0.53} \\
-        & \nh{DGMAE (repro.)}  & \dien & \dien & \dien & \dien & \dien & \dien \\
       \bottomrule
     \end{tabular}%
   }\\[0.3em]
-  {\scriptsize K-means on embeddings (\%). GREET, GraphMAE from Table~3 of the paper; ARI and F1 show the same trend.}
-  \ketluan{Paper: DGMAE \textbf{ranks 1st in all 24 cells} (6 datasets $\times$ 4 metrics) · Reproduced: [ĐIỀN]}
+  {\scriptsize K-means on embeddings (\%). Baselines from Table~3 of the paper; \underline{underline}: runner-up. ARI and F1 show the same trend.}
+  \ketluan{\textbf{Discrepancy helps:} vs.\ GraphMAE \textbf{+12.4 ACC}, \textbf{+19.0 NMI} on average · 1st in all 24 cells}
   % Lời thoại:
+  % - Chênh lệch DGMAE − GraphMAE (số paper), Texas / Cornell / Wisconsin / Chameleon / Squirrel / Roman:
+  %   ACC +20.6 / +11.0 / +16.0 / +2.9 / +3.2 / +20.9 (TB +12.4); NMI +31.4 / +22.3 / +25.7 / +2.9 / +3.4 / +28.2 (TB +19.0).
   % - Phân cụm khó hơn phân loại vì không dùng nhãn nào. GraphMAE gần như "mù" trên Texas (NMI 6, ARI ~1).
   % - Paper: cách biệt lớn nhất ở ARI (Texas +18.0, Wisconsin +19.2 so với GREET).
   % - Hạng 2 ở Texas ACC là NWR-GAE (55.03); ở Squirrel F1 là MaskGAE (23.27); các ô còn lại là GREET hoặc GraphMAE.
-  % - Nhóm (ARI, F1 — không đưa lên slide): [ĐIỀN].
+  % - Bảng giữ 4/6 baseline; bỏ Dink-Net và GraphACL (không đứng hạng 2 ở ô nào).
 \end{frame}
 
-% ── Slide: Đồng tính (Table 2) & phân loại đồ thị (Table 9) — 2 cột cân nhau: mỗi bên 4 baseline + 2 dòng DGMAE ──
+% ── Slide: Đồng tính (Table 2) & phân loại đồ thị (Table 9) — 2 cột cân nhau: mỗi bên 6 baseline + DGMAE ──
 \begin{frame}{Homophilic Graphs \& Graph Classification}
   \begin{columns}[t]
-    \begin{column}{0.48\textwidth}
+    \begin{column}{0.49\textwidth}
       \centering
       {\small\textbf{Node classification — Table~2}}\\[0.4em]
-      {\scriptsize\setlength{\tabcolsep}{3pt}
+      {\scriptsize\setlength{\tabcolsep}{2.5pt}
       \begin{tabular}{l ccc}
         \toprule
         \textbf{Method} & \textbf{Cora} & \textbf{Citeseer} & \textbf{Pubmed} \\
         \midrule
+        DGI      & 82.30 & 71.80 & 76.80 \\
+        BGRL     & 81.10 & 71.22 & 79.99 \\
         GraphACL & 84.20 & \underline{73.63} & 82.02 \\
         NWR-GAE  & 83.62 & 71.45 & \underline{83.44} \\
         Bandana  & \underline{84.62} & 73.60 & \textbf{83.53} \\
         GraphMAE & 84.20 & 73.40 & 81.10 \\
         \midrule
         \dg{DGMAE (paper)} & \dg{84.93}\pmstd{0.51} & \dg{73.82}\pmstd{0.64} & 81.10\pmstd{0.42} \\
-        \nh{DGMAE (repro.)}  & \dien & \dien & \dien \\
         \bottomrule
       \end{tabular}}
     \end{column}
-    \begin{column}{0.48\textwidth}
+    \begin{column}{0.49\textwidth}
       \centering
       {\small\textbf{Graph classification — Table~9}}\\[0.4em]
-      {\scriptsize\setlength{\tabcolsep}{3pt}
+      {\scriptsize\setlength{\tabcolsep}{2.5pt}
       \begin{tabular}{l cccc}
         \toprule
         \textbf{Method} & \textbf{MUTAG} & \textbf{PROTEINS} & \textbf{IMDB-M} & \textbf{COLLAB} \\
         \midrule
         Infograph & \underline{89.01} & 74.44 & 49.69 & 70.65 \\
+        GraphCL   & 86.80 & 74.39 & 48.58 & 71.36 \\
         S2GAE     & 88.26 & \underline{76.37} & 51.79 & \underline{81.02} \\
+        GraphMAE2 & 86.63 & 74.86 & \underline{51.80} & 77.59 \\
         AUG-MAE   & 88.28 & 75.83 & \underline{51.80} & 80.48 \\
         GraphMAE  & 88.19 & 75.30 & 51.63 & 80.32 \\
         \midrule
         \dg{DGMAE (paper)} & \dg{89.06}\pmstd{0.64} & \dg{76.51}\pmstd{0.52} & \dg{51.95}\pmstd{0.30} & \dg{81.15}\pmstd{0.30} \\
-        \nh{DGMAE (repro.)}  & \dien & \dien & \dien & \dien \\
         \bottomrule
       \end{tabular}}
     \end{column}
   \end{columns}
   \vspace{0.5em}
   \centering{\scriptsize Accuracy (\%). Baselines from the paper; \underline{underline}: runner-up.}
-  \ketluan{Paper: 1st on Cora, Citeseer and all 4 graph datasets $\Rightarrow$ $\mathcal{L}_d$ \textbf{does not hurt} · Reproduced: [ĐIỀN]}
+  \ketluan{\textbf{Discrepancy does not hurt:} vs.\ GraphMAE \textbf{+0.4} (homophilic), \textbf{+0.8} (graph classification) on average\\
+    $\Rightarrow$ large gains \textbf{only when neighbors differ} (heterophily)}
   % Lời thoại:
+  % - Chênh lệch DGMAE − GraphMAE (số paper): Cora +0.7, Citeseer +0.4, Pubmed 0.0; MUTAG +0.9, PROTEINS +1.2,
+  %   IMDB-M +0.3, COLLAB +0.8. So với +24.0 trên đồ thị dị tính → discrepancy có ích đúng chỗ cần.
   % - DGMAE được thiết kế cho đồ thị dị tính; ở đây paper chỉ cần chứng minh "không làm hại".
-  % - Table 2 trên slide chỉ giữ phương pháp hạng 2 / tốt nhất ở ít nhất một dataset và GraphMAE
-  %   (GREET 83.82/73.22/80.20, AUG-MAE 84.30/73.20/81.12 — xem Table 2 của paper).
+  % - Table 2 trên slide giữ 6/9 baseline: hạng 2 / tốt nhất ở ít nhất một dataset, GraphMAE, DGI, BGRL
+  %   (GREET 83.82/73.22/80.20, AUG-MAE 84.30/73.20/81.12, SeeGera 83.93/73.00/80.10 — xem Table 2 của paper).
+  % - Table 9 đủ 6 baseline của paper. IMDB-M: GraphMAE2 và AUG-MAE cùng hạng 2 (51.80).
   % - Pubmed: DGMAE của paper bằng GraphMAE (81.10), không đứng đầu (Bandana 83.53 tốt nhất — in đậm).
   % - Phân loại đồ thị: encoder GIN; L_d dùng L_sym X (Eq. 5). Table 8 không có siêu tham số cho tác vụ này → theo config tác giả.
-  % - Nhóm: [ĐIỀN].
 \end{frame}
 
 % ── Slide: Tái lập: nhóm vs. paper ───────────────────
-\begin{frame}{Reproducibility: Reproduced vs.\ Paper}
+% \begin{frame}{Reproducibility: Node Classification}
+%   \centering
+%   % Vẽ lại: python scripts/plot_paper_vs_team.py --results results_kaggle   (trong DGMAE-REIMPL)
+%   \includegraphics[width=\textwidth]{paper_vs_nhom.pdf}\\[0.1em]
+%   {\scriptsize DGMAE node classification accuracy. Labels: reproduced $-$ paper; \textbf{bold}: outside 1 std of the paper.}
+%   \ketluan{All 10 below the paper: median gap \nh{$-$2.2}, \nh{6/10} within 2.2 points (2/10 within 1 std)\\
+%     Largest gaps: Squirrel ($-$16.1), Chameleon ($-$8.3)}
+%   % Lời thoại:
+%   % - Chênh lệch trung bình (nhóm − paper): phân loại node dị tính −5.2 (trung vị −2.2), đồng tính −2.3;
+%   %   phân cụm ACC −9.1, NMI −6.3; phân loại đồ thị −0.6. Xu hướng giữ nguyên: dị tính vẫn hơn GraphMAE rất xa.
+%   % - Nguyên nhân có thể (kiểm tra lại khi có số chính thức): paper thiếu cấu hình (hidden size, số head, số epoch,
+%   %   tiền xử lý, linear probe); Table 8 khác config của tác giả (ví dụ Cora: lr 1e-4 trong paper, 1e-3 trong code —
+%   %   nhóm theo paper); phân cụm: code tác giả gán cứng λ = 0.4/0.6, không có trong Table 8.
+%   % - Code tác giả chọn epoch theo tập test, nhóm chọn theo tập val.
+%   % - Chi phí: Roman 4 216 MB, 1.66 s/vòng (~83 phút/seed) trên T4; paper (TITAN RTX): 1 416 MB, 1.50 s/vòng.
+%   % - Số của nhóm (10 seed): Texas 86.92 ± 3.72, Cornell 73.76 ± 5.33, Wisconsin 86.76 ± 3.12, Chameleon 67.17 ± 1.90,
+%   %   Squirrel 56.37 ± 2.29, Actor 34.41 ± 1.15, Roman 74.45 ± 0.70; Cora 81.23 ± 0.53, Citeseer 72.00 ± 0.68, Pubmed 79.80 ± 0.56.
+%   % - Nếu được hỏi so với baseline (khác thiết lập, không so trực tiếp): số của nhóm vẫn hạng 1 ở Texas, Wisconsin;
+%   %   Chameleon 67.17 thấp hơn GraphMAE của paper (68.67). Đồng tính thấp hơn cả GraphMAE của paper — chênh lệch do cài đặt,
+%   %   KHÔNG phải L_d gây hại; so sánh có kiểm soát (cùng code, chỉ bỏ L_d) ở slide Ablation.
+% \end{frame}
+
+% ── Slide: Tái lập — phân loại node (Table 1 & 2): chỉ DGMAE paper vs. nhóm (thay cho biểu đồ cột ở trên) ──
+\begin{frame}{Reproducibility: Node Classification}
   \centering
-  % Khi có kết quả: chạy  python scripts/plot_paper_vs_team.py  (trong DGMAE-REIMPL), rồi thay khung dưới bằng:
-  %   \includegraphics[width=\textwidth]{paper_vs_nhom.pdf}
-  \hinhcho{0.95\textwidth}{0.52\textheight}{[ĐIỀN] Bar chart: DGMAE accuracy, paper vs.\ reproduced, 10 datasets\\
-    (label: reproduced $-$ paper; bold if outside 1 std)}\\[0.1em]
-  {\scriptsize DGMAE node classification accuracy. Labels: reproduced $-$ paper; \textbf{bold}: outside 1 std of the paper.}
-  \ketluan{[ĐIỀN: bao nhiêu dataset nằm trong 1 std · chênh lệch trung bình dị tính / đồng tính]}
+  \renewcommand{\arraystretch}{1.6}
+  \resizebox{0.96\textwidth}{!}{%
+    \begin{tabular}{l ccccccc ccc}
+      \toprule
+      & \multicolumn{7}{c}{\textbf{Heterophilic} (Table~1)} & \multicolumn{3}{c}{\textbf{Homophilic} (Table~2)} \\
+      \cmidrule(lr){2-8} \cmidrule(lr){9-11}
+      & \textbf{Texas} & \textbf{Cornell} & \textbf{Wisconsin} & \textbf{Chameleon} & \textbf{Squirrel} & \textbf{Actor} & \textbf{Roman}
+      & \textbf{Cora} & \textbf{Citeseer} & \textbf{Pubmed} \\
+      \midrule
+      Paper  & 88.11\pmstd{5.16} & 78.65\pmstd{4.59} & 88.43\pmstd{3.56} & 75.50\pmstd{1.17} & 72.47\pmstd{1.77} & 36.61\pmstd{0.74} & 76.62\pmstd{0.41}
+             & 84.93\pmstd{0.51} & 73.82\pmstd{0.64} & 81.10\pmstd{0.42} \\
+      \nh{Repro.} & \nh{86.92}\pmstd{3.72} & \nh{73.76}\pmstd{5.33} & \nh{86.76}\pmstd{3.12} & \nh{67.17}\pmstd{1.90} & \nh{56.37}\pmstd{2.29} & \nh{34.41}\pmstd{1.15} & \nh{74.45}\pmstd{0.70}
+             & \nh{81.23}\pmstd{0.53} & \nh{72.00}\pmstd{0.68} & \nh{79.80}\pmstd{0.56} \\
+      $\Delta$ & $-$1.19 & $-$4.89 & $-$1.67 & $-$8.33 & $-$16.10 & $-$2.20 & $-$2.17 & $-$3.70 & $-$1.82 & $-$1.30 \\
+      \bottomrule
+    \end{tabular}%
+  }\\[0.3em]
+  {\scriptsize Accuracy (\%), mean $\pm$ std over 10 seeds. $\Delta$ = reproduced $-$ paper.}
+  \ketluan{All 10 below the paper: median gap \nh{$-$2.2}, \nh{6/10} within 2.2 points (2/10 within 1 std)\\
+    Largest gaps: Squirrel ($-$16.1), Chameleon ($-$8.3)}
   % Lời thoại:
-  % - Chênh lệch trung bình: dị tính [ĐIỀN] · đồng tính [ĐIỀN] · phân cụm (NMI) [ĐIỀN].
-  % - Nguyên nhân có thể (kiểm tra lại khi có số chính thức): paper thiếu cấu hình (hidden size, số head, số epoch,
+  % - Chênh lệch trung bình (nhóm − paper): phân loại node dị tính −5.2 (trung vị −2.2), đồng tính −2.3;
+  %   phân cụm ACC −9.1, NMI −6.3; phân loại đồ thị −0.6. Xu hướng giữ nguyên: dị tính vẫn hơn GraphMAE rất xa.
+  % - Nguyên nhân có thể: paper thiếu cấu hình (hidden size, số head, số epoch,
   %   tiền xử lý, linear probe); Table 8 khác config của tác giả (ví dụ Cora: lr 1e-4 trong paper, 1e-3 trong code —
   %   nhóm theo paper); phân cụm: code tác giả gán cứng λ = 0.4/0.6, không có trong Table 8.
   % - Code tác giả chọn epoch theo tập test, nhóm chọn theo tập val.
-  % - Chi phí: Roman [ĐIỀN] MB, [ĐIỀN] s/vòng trên GPU Kaggle; paper (TITAN RTX): 1 416 MB, 1.50 s/vòng.
+  % - Chi phí: Roman 4 216 MB, 1.66 s/vòng (~83 phút/seed) trên T4; paper (TITAN RTX): 1 416 MB, 1.50 s/vòng.
+  % - Nếu được hỏi so với baseline (khác thiết lập, không so trực tiếp): số của nhóm vẫn hạng 1 ở Texas, Wisconsin;
+  %   Chameleon 67.17 thấp hơn GraphMAE của paper (68.67). Đồng tính thấp hơn cả GraphMAE của paper — chênh lệch do cài đặt,
+  %   KHÔNG phải L_d gây hại; so sánh có kiểm soát (cùng code, chỉ bỏ L_d) ở slide Ablation.
+\end{frame}
+
+% ── Slide: Tái lập — phân cụm (Table 3) & phân loại đồ thị (Table 9): chỉ DGMAE paper vs. nhóm ──
+\begin{frame}{Reproducibility: Clustering \& Graph Classification}
+  \centering
+  {\small\textbf{Node clustering — Table~3}}\\[0.3em]
+  {\scriptsize
+  \begin{tabular}{ll cccccc}
+    \toprule
+    & & \textbf{Texas} & \textbf{Cornell} & \textbf{Wisconsin} & \textbf{Chameleon} & \textbf{Squirrel} & \textbf{Roman} \\
+    \midrule
+    \multirow{3}{*}{ACC}
+      & Paper  & 66.83\pmstd{6.19} & 57.16\pmstd{5.99} & 68.69\pmstd{4.52} & 39.96\pmstd{1.74} & 30.83\pmstd{0.71} & 36.25\pmstd{0.86} \\
+      & \nh{Repro.} & \nh{60.42}\pmstd{7.69} & \nh{40.81}\pmstd{3.11} & \nh{52.81}\pmstd{4.17} & \nh{28.83}\pmstd{1.52} & \nh{25.92}\pmstd{1.36} & \nh{36.24}\pmstd{1.71} \\
+      & $\Delta$ & $-$6.41 & $-$16.35 & $-$15.88 & $-$11.13 & $-$4.91 & $-$0.01 \\
+    \midrule
+    \multirow{3}{*}{NMI}
+      & Paper  & 37.41\pmstd{7.20} & 34.41\pmstd{7.88} & 44.19\pmstd{2.19} & 22.39\pmstd{0.43} & 8.00\pmstd{0.73} & 37.57\pmstd{0.53} \\
+      & \nh{Repro.} & \nh{36.76}\pmstd{4.34} & \nh{20.59}\pmstd{3.59} & \nh{33.77}\pmstd{4.00} & \nh{11.61}\pmstd{1.93} & \nh{3.49}\pmstd{0.99} & \nh{40.09}\pmstd{1.96} \\
+      & $\Delta$ & $-$0.65 & $-$13.82 & $-$10.42 & $-$10.78 & $-$4.51 & +2.52 \\
+    \bottomrule
+  \end{tabular}}\\[0.8em]
+  {\small\textbf{Graph classification — Table~9}}\\[0.3em]
+  {\scriptsize
+  \begin{tabular}{l cccc}
+    \toprule
+    & \textbf{MUTAG} & \textbf{PROTEINS} & \textbf{IMDB-M} & \textbf{COLLAB} \\
+    \midrule
+    Paper       & 89.06\pmstd{0.64} & 76.51\pmstd{0.52} & 51.95\pmstd{0.30} & 81.15\pmstd{0.30} \\
+    \nh{Repro.} & \nh{87.84}\pmstd{0.88} & \nh{75.63}\pmstd{0.64} & \nh{51.91}\pmstd{0.51} & \nh{80.92}\pmstd{0.36} \\
+    $\Delta$    & $-$1.22 & $-$0.88 & $-$0.04 & $-$0.23 \\
+    \bottomrule
+  \end{tabular}}
+  \ketluan{Graph classification: \nh{within 1.2} of the paper\\
+    Clustering: \nh{$-$9.1 ACC}, \nh{$-$6.3 NMI} on average · Roman matches the paper}
+  % Lời thoại:
+  % - Δ = nhóm − paper. Phân loại đồ thị tái lập tốt nhất (TB −0.6); phân cụm lệch nhiều nhất (Cornell, Wisconsin, Chameleon).
+  % - Roman khớp paper (ACC 36.24 vs 36.25; NMI 40.09 > 37.57). Phân cụm nhạy với embedding hơn phân loại vì không dùng nhãn.
+  % - Nguyên nhân có thể: code tác giả gán cứng λ = 0.4/0.6 cho phân cụm, không có trong Table 8 — nhóm theo Table 8.
+  % - Nhóm (ARI, F1 — không đưa lên slide): Texas 34.12 / 41.35, Cornell 11.42 / 33.45, Wisconsin 25.68 / 40.40,
+  %   Chameleon 3.41 / 21.45, Squirrel 1.93 / 18.25, Roman 24.66 / 30.44.
+  % - Phân loại đồ thị: encoder GIN; Table 8 không có siêu tham số cho tác vụ này → theo config tác giả.
 \end{frame}
 
 \section{Analysis}
@@ -203,69 +301,100 @@
 % ── Slide: Ablation (Table 4) ────────────────────────
 \begin{frame}{Ablation Study}
   \centering
-  \resizebox{0.80\textwidth}{!}{%
-    \begin{tabular}{l c cc cc}
+  \setlength{\tabcolsep}{4pt}
+  \resizebox{0.96\textwidth}{!}{%
+    \begin{tabular}{l cc cc cc cc}
       \toprule
-      & \textbf{Roman} & \multicolumn{2}{c}{\textbf{Actor}} & \multicolumn{2}{c}{\textbf{Citeseer}} \\
-      \cmidrule(lr){2-2} \cmidrule(lr){3-4} \cmidrule(lr){5-6}
-      \textbf{Variant} & Paper & Paper & \nh{Repro.} & Paper & \nh{Repro.} \\
+      & \multicolumn{2}{c}{\textbf{Roman}} &
+        \multicolumn{2}{c}{\textbf{Actor}} & \multicolumn{2}{c}{\textbf{Citeseer}} &
+        \multicolumn{2}{c}{\textbf{Photo}} \\
+      \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7} \cmidrule(lr){8-9}
+      \textbf{Variant} & Paper & \textbf{Repro.} & Paper & \textbf{Repro.} &
+        Paper & \textbf{Repro.} & Paper & \textbf{Repro.} \\
       \midrule
-      w/o adaptive edge selection                        & 75.35          & 33.41          & \dien & 73.03          & \dien \\
-      w/o $\mathcal{L}_d$ ($\approx$ GraphMAE)$^{*}$      & \textbf{36.71} & \textbf{28.14} & \dien & 73.05          & \dien \\
-      w/o $\mathcal{L}_f$ ($\mathcal{L}_d$ only)$^{*}$     & 75.04          & 35.16          & \dien & \textbf{58.02} & \dien \\
+      w/o adaptive edge selection & 75.35 &
+        74.71 &
+        33.41 &
+        34.28 &
+        73.03 & 73.05 & 93.40 & 93.14 \\
+      w/o $\mathcal{L}_d$$^{*}$ & \textbf{36.71} &
+        \textbf{40.03} &
+        \textbf{28.14} &
+        \textbf{26.86} &
+        73.05 & 73.09 & 93.15 & 92.90 \\
+      w/o $\mathcal{L}_f$ ($\mathcal{L}_d$ only)$^{*}$ & 75.04 &
+        72.24 &
+        35.16 &
+        31.41 &
+        \textbf{58.02} & \textbf{59.92} & \textbf{92.88} & \textbf{92.76} \\
       \midrule
-      \dg{DGMAE (full)}                                  & \dg{76.62}     & \dg{36.61}     & \dien & \dg{73.82}     & \dien \\
+      DGMAE (full) & 76.62 &
+        74.60 &
+        36.61 &
+        33.37 &
+        73.82 & 73.34 & 93.96 & 93.01 \\
       \bottomrule
     \end{tabular}%
-  }\\[0.3em]
-  {\scriptsize Accuracy (\%), Table~4. Bold: largest drop. $^{*}$Labels swapped in the paper; corrected using Fig.~10.
-    Roman not reproduced (too costly).}
-  \ketluan{Paper: w/o $\mathcal{L}_d$ loses \textbf{$\sim$40 points} on heterophilic Roman; w/o $\mathcal{L}_f$ loses 16 points on homophilic Citeseer ·
-    Reproduced: [ĐIỀN: cùng xu hướng?]}
+  }\par\smallskip
+  {\scriptsize
+    Each ablation removes one component. Mean test accuracy (\%) over 10 seeds.\par
+    Bold marks the largest ablation drop in each column.
+    $^{*}$Table~4 labels are inferred from Fig.~10.\par
+  }
+
+  \begin{block}{Findings}
+    \small
+    Removing $\mathcal{L}_d$ causes the largest drops on Roman
+    (\textbf{34.57 pp}) and Actor (\textbf{6.51 pp}), while removing
+    $\mathcal{L}_f$ has the largest impact on Citeseer (\textbf{13.42 pp}).
+    On Photo, removing $\mathcal{L}_f$ gives the largest drop (\textbf{0.25 pp}).
+  \end{block}
+
   % Lời thoại:
-  % - Dị tính: L_d là cốt lõi. Đồng tính (Citeseer): bỏ L_f mất ~16 điểm → ngữ cảnh láng giềng (L_f, GraphMAE gốc) vẫn cần.
-  % - Chọn cạnh thích ứng: cải thiện nhỏ nhưng đều (+0.8 đến +3.2).
-  % - Vì sao biết paper ghi ngược nhãn: Fig. 10 cho λ = 0 (bỏ L_d): Roman 0.37, Actor 0.28; λ = 1 (bỏ L_f): Citeseer 0.58.
-  % - Biến thể của nhóm: bỏ L_d = --lam 0 · bỏ L_f = --lam 1 · bỏ chọn cạnh = --selection all. Nhóm: [ĐIỀN].
+  % - Roman dùng split 48/32/20 tự sinh, seed 0–9. Nhánh L_d dùng trung bình
+  %   SCE của 1-hop và 2-hop. Với no-feature, trọng số L_d là 1,0.
+  % - Roman (test accuracy ± độ lệch chuẩn): full 74,60 ± 0,71 (v14),
+  %   no-selection 74,71 ± 0,57 (v15), no-discrepancy 40,03 ± 0,83 (v3)
+  %   và no-feature 72,24 ± 0,90 (v5).
+  % - Actor dùng 10 split có sẵn (48/32/20), mỗi seed ứng với một split.
+  %   Full 33,37 ± 0,81 (v7), no-selection 34,28 ± 1,17 (v8),
+  %   no-discrepancy 26,86 ± 1,24 (v2) và no-feature 31,41 ± 1,46 (v8).
+  % - Citeseer dùng split cố định 120/500/1.000 và seed 0–9 (Kaggle v9,
+  %   scriptVersionId 374113099). Full 73,34 ± 0,54, no-selection 73,05 ± 0,89,
+  %   no-discrepancy 73,09 ± 0,64 và no-feature 59,92 ± 1,76.
+  % - Photo dùng split 10/10/80 tự sinh cho seed 0–9 (Kaggle v10,
+  %   scriptVersionId 374180844). Full 93,01 ± 0,27,
+  %   no-discrepancy 92,90 ± 0,25 và no-feature 92,76 ± 0,27.
+  % - Photo no-selection 93,14% gồm 9 seed từ v10 và seed 2 chạy lại
+  %   với lịch cosine 5.000 epoch (93,17%, scriptVersionId 374208125).
+  % - Với Photo, split cùng tỷ lệ Bảng 7 nhưng paper không công bố chỉ số nút.
+  %   Nhóm lấy trung bình SCE của 1-hop và 2-hop. Hai khác biệt về thiết lập
+  %   này có thể ảnh hưởng điểm full, chưa xác định mức ảnh hưởng riêng.
+  % - Trên Roman và Actor, loss sai khác có thể giúp giữ thông tin phân biệt
+  %   giữa các nút kề nhau thường khác nhãn. Trên Citeseer, các nút kề nhau
+  %   thường tương đồng và cung cấp ngữ cảnh để tái tạo đặc trưng bị che.
+  % - Bỏ chọn cạnh làm điểm trung bình tăng 0,11 điểm trên Roman, 0,91 điểm
+  %   trên Actor và 0,13 điểm trên Photo, còn Citeseer giảm 0,29 điểm.
+  %   Bảng 4 ghi nhận giảm trên cả bốn bộ dữ liệu.
+  % - Theo Eq. 13, khi lambda = 0 chỉ còn L_f. Hình 10 cho Roman khoảng
+  %   37% và Actor khoảng 28%, gần dòng variant 2. Khi lambda = 1 chỉ còn
+  %   L_d, Citeseer gần 58%, khớp dòng variant 3. Mục 5.6 gán hai nhãn ngược lại.
 \end{frame}
 
 % ── Slide: Vì sao hiệu quả — chọn cạnh (Table 6) & trực quan hóa (Fig. 8) — 2 cột cân nhau ──
-\begin{frame}{Why Does DGMAE Work?}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \centering
-      {\small\textbf{Edge selection — Table~6}}\\[0.4em]
-      \resizebox{0.95\columnwidth}{!}{%
-        \begin{tabular}{l ccc}
-          \toprule
-          \textbf{Select by} & \textbf{Actor} & \textbf{Chameleon} & \textbf{Squirrel} \\
-          \midrule
-          High attention ($w_{ij}$) & 34.34 & 70.88 & 58.20 \\
-          Random                   & 34.72 & 71.80 & 60.07 \\
-          Node degree              & 35.12 & 73.44 & 60.63 \\
-          \midrule
-          \dg{Low attention ($1-w_{ij}$)} & \dg{35.36} & \dg{73.90} & \dg{65.61} \\
-          \bottomrule
-        \end{tabular}%
-      }\\[0.4em]
-      {\scriptsize Low attention is best $\Rightarrow$\\ attention detects heterophilic edges}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \centering
-      {\small\textbf{Inter-class node pairs (Roman) — Fig.~8}}\\[0.4em]
-      \includegraphics[height=0.40\textheight]{new_roman.pdf}\\[0.4em]
-      {\scriptsize GraphMAE makes them similar ($\sim$1.0);\\ DGMAE preserves the discrepancy}
-    \end{column}
-  \end{columns}
-  \ketluan{Attention \textbf{identifies heterophilic edges} $\Rightarrow$ DGMAE \textbf{preserves node discrepancy}}
-  % Lời thoại:
-  % - Số và hình trên slide này là của paper. Table 6 chỉ dùng L_d nên số thấp hơn Table 1; p_c = 0.2, p_τ = 1.
-  % - Fig. 4 (ảnh hưởng của p_c): có lợi trên đồ thị dị tính, có hại trên đồ thị đồng tính.
-  % - Fig. 8: cosine similarity của cặp node nối nhau nhưng khác lớp. GMAE đẩy similarity lên ~1.0 (đồng nhất hóa);
-  %   DGMAE kéo về gần phân bố của đặc trưng gốc → giải quyết đúng vấn đề nêu ở Figure 2 phần mở đầu.
-  % - (Tùy chọn, nếu nhóm kịp) vẽ lại Fig. 8 từ embedding của nhóm (train_node.py --save_emb).
-  % - Fig. 5 (tỉ lệ che, Roman): DGMAE ổn định khi che tới 80%, GraphMAE giảm từ 46.73 xuống 38.2 — nói miệng nếu được hỏi.
+\begin{frame}{Trực quan hóa biểu diễn}
+  \centering
+  {\small\textbf{Tái thực nghiệm Figure 8}}\par
+  \vspace{0.35em}
+  \includegraphics[width=\linewidth]{3-experiment/figures/figure8-squirrel-bandwidth-006.pdf}\par
+  \vspace{0.35em}
+  {\scriptsize Phân bố cosine trên các cặp node kề nhau và khác nhãn.\par
+  Actor: GraphMAE dùng feature nhị phân và tắt residual, cho đỉnh tại \(0{,}97\).
+  Đường đỏ Actor dùng feature chuẩn hóa theo cột.\par
+  Squirrel dùng bandwidth KDE \(0{,}06\) chung cho cả bốn đường.}
+  % TODO: t-SNE
 \end{frame}
+
 
 % ── Slide: Độ nhạy λ (Fig. 10) — 2 cột cân nhau: hình paper | hình nhóm, cùng kích thước ──
 \begin{frame}{Sensitivity to $\lambda$}
