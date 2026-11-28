@@ -25,27 +25,39 @@
 \end{frame}
 
 % 2. GAT encoder tạo trọng số attention
-\begin{frame}{GAT encoder: trọng số cho từng láng giềng}
-  \centering
-  \vspace{0.1em}
-  {\small Với mỗi cạnh $(i,j)$, GAT học điểm chú ý từ biểu diễn của hai nút:}\\[0.35em]
-  {\large $\displaystyle e_{ij}=a(Wu_i, Wu_j)$}\\[0.55em]
+\begin{frame}{GAT Encoder: Tính trọng số Attention}
+  \small
 
-  {\small Chuẩn hóa các điểm trong tập láng giềng của $i$:}\\[0.35em]
-  {\Large $\displaystyle w_{ij}=
-    \frac{\exp(e_{ij})}
-         {\sum_{k\in\mathcal N(i)}\exp(e_{ik})}$}\\[0.55em]
+  \textbf{1. Tính điểm attention}
+  \[
+    e_{ij}^{(l)} = \operatorname{LeakyReLU}
+    \left(\mathbf{a}^{\top}
+    [Wh_i^{(l)} \Vert Wh_j^{(l)}]\right)
+  \]
 
-  {\small Dùng $w_{ij}$ để tổng hợp thông tin từ các nút kề:}\\[0.35em]
-  {\large $\displaystyle h_i'=\sigma\!\left(
-    \sum_{j\in\mathcal N(i)} w_{ij}Wu_j\right)$}\\[0.35em]
+  \textbf{2. Chuẩn hóa trọng số attention}
+  \[
+    w_{ij}^{(l)} =
+    \frac{\exp(e_{ij}^{(l)})}
+         {\sum_{k\in\mathcal{N}(i)}\exp(e_{ik}^{(l)})}
+  \]
 
-  {\small $u_i$: biểu diễn đầu vào; $W$: ma trận học được; $a$: hàm attention.}
-  \vfill
-  \textbf{DGMAE dùng lại $w_{ij}$ từ encoder để chọn cạnh cho mục tiêu sai khác.}
-  \vspace{0.2em}
+  \textbf{3. Tổng hợp thông tin láng giềng}
+  \[
+    h_i^{(l+1)} = \sigma\left(
+      \sum_{j\in\mathcal{N}(i)}w_{ij}^{(l)}Wh_j^{(l)}
+    \right)
+  \]
 
-  {\tiny Veličković et al., ICLR 2018; Zheng et al., KDD 2025, \S4.3.2}
+  {\footnotesize
+    $h_i^{(l)}$: biểu diễn nút $i$ tại đầu vào lớp GAT thứ $l$;
+    $W$: ma trận tham số học được;
+    $\mathbf{a}$: vector tham số attention;
+    $\Vert$: phép nối vector.
+  }
+
+  {\tiny Veličković et al., ICLR 2018;
+  Zheng et al., KDD 2025, \S4.3.2.}
 \end{frame}
 
 % 3. Chọn cạnh bằng attention
