@@ -358,9 +358,12 @@
     $^{*}$Nhãn của Table~4 suy ra từ Fig.~10.\par
   }
 
-  \ketluan{\textbf{Hai loss bổ sung cho nhau}, cùng xu hướng với paper:\\
-    bỏ $\mathcal{L}_d$ sụp trên heterophilic (Roman \nh{$-$34.6}, Actor \nh{$-$6.5}) · bỏ $\mathcal{L}_f$ sụp trên homophilic (Citeseer \nh{$-$13.4})\\
-    \textbf{Adaptive edge selection} chưa giúp ích ổn định: bỏ đi lại tăng accuracy ở \nh{3/4} dataset (paper: giảm cả 4)}
+  \ketluan{\textbf{Hai loss bổ sung cho nhau}, cùng xu hướng với paper\\[0.2em]
+    \begin{tabular}{@{}l@{\quad}l@{}}
+      Bỏ $\mathcal{L}_d$:               & giảm mạnh trên heterophilic (Roman \nh{$-$34.6}, Actor \nh{$-$6.5}) \\
+      Bỏ $\mathcal{L}_f$:               & giảm mạnh trên homophilic (Citeseer \nh{$-$13.4}) \\
+      Bỏ adaptive edge selection: & chưa thấy lợi ích ổn định (accuracy tăng ở \nh{3/4} dataset)
+    \end{tabular}}
 
 
   % Lời thoại:
